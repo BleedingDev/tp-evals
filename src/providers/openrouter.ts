@@ -199,8 +199,28 @@ const fragmentsToPreserve = (input: TranslationInput): string[] =>
     ...inlineTags(input.sourceText),
   ]);
 
-const liveVariant = (options?: RunVariantOptions): OutputVariant =>
-  options?.variant ?? "live";
+const promptVariantName = (options?: RunVariantOptions): string =>
+  options?.variantId ?? options?.variant ?? "live";
+
+const liveVariant = (options?: RunVariantOptions): OutputVariant => {
+  if (options?.variant !== undefined) {
+    return options.variant;
+  }
+
+  if (options?.variantId?.endsWith(".baseline")) {
+    return "baseline";
+  }
+
+  if (options?.variantId?.endsWith(".flawed")) {
+    return "flawed";
+  }
+
+  if (options?.variantId?.endsWith(".improved")) {
+    return "improved";
+  }
+
+  return "live";
+};
 
 const makeLiveTrace = (
   capability: "translation" | "mobile_search" | "travel_summary",
@@ -209,7 +229,7 @@ const makeLiveTrace = (
   createTrace(capability, liveVariant(options), [], {
     mode: "live",
     modelName: modelName(),
-    promptName: options?.variantId ?? options?.variant ?? "live",
+    promptName: promptVariantName(options),
   });
 
 const systemInstruction = (task: string): string =>
@@ -220,6 +240,41 @@ const systemInstruction = (task: string): string =>
     task,
   ].join("\n");
 
+const translationPromptInstruction = (options?: RunVariantOptions): string => {
+  const variant = promptVariantName(options);
+
+  if (variant.includes("baseline")) {
+    return "Translate the UI text into the target language. Return JSON with key: text.";
+  }
+
+  if (variant.includes("flawed")) {
+    return "Translate the UI text naturally into the target language. Prefer fluent wording over preserving technical formatting. Return JSON with key: text.";
+  }
+
+  return "Translate UI text. Preserve placeholders, product codes, and HTML-like tags exactly. Apply glossary terms when provided. Return JSON with key: text.";
+};
+
+const translationPromptPayload = (
+  input: TranslationInput,
+  options?: RunVariantOptions,
+): Record<string, unknown> => {
+  const variant = promptVariantName(options);
+  const basePayload: Record<string, unknown> = {
+    sourceLanguage: input.sourceLanguage,
+    targetLanguage: input.targetLanguage,
+    sourceText: input.sourceText,
+    context: input.context,
+    promptVariant: variant,
+  };
+
+  if (!variant.includes("baseline") && !variant.includes("flawed")) {
+    basePayload["placeholders"] = input.placeholders ?? [];
+    basePayload["protectedTerms"] = input.protectedTerms ?? [];
+  }
+
+  return basePayload;
+};
+
 export const translateWithOpenRouter = async (
   input: TranslationInput,
   options?: RunVariantOptions,
@@ -228,21 +283,11 @@ export const translateWithOpenRouter = async (
     [
       {
         role: "system",
-        content: systemInstruction(
-          "Translate UI text. Preserve placeholders, product codes, and HTML-like tags exactly. Apply glossary terms when provided. Return JSON with key: text.",
-        ),
+        content: systemInstruction(translationPromptInstruction(options)),
       },
       {
         role: "user",
-        content: JSON.stringify({
-          sourceLanguage: input.sourceLanguage,
-          targetLanguage: input.targetLanguage,
-          sourceText: input.sourceText,
-          context: input.context,
-          placeholders: input.placeholders ?? [],
-          protectedTerms: input.protectedTerms ?? [],
-          promptVariant: options?.variantId ?? options?.variant ?? "live",
-        }),
+        content: JSON.stringify(translationPromptPayload(input, options)),
       },
     ],
     objectRecordSchema,
@@ -478,7 +523,7 @@ export const extractMobileSearchIntentWithOpenRouter = async (
           platform: input.platform,
           appScreen: input.appScreen,
           conversation: input.conversation ?? [],
-          promptVariant: options?.variantId ?? options?.variant ?? "live",
+          promptVariant: promptVariantName(options),
         }),
       },
     ],
@@ -545,7 +590,7 @@ export const summarizeTravelInfoWithOpenRouter = async (
           sourceText: input.sourceText,
           userQuestion: input.userQuestion,
           audience: input.audience,
-          promptVariant: options?.variantId ?? options?.variant ?? "live",
+          promptVariant: promptVariantName(options),
         }),
       },
     ],

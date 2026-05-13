@@ -23,7 +23,7 @@ const variants: Array<{ name: string; input: VariantId }> = [
 ];
 
 evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
-  "Lab 06 - Prompt And Model-Like Variants",
+  "Lab 06 - Live Prompt Variants",
   {
     data: async () => {
       const records = await loadLabData(
@@ -58,7 +58,7 @@ evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["
       }),
       {
         name: "variant_profile",
-        description: "Reports the prompt/model-like variant under test.",
+        description: "Reports the live prompt variant under test.",
         scorer: (_input) => ({
           score: 1,
           name: "variant_profile",

@@ -74,7 +74,7 @@ Each lab has a short participant handout under `docs/labs`.
 | 03 | Translation quality judge | [Lab 03](docs/labs/lab-03-translation-quality.md) |
 | 04 | Mobile search intent extraction | [Lab 04](docs/labs/lab-04-mobile-search-intent.md) |
 | 05 | Mobile search conversation state | [Lab 05](docs/labs/lab-05-mobile-search-conversation.md) |
-| 06 | Prompt and model-like variants | [Lab 06](docs/labs/lab-06-prompt-model-variants.md) |
+| 06 | Live prompt variants | [Lab 06](docs/labs/lab-06-prompt-model-variants.md) |
 | 07 | Travel information summaries | [Lab 07](docs/labs/lab-07-travel-info-summary.md) |
 | 08 | Judge calibration | [Lab 08](docs/labs/lab-08-judge-calibration.md) |
 | 09 | Prompt injection handling | [Lab 09](docs/labs/lab-09-prompt-injection.md) |

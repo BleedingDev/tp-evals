@@ -1,8 +1,8 @@
-# Lab 06: Prompt And Model-Like Variants
+# Lab 06: Live Prompt Variants
 
 ## Goal
 
-Compare two deterministic translation variants and decide which failures are prompt-like, model-like, or expectation-related.
+Compare two live OpenRouter prompt variants on the same translation cases and decide which failures are caused by the prompt, the model behavior, or the expectation.
 
 The point is not to trust the average score. The point is to compare the same cases across variants and find which exact case got better, worse, or stayed risky.
 
@@ -34,9 +34,11 @@ Then open `evals/06-prompt-model-variants.eval.ts` and find two things:
 
 The starting comparison is:
 
-- `plain-ui-translation` backed by `translation.baseline`,
-- `guardrailed-translation` backed by `translation.improved`,
+- `plain-ui-translation`: a weaker prompt with fewer instructions,
+- `guardrailed-translation`: a stricter prompt with explicit guardrails,
 - three selected cases from `data/evals/translations-edge-cases.jsonl`.
+
+Both variants call the same live OpenRouter model. The lab changes the prompt instructions and payload.
 
 In Evalite, compare the two variants case by case:
 
@@ -46,9 +48,14 @@ In Evalite, compare the two variants case by case:
 - Did glossary terms improve or regress?
 - Is a single high-risk failure hidden by a better average?
 
-Make one small edit:
+Run one controlled experiment:
 
-- add or remove one case ID in `records.filter(...)`, or
-- change one variant in `variants`.
+1. In `records.filter(...)`, add `translation-edge-mode-de` to the selected case IDs.
+2. Re-run `pnpm run lab:06`.
+3. Compare whether the average score and the case-level failures tell the same story.
 
-Re-run `pnpm run lab:06` and confirm that the comparison now focuses on the case or variant you intended to study.
+This is not a random edit. You are changing the scope of the eval suite to see whether the QA conclusion still holds when the dataset selection changes.
+
+Optional stronger contrast: change the first variant input from `translation.baseline` to `translation.flawed`, then rerun `pnpm run lab:06`.
+
+Re-run `pnpm run lab:06` and confirm that the comparison now focuses on the cases you intended to study.

@@ -265,20 +265,24 @@ expected:
     language: "md",
   },
   {
-    title: "06 Prompt + Model Variants",
-    eyebrow: "Prompt nebo model",
+    title: "06 Live Prompt Variants",
+    eyebrow: "Stejný model, jiný prompt",
     hint: "<code>evals/06-prompt-model-variants.eval.ts</code>, <code>src/variants/index.ts</code>",
-    task: "Spusťte lab, porovnejte dvě varianty na stejných translation cases a potom záměrně změňte variantu nebo seznam case IDs",
+    task: "Spusťte lab a porovnejte dvě live prompt varianty nad stejnými translation cases. Potom změňte výběr cases a sledujte, jak se změní QA závěr.",
     items: [
       "Příkaz: pnpm run lab:06",
-      "V souboru najdete variants a filter se třemi case IDs",
-      "Porovnat plain-ui-translation vs guardrailed-translation",
+      "Obě varianty volají stejný OpenRouter model",
+      "plain-ui-translation = slabší prompt",
+      "guardrailed-translation = prompt s explicitními guardrails",
       "Nejdřív řešit jednotlivé cases, teprve potom průměr",
-      "Edit: přidejte/odeberte case ID nebo změňte variantu",
+      "Experiment: přidejte translation-edge-mode-de do records.filter(...)",
     ],
     code: `evals/06-prompt-model-variants.eval.ts
 
-const variants = [...]
+const variants = [
+  { name: "plain-ui-translation", input: "translation.baseline" },
+  { name: "guardrailed-translation", input: "translation.improved" },
+]
 
 return records.filter((record) =>
   ["translation-edge-..."].includes(record.input.id)

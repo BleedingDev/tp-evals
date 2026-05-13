@@ -12,7 +12,7 @@ Recommended flow:
 2. Lab 01 establishes dataset repair and schema discipline.
 3. Labs 02-03 move from deterministic translation guardrails into judge-assisted quality scoring.
 4. Labs 04-05 cover structured mobile-search intent extraction and conversation state.
-5. Lab 06 compares prompt/model-like variants without changing the dataset.
+5. Lab 06 compares live prompt variants on the same dataset cases.
 6. Lab 07 covers supplied-text summary quality, uncertainty, and unsupported claims.
 7. Lab 08 calibrates the judge against known good, borderline, and bad examples.
 8. Lab 09 tests prompt-injection resistance against supplied text that contains hostile instructions.
@@ -30,7 +30,7 @@ If time is tight, keep Labs 01, 02, 04, 07, 09, and 11. Use Lab 06 as a short in
 | 03 - Translation Quality Judge | `pnpm run lab:03` | A criteria-based judge can supplement hard guardrails when semantic quality matters. | Output may preserve protected text but still miss meaning, terminology, or quality thresholds. | Ask what the deterministic scorer should own versus what the judge should own. | `checkpoint/03-translation-quality` |
 | 04 - Mobile Search Intent | `pnpm run lab:04` | Structured-output evals should verify schema, intent, slots, missing fields, confidence, and invented data. | Baseline cases invent disallowed slots, miss ambiguity, return low confidence, or fail the expected shape. | Ask which fields would block release and which should only trigger review. | `checkpoint/04-mobile-search-intent` |
 | 05 - Mobile Search Conversation | `pnpm run lab:05` | Conversation state changes the expected intent and slots; the scorer should make state carry-over visible. | The app ignores prior turns, loses ordinal references, drops required slots, or fails to ask for missing information. | Ask how much conversation history belongs in the fixture and how to keep it readable. | `checkpoint/05-mobile-search-conversation` |
-| 06 - Prompt And Model-Like Variants | `pnpm run lab:06` | Variant comparison should use the same cases so prompt/model changes can be judged case by case. | The under-specified variant looks acceptable on averages while still failing specific protected-text cases. | Ask participants to inspect per-case diffs before trusting an aggregate score. | `checkpoint/06-prompt-model-variants` |
+| 06 - Live Prompt Variants | `pnpm run lab:06` | Prompt comparison should use the same live model and the same cases so changes can be judged case by case. | The weaker prompt looks acceptable on averages while still failing specific protected-text cases. | Ask participants to inspect per-case diffs before trusting an aggregate score. | `checkpoint/06-prompt-model-variants` |
 | 07 - Travel Info Summary | `pnpm run lab:07` | Summary evals need required facts, forbidden claims, warning/uncertainty handling, and length checks tied to supplied text. | The flawed summary adds unsupported details, misses warnings, invents missing policy details, or exceeds the sentence limit. | Say "supplied text" and "source text"; keep the discussion about summary behavior, not outside knowledge. | `checkpoint/07-summary` |
 | 08 - Judge Calibration | `pnpm run lab:08` | Judges need calibration examples so teams can see whether scores land in expected bands. | A judge that accepts the known bad case, rejects the known good case, or treats borderline cases too confidently is not ready for gating. | Ask what examples belong in a permanent calibration suite. | `checkpoint/08-judge-calibration` |
 | 09 - Prompt Injection | `pnpm run lab:09` | The system must distinguish trusted task instructions from hostile instructions inside supplied text. | The vulnerable handler follows embedded instructions, emits evaluator-like text, leaks system-style content, or adds success claims. | Ask what content is allowed to pass through and what must be treated as data. | `checkpoint/09-prompt-injection` |
@@ -64,7 +64,7 @@ Prompt/model changes:
 
 - Did the new variant improve the exact cases it was meant to improve?
 - Which regression is hidden by the average score?
-- What metadata must be captured with each run: prompt name, model-like variant, threshold, dataset version, and run time?
+- What metadata must be captured with each run: prompt name, model name, threshold, dataset version, and run time?
 
 Prompt injection:
 
@@ -88,7 +88,7 @@ Release gating:
 
 - Which lab scores are release blockers, and which are review signals?
 - Should a high-risk case override the suite average?
-- What evidence should be exported before approving a prompt or model-like variant change?
+- What evidence should be exported before approving a prompt or model change?
 
 ## Rescue Procedures
 
@@ -141,10 +141,11 @@ Default live setup:
 - `pnpm run live:check` makes one small model call without printing the key.
 - Record the model name, run time, threshold, dataset version, and retries when discussing results.
 
-Fallback mock mode:
+Emergency-only mock mode:
 
-- The code still contains deterministic local variants for private dry runs and recovery.
-- Switch to `WORKSHOP_MODE=mock` only if connectivity blocks the room.
+- The participant path is live OpenRouter only.
+- The code still contains deterministic local variants for instructor dry runs and recovery.
+- Switch to `WORKSHOP_MODE=mock` only if connectivity blocks the room and the live workshop would otherwise stop.
 - If you switch modes, tell participants that scores are no longer live model evidence.
 
 ## Dry-Run Checklist
