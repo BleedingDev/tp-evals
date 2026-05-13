@@ -27,6 +27,7 @@
     "lab:08": "tsx scripts/run-lab.ts lab:08",
     "lab:09": "tsx scripts/run-lab.ts lab:09",
     "lab:10": "tsx scripts/run-lab.ts lab:10",
+    "lab:11": "tsx scripts/run-lab.ts lab:11",
     "lab:all": "tsx scripts/run-lab.ts lab:all",
     "eval:dev": "tsx scripts/run-lab.ts eval:dev",
     "eval:all": "tsx scripts/run-lab.ts eval:all",

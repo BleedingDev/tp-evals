@@ -74,6 +74,11 @@ const labs = [
     file: "evals/10-consistency-regression.eval.ts",
     label: "Lab 10",
   },
+  {
+    command: "lab:11",
+    file: "evals/11-agentic-eval-authoring.eval.ts",
+    label: "Lab 11",
+  },
 ] as const satisfies readonly LabDefinition[];
 
 const requestedCommand = process.argv[2];

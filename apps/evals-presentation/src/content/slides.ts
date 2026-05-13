@@ -265,7 +265,7 @@ expected:
     language: "md",
   },
   {
-    title: "06 Prompt And Model Variants",
+    title: "06 Prompt + Model Variants",
     eyebrow: "Prompt nebo model",
     hint: "<code>evals/06-prompt-model-variants.eval.ts</code>, <code>src/variants/index.ts</code>",
     task: "Spusťte lab, porovnejte dvě varianty na stejných translation cases a potom záměrně změňte variantu nebo seznam case IDs",
@@ -358,12 +358,58 @@ bad:        0.00 - 0.65`,
     ],
   },
   {
+    title: "Agent jako QA akcelerátor",
+    eyebrow: "Ne autopilot",
+    hint: "<code>docs/agent-prompts/lab-11-agentic-eval-authoring.md</code>",
+    items: [
+      "Agent může rychle navrhnout dataset case nebo eval file",
+      "QA musí vlastnit expected behavior, risk a threshold",
+      "Agentovi dáme omezený scope a zakážeme reálná data",
+      "Diff se kontroluje stejně přísně jako produkční test",
+      "Hotový výsledek musí projít data:check a konkrétním labem",
+    ],
+    code: `agent dostane:
+- allowed files
+- syntetický use case
+- schema požadavky
+- příkazy k ověření
+
+QA kontroluje:
+- diff
+- výsledek evalů
+- release rozhodnutí`,
+    language: "md",
+  },
+  {
+    title: "11 Agentic Eval Authoring",
+    eyebrow: "Vlastní dataset s agentem",
+    hint: "<code>evals/11-agentic-eval-authoring.eval.ts</code>, <code>data/evals/agent-authored-summary.jsonl</code>",
+    task: "Použijte Cline, GitHub Copilot nebo jiného agenta k přidání nového synthetic case a potom sami ověřte, jestli je QA použitelný",
+    items: [
+      "Příkaz: pnpm run lab:11",
+      "Prompt pro agenta je v docs/agent-prompts",
+      "Agent přidá jeden case, ne celý dataset dump",
+      "Vy kontrolujete expectedBehavior, requiredFacts, forbiddenClaims a risk",
+      "Na konci musí projít pnpm run data:check a pnpm run lab:11",
+    ],
+    code: `pnpm run lab:11
+
+# agent upraví dataset
+pnpm run data:check
+pnpm run lab:11
+
+rozhodnutí:
+  blocker / review / přepsat case`,
+    language: "bash",
+  },
+  {
     title: "Co si odnést",
     eyebrow: "QA proces",
     items: [
       "Sbírat dobré případy je práce QA, ne vedlejší aktivita",
       "Deterministický scoring patří před judge",
       "Judge bez kalibrace není release gate",
+      "Coding agent umí navrhnout eval, ale QA vlastní kritéria",
       "Varianty se porovnávají na stejných datech",
       "Výsledek evalů musí být důkaz pro rozhodnutí",
     ],

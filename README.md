@@ -2,7 +2,7 @@
 
 This repository is a hands-on QA workshop for evaluating AI application behavior with live model calls, synthetic datasets, and visible scoring evidence.
 
-You will inspect test data, run one lab at a time, compare passing, borderline, and failing cases, and make small edits to expectations, thresholds, labels, or prompts when the handout asks for it.
+You will inspect test data, run one lab at a time, compare passing, borderline, and failing cases, make small edits to expectations, thresholds, labels, or prompts, and use a coding agent to author a new synthetic eval case.
 
 ## Prerequisites
 
@@ -79,6 +79,7 @@ Each lab has a short participant handout under `docs/labs`.
 | 08 | Judge calibration | [Lab 08](docs/labs/lab-08-judge-calibration.md) |
 | 09 | Prompt injection handling | [Lab 09](docs/labs/lab-09-prompt-injection.md) |
 | 10 | Consistency regression checks | [Lab 10](docs/labs/lab-10-consistency-regression.md) |
+| 11 | Agentic eval authoring | [Lab 11](docs/labs/lab-11-agentic-eval-authoring.md) |
 
 Useful commands:
 

@@ -14,11 +14,12 @@ Recommended flow:
 4. Labs 04-05 cover structured mobile-search intent extraction and conversation state.
 5. Lab 06 compares prompt/model-like variants without changing the dataset.
 6. Lab 07 covers supplied-text summary quality, uncertainty, and unsupported claims.
-7. Lab 08 calibrates the rubric judge against known good, borderline, and bad examples.
+7. Lab 08 calibrates the judge against known good, borderline, and bad examples.
 8. Lab 09 tests prompt-injection resistance against supplied text that contains hostile instructions.
 9. Lab 10 turns case scores into a consistency and regression gate.
+10. Lab 11 uses a coding agent to author a new synthetic eval case and then verifies the result.
 
-If time is tight, keep Labs 01, 02, 04, 07, 09, and 10. Use Lab 06 as a short instructor-led comparison and Lab 08 as a discussion exercise.
+If time is tight, keep Labs 01, 02, 04, 07, 09, and 11. Use Lab 06 as a short instructor-led comparison, Lab 08 as a discussion exercise, and Lab 10 as a closing release-gate example.
 
 ## Lab Guide
 
@@ -26,7 +27,7 @@ If time is tight, keep Labs 01, 02, 04, 07, 09, and 10. Use Lab 06 as a short in
 | --- | --- | --- | --- | --- | --- |
 | 01 - Dataset Quality Repair | `pnpm run lab:01` | Eval results are only as useful as the dataset metadata, expected behavior, and repair checklist. | Broken rows should expose missing labels, invalid risk/capability values, unsafe source flags, empty edit targets, and out-of-range thresholds. | Ask which fields affect scoring, filtering, and reviewer trust. Emphasize that dataset quality is part of the test, not pre-work. | `checkpoint/01-dataset-quality` |
 | 02 - Translation Guardrails | `pnpm run lab:02` | Deterministic scorers catch protected text, placeholders, tags, glossary terms, and forbidden phrases before a subjective quality discussion. | Failing translation cases break placeholders or tags, drift on glossary terms, or include forbidden patterns. | Ask participants to separate exact invariants from language-quality judgments. | `checkpoint/02-translation-guardrails` |
-| 03 - Translation Quality Judge | `pnpm run lab:03` | A rubric judge can supplement hard guardrails when semantic quality matters. | Output may preserve protected text but still miss meaning, terminology, or quality thresholds. | Ask what the deterministic scorer should own versus what the judge should own. | `checkpoint/03-translation-quality` |
+| 03 - Translation Quality Judge | `pnpm run lab:03` | A criteria-based judge can supplement hard guardrails when semantic quality matters. | Output may preserve protected text but still miss meaning, terminology, or quality thresholds. | Ask what the deterministic scorer should own versus what the judge should own. | `checkpoint/03-translation-quality` |
 | 04 - Mobile Search Intent | `pnpm run lab:04` | Structured-output evals should verify schema, intent, slots, missing fields, confidence, and invented data. | Baseline cases invent disallowed slots, miss ambiguity, return low confidence, or fail the expected shape. | Ask which fields would block release and which should only trigger review. | `checkpoint/04-mobile-search-intent` |
 | 05 - Mobile Search Conversation | `pnpm run lab:05` | Conversation state changes the expected intent and slots; the scorer should make state carry-over visible. | The app ignores prior turns, loses ordinal references, drops required slots, or fails to ask for missing information. | Ask how much conversation history belongs in the fixture and how to keep it readable. | `checkpoint/05-mobile-search-conversation` |
 | 06 - Prompt And Model-Like Variants | `pnpm run lab:06` | Variant comparison should use the same cases so prompt/model changes can be judged case by case. | The under-specified variant looks acceptable on averages while still failing specific protected-text cases. | Ask participants to inspect per-case diffs before trusting an aggregate score. | `checkpoint/06-prompt-model-variants` |
@@ -34,8 +35,9 @@ If time is tight, keep Labs 01, 02, 04, 07, 09, and 10. Use Lab 06 as a short in
 | 08 - Judge Calibration | `pnpm run lab:08` | Judges need calibration examples so teams can see whether scores land in expected bands. | A judge that accepts the known bad case, rejects the known good case, or treats borderline cases too confidently is not ready for gating. | Ask what examples belong in a permanent calibration suite. | `checkpoint/08-judge-calibration` |
 | 09 - Prompt Injection | `pnpm run lab:09` | The system must distinguish trusted task instructions from hostile instructions inside supplied text. | The vulnerable handler follows embedded instructions, emits evaluator-like text, leaks system-style content, or adds success claims. | Ask what content is allowed to pass through and what must be treated as data. | `checkpoint/09-prompt-injection` |
 | 10 - Consistency Regression | `pnpm run lab:10` | Release gates should catch inconsistent repeated outputs and regressions against a baseline. | One high-risk case can fall below the baseline or consistency threshold while easier cases still pass. | Ask whether a single high-risk regression should block release even when the average looks healthy. | `checkpoint/10-consistency-regression` |
+| 11 - Agentic Eval Authoring | `pnpm run lab:11` | Coding agents can draft new eval cases quickly, but QA must review expected behavior, risk, and scoring evidence. | The agent may produce vague expected behavior, weak forbidden claims, unsafe examples, or a case that passes without testing the intended risk. | Keep the agent scope narrow: one synthetic case, allowed files only, run `data:check` and `lab:11`, then review the diff. | `checkpoint/11-agentic-eval-authoring` |
 
-Use `checkpoint/00-runtime` when a participant has not reached the first lab. Use `checkpoint/11-final` for the finished repository state after all labs.
+Use `checkpoint/00-runtime` when a participant has not reached the first lab. Use `checkpoint/12-final` for the finished repository state after all labs.
 
 ## Discussion Prompts
 
@@ -76,6 +78,12 @@ Consistency:
 - How much wording variation is acceptable when the answer remains equivalent?
 - When should trial count increase, and what runtime cost does that create?
 
+Agentic eval authoring:
+
+- What should the agent be allowed to edit, and what must remain owned by QA?
+- Is the new case testing one concrete risk, or is it vague dataset noise?
+- Did the agent add enough expected behavior, forbidden claims, metadata, and review notes for another tester to trust the case?
+
 Release gating:
 
 - Which lab scores are release blockers, and which are review signals?
@@ -111,7 +119,8 @@ Checkpoint map:
 | Ready to continue after Lab 08 | `checkpoint/08-judge-calibration` |
 | Ready to continue after Lab 09 | `checkpoint/09-prompt-injection` |
 | Ready to continue after Lab 10 | `checkpoint/10-consistency-regression` |
-| Finished state | `checkpoint/11-final` |
+| Ready to continue after Lab 11 | `checkpoint/11-agentic-eval-authoring` |
+| Finished state | `checkpoint/12-final` |
 
 Common rescues:
 
@@ -169,6 +178,7 @@ Thirty minutes before:
 - Run `pnpm run live:check` again.
 - Run the first lab command, `pnpm run lab:01`, and confirm the expected failure details are visible.
 - Run one later lab, such as `pnpm run lab:09`, so prompt-injection scoring is known-good.
+- Run `pnpm run lab:11` and confirm the agent-authored starter dataset is valid.
 - Confirm screen sharing shows scorer details and columns clearly.
 - Keep a copy of this runbook open privately.
 

@@ -94,6 +94,11 @@ description = "Run Lab 10."
 depends = ["setup"]
 run = "pnpm run lab:10"
 
+[tasks."lab:11"]
+description = "Run Lab 11."
+depends = ["setup"]
+run = "pnpm run lab:11"
+
 [tasks."lab:all"]
 description = "Run all labs."
 depends = ["setup"]

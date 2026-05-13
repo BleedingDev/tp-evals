@@ -33,6 +33,7 @@ const requiredScripts = [
   "lab:08",
   "lab:09",
   "lab:10",
+  "lab:11",
   "lab:all",
   "eval:dev",
   "eval:all",
