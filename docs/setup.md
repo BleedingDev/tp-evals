@@ -1,0 +1,93 @@
+# Setup
+
+Use one path. The workshop defaults to mock mode, so you do not need API keys.
+
+## Option 1: Mise
+
+Mise reads `mise.toml`, installs Node `26.0.0` and pnpm `10.33.4`, and exposes workshop tasks.
+
+```sh
+mise trust
+mise install
+mise run setup
+mise run start
+```
+
+`mise trust` is required the first time because Mise will not run tasks from a new repository until you approve its local config.
+
+Run labs through Mise or pnpm:
+
+```sh
+mise run lab:01
+pnpm run lab:01
+```
+
+## Option 2: Proto
+
+Proto reads `.prototools` and installs the same tool versions.
+
+```sh
+proto install
+pnpm install --frozen-lockfile
+pnpm run start
+```
+
+If your shell cannot find `pnpm` after `proto install`, restart the terminal or run the shell initialization command printed by Proto.
+
+## Option 3: Direct Node And pnpm
+
+Use this path if you already manage Node locally.
+
+```sh
+node --version
+corepack enable
+corepack prepare pnpm@10.33.4 --activate
+pnpm --version
+pnpm install --frozen-lockfile
+pnpm run start
+```
+
+Expected versions:
+
+- `node --version` should be `v26.0.0` or newer.
+- `pnpm --version` should be `10.33.4` or newer.
+
+## Option 4: Docker
+
+Docker is the fallback path when local tool installation is blocked.
+
+```sh
+docker compose build lab
+docker compose run --rm lab pnpm run start
+```
+
+Run one lab in Docker:
+
+```sh
+docker compose run --rm lab pnpm run lab:01
+```
+
+Open an interactive shell:
+
+```sh
+docker compose run --rm lab zsh
+```
+
+Docker mounts the repository into `/workspace` and keeps dependencies in a named volume.
+
+## Environment Defaults
+
+The default environment is equivalent to `.env.example`.
+
+```sh
+WORKSHOP_MODE=mock
+EVALITE_DB_PATH=.evalite/evalite.db
+EVALITE_RESULT_PATH=.evalite/results/latest.json
+EVALITE_PORT=3006
+EVALITE_SCORE_THRESHOLD=70
+EVALITE_MAX_CONCURRENCY=4
+EVALITE_TEST_TIMEOUT_MS=30000
+LIVE_LLM_ENABLED=false
+```
+
+Use mock mode unless the facilitator explicitly asks for live model experiments.

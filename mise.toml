@@ -1,0 +1,127 @@
+[tools]
+node = "26.0.0"
+pnpm = "10.33.4"
+
+[env]
+WORKSHOP_MODE = "mock"
+EVALITE_DB_PATH = ".evalite/evalite.db"
+EVALITE_RESULT_PATH = ".evalite/results/latest.json"
+EVALITE_PORT = "3006"
+EVALITE_SCORE_THRESHOLD = "70"
+EVALITE_MAX_CONCURRENCY = "4"
+EVALITE_TEST_TIMEOUT_MS = "30000"
+
+[tasks.setup]
+description = "Install pnpm dependencies from the lockfile."
+run = "pnpm install --frozen-lockfile"
+
+[tasks.verify]
+description = "Run the full mock-mode repository verification."
+depends = ["setup"]
+run = "pnpm run verify"
+
+[tasks.start]
+description = "Check local runtime setup and show dataset inventory."
+depends = ["setup"]
+run = "pnpm run start"
+
+[tasks.smoke]
+description = "Run the runtime smoke check."
+depends = ["setup"]
+run = "pnpm run smoke"
+
+[tasks."data:check"]
+description = "Validate JSONL dataset files."
+depends = ["setup"]
+run = "pnpm run data:check"
+
+[tasks."data:summary"]
+description = "Summarize JSONL dataset files."
+depends = ["setup"]
+run = "pnpm run data:summary"
+
+[tasks."lab:01"]
+description = "Run Lab 01 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:01"
+
+[tasks."lab:02"]
+description = "Run Lab 02 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:02"
+
+[tasks."lab:03"]
+description = "Run Lab 03 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:03"
+
+[tasks."lab:04"]
+description = "Run Lab 04 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:04"
+
+[tasks."lab:05"]
+description = "Run Lab 05 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:05"
+
+[tasks."lab:06"]
+description = "Run Lab 06 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:06"
+
+[tasks."lab:07"]
+description = "Run Lab 07 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:07"
+
+[tasks."lab:08"]
+description = "Run Lab 08 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:08"
+
+[tasks."lab:09"]
+description = "Run Lab 09 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:09"
+
+[tasks."lab:10"]
+description = "Run Lab 10 in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:10"
+
+[tasks."lab:all"]
+description = "Run all labs in mock mode."
+depends = ["setup"]
+run = "pnpm run lab:all"
+
+[tasks."eval:dev"]
+description = "Run Evalite watch mode for local development."
+depends = ["setup"]
+run = "pnpm run eval:dev"
+
+[tasks."eval:all"]
+description = "Run all Evalite suites once and write JSON results."
+depends = ["setup"]
+run = "pnpm run eval:all"
+
+[tasks."eval:export"]
+description = "Export the latest Evalite UI bundle."
+depends = ["setup"]
+run = "pnpm run eval:export"
+
+[tasks."docker:build"]
+description = "Build the Docker fallback image."
+run = "docker build -t tp-evals-workshop ."
+
+[tasks."docker:shell"]
+description = "Open a shell in the Docker fallback environment."
+run = "docker compose run --rm lab zsh"
+
+[tasks."docker:verify"]
+description = "Run mock-mode verification inside Docker."
+run = "docker compose run --rm lab pnpm run verify"
+
+[tasks."docker:lab"]
+description = "Run the first lab inside Docker."
+run = "docker compose run --rm lab pnpm run lab:01"

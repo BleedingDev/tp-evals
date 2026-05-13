@@ -1,0 +1,16 @@
+node = "26.0.0"
+pnpm = "10.33.4"
+
+[settings]
+auto-install = true
+detect-strategy = "prefer-prototools"
+telemetry = false
+
+[env]
+WORKSHOP_MODE = "mock"
+EVALITE_DB_PATH = ".evalite/evalite.db"
+EVALITE_RESULT_PATH = ".evalite/results/latest.json"
+EVALITE_PORT = "3006"
+EVALITE_SCORE_THRESHOLD = "70"
+EVALITE_MAX_CONCURRENCY = "4"
+EVALITE_TEST_TIMEOUT_MS = "30000"

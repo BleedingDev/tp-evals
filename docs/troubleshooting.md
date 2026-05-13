@@ -1,0 +1,112 @@
+# Troubleshooting
+
+## Install Issues
+
+Check tool versions first:
+
+```sh
+node --version
+pnpm --version
+```
+
+This repo expects Node `26.0.0` or newer and pnpm `10.33.4` or newer. If install fails after changing tool versions, reinstall from the lockfile:
+
+```sh
+pnpm install --frozen-lockfile
+```
+
+If Mise refuses to run because the config is not trusted, approve the local repository config and retry:
+
+```sh
+mise trust
+mise run start
+```
+
+If native dependencies fail to build, make sure your local machine has normal build tooling installed. Docker is the fastest fallback:
+
+```sh
+docker compose build lab
+docker compose run --rm lab pnpm run start
+```
+
+## Docker Issues
+
+If Docker cannot find the `lab` service, run commands from the repository root where `compose.yaml` lives.
+
+If dependencies inside Docker look stale, rebuild the image and recreate the dependency volume:
+
+```sh
+docker compose down --volumes
+docker compose build lab
+docker compose run --rm lab pnpm run start
+```
+
+## Evalite UI Does Not Open
+
+Start the UI:
+
+```sh
+pnpm run eval:dev
+```
+
+Then open `http://localhost:3006`.
+
+If the terminal exits, read the first error in the output. Common causes are missing dependencies, a port conflict, or a TypeScript error in a file you just edited.
+
+## Port Conflicts
+
+The Evalite UI defaults to port `3006`. Use another port for the current UI command:
+
+```sh
+EVALITE_PORT=3016 pnpm run eval:dev
+```
+
+Then open `http://localhost:3016`.
+
+Lab commands pick their own ports so several labs can run without colliding. If a lab still needs a manual override, set `EVALITE_LAB_PORT`:
+
+```sh
+EVALITE_LAB_PORT=3116 pnpm run lab:04
+```
+
+## Optional API Keys
+
+API keys are not required in mock mode. This is the expected workshop mode:
+
+```sh
+WORKSHOP_MODE=mock pnpm run start
+```
+
+If you see an API-key error during the default labs, check that `WORKSHOP_MODE` is not set to `live` in your shell.
+
+## Missing Files
+
+If a command reports `Integration dependency missing`, verify that you are in the repository root:
+
+```sh
+pwd
+ls package.json evalite.config.ts data/evals evals
+```
+
+If a JSONL dataset error names a line, open that file and inspect the exact line. Dataset rows are one JSON object per line, so blank lines or multi-line JSON objects will fail validation.
+
+Run the dataset check after edits:
+
+```sh
+pnpm run data:check
+```
+
+## Lab Result Looks Unexpected
+
+Open the matching handout in `docs/labs`, then inspect the lab file and dataset it names. Focus on:
+
+- The `task` function that produces output.
+- The `scorers` array that decides pass or fail.
+- The dataset row's `expected` object.
+- Any `caseType` value marked `passing`, `borderline`, or `failing`.
+
+Re-run only the lab you changed:
+
+```sh
+pnpm run lab:01
+```

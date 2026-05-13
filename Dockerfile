@@ -1,0 +1,42 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PROTO_HOME=/root/.proto
+ENV PATH=/root/.proto/shims:/root/.proto/bin:$PATH
+ENV WORKSHOP_MODE=mock
+ENV EVALITE_DB_PATH=/workspace/.evalite/evalite.db
+ENV EVALITE_RESULT_PATH=/workspace/.evalite/results/latest.json
+ENV EVALITE_PORT=3006
+ENV EVALITE_SCORE_THRESHOLD=70
+ENV EVALITE_MAX_CONCURRENCY=4
+ENV EVALITE_TEST_TIMEOUT_MS=30000
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    g++ \
+    git \
+    jq \
+    libatomic1 \
+    make \
+    python3 \
+    ripgrep \
+    unzip \
+    xz-utils \
+    zsh \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN bash -c 'bash <(curl -fsSL https://moonrepo.dev/install/proto.sh)'
+
+WORKDIR /workspace
+
+COPY .prototools package.json pnpm-lock.yaml ./
+RUN proto install
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+ENTRYPOINT ["bash", "./scripts/docker-entrypoint.sh"]
+CMD ["pnpm", "run", "smoke"]
