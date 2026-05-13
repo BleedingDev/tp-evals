@@ -4,6 +4,13 @@
 
 Evaluate single-turn mobile search intent extraction, required slots, missing slots, ambiguity, and disallowed invented fields.
 
+## Terms
+
+- `intent`: what the user wants to do, for example `find_item`, `filter_results`, or `ask_clarification`.
+- `slots`: extracted values needed by the app, for example `category`, `maxPrice`, `material`, `color`, or `resultPositions`.
+- `missingSlots`: values the model says are missing before the app can safely continue.
+- `confidence`: how sure the model claims to be about the selected intent.
+
 ## Files To Inspect
 
 - `evals/04-mobile-search-intent.eval.ts`

@@ -139,7 +139,7 @@ výsledek:
     eyebrow: "Rizika, která bolí v provozu",
     items: [
       "Kvalita: význam, přesnost, srozumitelnost, užitečnost",
-      "Struktura: schema, intent, slots a confidence",
+      "Struktura: schema, intent, slots (vytažené hodnoty) a confidence",
       "Konzistence: stejný dotaz, parafráze, změna kontextu",
       "Bezpečnost: prompt injection, nechtěný únik obsahu",
       "Release signály: score, riziko případu, trend proti minulé verzi",
@@ -231,39 +231,59 @@ pnpm run eval:export`,
     title: "04 Mobile Search Intent",
     eyebrow: "Strukturovaný výstup",
     hint: "<code>evals/04-mobile-search-intent.eval.ts</code>, <code>src/apps/mobile-search.ts</code>",
-    task: "Zkontrolujte intent, slots, confidence a chování při neúplném vstupu",
+    task: "Zkontrolujte intent, slots (vytažené hodnoty), confidence a chování při neúplném vstupu",
     items: [
-      "Schema validace",
-      "Intent classification",
-      "Missing fields",
-      "Invented data",
-      "Confidence threshold",
+      "Intent = co chce uživatel udělat",
+      "Slots = hodnoty vytažené z dotazu: category, maxPrice, color, resultPositions",
+      "Missing fields = co chybí pro bezpečné pokračování",
+      "Invented data = hodnoty, které model neměl odkud vzít",
+      "Confidence threshold = kdy výstup stačí a kdy jde do review",
     ],
   },
   {
     title: "05 Conversation State",
     eyebrow: "Historie mění očekávání",
     hint: "<code>evals/05-mobile-search-conversation.eval.ts</code>, <code>data/evals/mobile-search-conversation.jsonl</code>",
-    task: "Rozhodněte, kdy má model nést kontext a kdy se musí doptat",
+    task: "Ověřte, jestli model správně spojí aktuální větu s conversation history, a když odkaz není jednoznačný, raději se doptá",
     items: [
-      "Navázání na předchozí tah",
-      "Ordinal reference: první, druhý, třetí",
-      "Změna intentu",
-      "Nejasné zadání",
-      "Follow-up otázka",
+      "Slots z historie versus slots z aktuální věty",
+      "Pořadový odkaz (ordinal reference): první, druhý, třetí výsledek",
+      "Změna intentu: filter, sort, compare, open",
+      "Nejasný odkaz musí skončit jako ask_clarification",
+      "Follow-up otázka má říct, co přesně chybí",
     ],
+    code: `history:
+  Result 1 is a shell jacket.
+  Result 2 is a fleece jacket.
+
+utterance:
+  compare the first two
+
+expected:
+  intent: compare_options
+  slots.resultPositions: ["1", "2"]`,
+    language: "md",
   },
   {
     title: "06 Prompt And Model Variants",
     eyebrow: "Prompt nebo model",
     hint: "<code>evals/06-prompt-model-variants.eval.ts</code>, <code>src/variants/index.ts</code>",
-    task: "Porovnejte varianty na stejných případech a najděte regresi schovanou v průměru",
+    task: "Spusťte lab, porovnejte dvě varianty na stejných translation cases a potom záměrně změňte variantu nebo seznam case IDs",
     items: [
-      "Stejný dataset pro všechny varianty",
-      "Nejdřív case-by-case diff, až potom průměr",
-      "Levnější varianta musí mít hranice použití",
-      "Změna promptu je změna chování aplikace",
+      "Příkaz: pnpm run lab:06",
+      "V souboru najdete variants a filter se třemi case IDs",
+      "Porovnat plain-ui-translation vs guardrailed-translation",
+      "Nejdřív řešit jednotlivé cases, teprve potom průměr",
+      "Edit: přidejte/odeberte case ID nebo změňte variantu",
     ],
+    code: `evals/06-prompt-model-variants.eval.ts
+
+const variants = [...]
+
+return records.filter((record) =>
+  ["translation-edge-..."].includes(record.input.id)
+)`,
+    language: "ts",
   },
   {
     title: "07 Travel Info Summary",
@@ -279,17 +299,37 @@ pnpm run eval:export`,
     ],
   },
   {
+    title: "Než kalibrujeme judge",
+    eyebrow: "Krátká teorie",
+    hint: "<code>src/judges/rubrics.ts</code>, <code>evals/08-judge-calibration.eval.ts</code>",
+    items: [
+      "Judge je model, který hodnotí výstup aplikace podle kritérií",
+      "Kalibrace ověřuje, jestli judge hodnotí známé příklady předvídatelně",
+      "Known good má dostat vysoké score, known bad nízké, borderline má vyvolat review",
+      "Když to nevychází, nejdřív kontrolujeme kritéria, příklady a thresholdy",
+      "Cílem není přesné číslo, ale spolehlivý signál pro QA rozhodnutí",
+    ],
+    code: `known good  -> pass
+borderline  -> review
+known bad   -> fail`,
+    language: "md",
+  },
+  {
     title: "08 Judge Calibration",
     eyebrow: "Důvěřuj až po kalibraci",
     hint: "<code>evals/08-judge-calibration.eval.ts</code>, <code>src/judges/live-judge.ts</code>",
-    task: "Ověřte, že known good, known bad a borderline výstup padá do správného pásma",
+    task: "Spusťte lab a zkontrolujte, jestli tři kalibrační příklady spadají do očekávaných pásem",
     items: [
-      "Known good",
-      "Known bad",
-      "Borderline",
-      "Score po dimenzích",
-      "Kdy je judge dostatečně kalibrovaný pro review",
+      "Příkaz: pnpm run lab:08",
+      "V eval file hledejte calibrationData",
+      "Porovnejte judgeScore, dimensionScores a targetBand",
+      "Upravte hranici pro borderline případ a spusťte lab znovu",
+      "Rozhodněte, jestli judge smí být release gate nebo jen review signál",
     ],
+    code: `good:       0.75 - 1.00
+borderline: 0.45 - 0.90
+bad:        0.00 - 0.65`,
+    language: "md",
   },
   {
     title: "09 Prompt Injection",
@@ -322,7 +362,7 @@ pnpm run eval:export`,
     eyebrow: "QA proces",
     items: [
       "Sbírat dobré případy je práce QA, ne vedlejší aktivita",
-      "Deterministické scorery patří před judge",
+      "Deterministický scoring patří před judge",
       "Judge bez kalibrace není release gate",
       "Varianty se porovnávají na stejných datech",
       "Výsledek evalů musí být důkaz pro rozhodnutí",
