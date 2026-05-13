@@ -96,7 +96,7 @@ QA rozhodnutí:
     language: "md",
   },
   {
-    title: "Deterministické scorery první",
+    title: "Deterministický scoring první",
     eyebrow: "Co není věc názoru",
     hint: "<code>src/scorers/text-quality.ts</code>, <code>src/scorers/structured-output.ts</code>",
     items: [
@@ -114,16 +114,16 @@ kontrola povinných termínů`,
   },
   {
     title: "LLM as a Judge",
-    eyebrow: "Rubrika místo dojmu",
+    eyebrow: "Kritéria místo dojmu",
     hint: "<code>src/judges/rubrics.ts</code>, <code>src/judges/live-judge.ts</code>",
     items: [
       "Judge použijeme tam, kde nestačí pevné pravidlo: význam, úplnost, srozumitelnost",
-      "Rubrika říká, podle čeho se odpověď hodnotí a co už je problém",
+      "Kritéria říkají, podle čeho se odpověď hodnotí a co už je problém",
       "Jedno číslo nestačí: výsledek musí ukázat, které kritérium score zhoršilo",
       "Kalibrační příklady ověří, že good, bad a borderline výstupy padají do správných pásem",
       "Judge je další signál pro QA rozhodnutí, ne náhrada deterministických scorerů",
     ],
-    code: `rubrika:
+    code: `kritéria:
   věcná správnost     40 %
   úplnost odpovědi    30 %
   práce s nejistotou  20 %
