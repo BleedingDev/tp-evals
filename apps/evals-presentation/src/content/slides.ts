@@ -397,15 +397,17 @@ QA kontroluje:
       "Vy kontrolujete expectedBehavior, requiredFacts, forbiddenClaims a risk",
       "Na konci musí projít pnpm run data:check a pnpm run lab:11",
     ],
-    code: `pnpm run lab:11
+    code: `Úkol pro agenta:
+V Labu 11 přidej synthetic case pro missing source information.
+Zdrojový text záměrně neobsahuje fee ani processing time.
+Výstup musí explicitně říct, že data chybí.
 
-# agent upraví dataset + eval kód
-pnpm run data:check
-pnpm run lab:11
-
-rozhodnutí:
-  blocker / review / přepsat case`,
-    language: "bash",
+Kódová kontrola:
+High-risk missing-source case musí mít:
+- insufficientSource = true
+- aspoň 2 forbiddenClaims
+- metadata.reviewHint`,
+    language: "md",
   },
   {
     title: "Co si odnést",
