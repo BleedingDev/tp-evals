@@ -82,10 +82,17 @@ rozhodnutí: riziko + trend + konkrétní selhání`,
       "Scorery zkontrolují guardrails i kvalitu",
       "Threshold určí, jestli výsledek stačí pro další krok",
     ],
-    code: `1. dataset dodá case
-2. task zavolá model
-3. scorery zkontrolují output
-4. threshold rozhodne: projít / review / stop`,
+    code: `case: mobile-search-missing-date
+risk: high
+
+výsledek:
+  schema_validity       pass
+  intent_classification pass
+  missing_fields        review
+  invented_data         fail
+
+QA rozhodnutí:
+  změnu nepustit bez opravy`,
     language: "md",
   },
   {
