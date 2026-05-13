@@ -155,7 +155,7 @@ výsledek:
       "Výsledek musí jít dohledat: dataset, varianta, threshold, čas běhu",
     ],
     code: `high-risk case + nízké skóre -> stop
-nízký suite score -> review
+nízké suite score -> review
 stabilní výsledek -> pokračovat`,
     language: "md",
   },
