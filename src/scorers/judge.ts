@@ -58,7 +58,7 @@ export function createJudgeScorer<TInput, TOutput, TExpected>(opts: {
 }) {
   return createEvaliteScorer<TInput, TOutput, TExpected>({
     name: "rubric_judge",
-    description: "Scores output with the workshop rubric judge; mock mode is used by default.",
+    description: "Scores output with the workshop rubric judge.",
     scorer: async (input) => {
       const request: JudgeScoringRequest = {
         rubric: opts.rubric(input),

@@ -1,8 +1,8 @@
 # Evalite QA Workshop
 
-This repository is a hands-on Evalite beta workshop for QA testers working with strict TypeScript evals. The exercises use deterministic mock apps, synthetic datasets, and local scorers so you can practice writing and reviewing evals without live API keys.
+This repository is a hands-on QA workshop for evaluating AI application behavior with live model calls, synthetic datasets, and visible scoring evidence.
 
-You will inspect test data, run one lab at a time, compare passing, borderline, and failing cases, and make small edits to eval expectations, thresholds, labels, or mock behavior when the handout asks for it.
+You will inspect test data, run one lab at a time, compare passing, borderline, and failing cases, and make small edits to expectations, thresholds, labels, or prompts when the handout asks for it.
 
 ## Prerequisites
 
@@ -10,8 +10,9 @@ You will inspect test data, run one lab at a time, compare passing, borderline, 
 - pnpm `10.33.4`
 - One setup path from [docs/setup.md](docs/setup.md): Mise, Proto, direct pnpm, or Docker
 - A terminal in the repository root
+- `OPENROUTER_API_KEY` in local `.env`
 
-API keys are not required for the default mock-mode workshop.
+The default workshop mode uses OpenRouter with `openrouter/owl-alpha`.
 
 ## First Commands
 
@@ -31,7 +32,13 @@ pnpm install --frozen-lockfile
 pnpm run start
 ```
 
-The start command runs a smoke check and prints a dataset summary. When that passes, run a lab:
+The start command runs a smoke check and prints a dataset summary. Before the first lab, verify the live model path:
+
+```sh
+pnpm run live:check
+```
+
+When that passes, run a lab:
 
 ```sh
 pnpm run lab:01

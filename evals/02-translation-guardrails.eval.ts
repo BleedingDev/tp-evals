@@ -4,7 +4,7 @@ import {
   TranslationRecordSchema,
   type TranslationRecord,
 } from "../src/datasets/index.js";
-import { runTranslationVariant } from "../src/variants/index.js";
+import { runTranslation } from "../src/variants/index.js";
 import {
   createForbiddenPhraseScorer,
   createTextGuardrailScorer,
@@ -27,7 +27,7 @@ evalite<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
     data: () =>
       loadLabData("data/evals/translations-edge-cases.jsonl", TranslationRecordSchema),
     task: (record) =>
-      runTranslationVariant(record.input, {
+      runTranslation(record.input, {
         variant: record.caseType === "failing" ? "flawed" : "baseline",
       }),
     scorers: [

@@ -110,7 +110,10 @@ export function createCaseTypeScorer<
 
 export function workshopColumns<
   TInput extends LabRecordBase,
-  TOutput extends { readonly variant?: string },
+  TOutput extends {
+    readonly variant?: string;
+    readonly trace?: { readonly mode?: string; readonly modelName?: string };
+  },
   TExpected,
 >(opts: Evalite.ColumnInput<TInput, TOutput, TExpected>): Evalite.RenderedColumn[] {
   const numericScores = opts.scores
@@ -122,6 +125,12 @@ export function workshopColumns<
     { label: "type", value: opts.input.caseType },
     { label: "risk", value: opts.input.risk },
     { label: "variant", value: opts.output.variant ?? "n/a" },
+    {
+      label: "runtime",
+      value: opts.output.trace?.mode === "live"
+        ? (opts.output.trace.modelName ?? "live")
+        : (opts.output.trace?.mode ?? "local"),
+    },
     {
       label: "avg",
       value: numericScores.length === 0

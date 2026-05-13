@@ -9,18 +9,20 @@ services:
       - .:/workspace
       - lab-node-modules:/workspace/node_modules
     environment:
-      WORKSHOP_MODE: ${WORKSHOP_MODE:-mock}
+      WORKSHOP_MODE: ${WORKSHOP_MODE:-live}
       EVALITE_DB_PATH: ${EVALITE_DB_PATH:-/workspace/.evalite/evalite.db}
       EVALITE_RESULT_PATH: ${EVALITE_RESULT_PATH:-/workspace/.evalite/results/latest.json}
       EVALITE_PORT: ${EVALITE_PORT:-3006}
-      EVALITE_SCORE_THRESHOLD: ${EVALITE_SCORE_THRESHOLD:-70}
+      EVALITE_SCORE_THRESHOLD: ${EVALITE_SCORE_THRESHOLD:-60}
       EVALITE_MAX_CONCURRENCY: ${EVALITE_MAX_CONCURRENCY:-4}
-      EVALITE_TEST_TIMEOUT_MS: ${EVALITE_TEST_TIMEOUT_MS:-30000}
+      EVALITE_TEST_TIMEOUT_MS: ${EVALITE_TEST_TIMEOUT_MS:-90000}
       EVALITE_CACHE: ${EVALITE_CACHE:-true}
       EVALITE_HIDE_TABLE: ${EVALITE_HIDE_TABLE:-false}
-      LIVE_LLM_ENABLED: ${LIVE_LLM_ENABLED:-false}
-      LIVE_MODEL: ${LIVE_MODEL:-}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LIVE_LLM_ENABLED: ${LIVE_LLM_ENABLED:-true}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openrouter/owl-alpha}
+      OPENROUTER_JUDGE_MODEL: ${OPENROUTER_JUDGE_MODEL:-openrouter/owl-alpha}
+      OPENROUTER_TIMEOUT_MS: ${OPENROUTER_TIMEOUT_MS:-60000}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
     entrypoint: ["bash", "./scripts/docker-entrypoint.sh"]
     command: ["pnpm", "run", "smoke"]
 

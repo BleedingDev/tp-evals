@@ -69,15 +69,25 @@ Lab commands pick their own ports so several labs can run without colliding. If 
 EVALITE_LAB_PORT=3116 pnpm run lab:04
 ```
 
-## Optional API Keys
+## OpenRouter API Key
 
-API keys are not required in mock mode. This is the expected workshop mode:
+The workshop expects live OpenRouter calls. Check `.env` first:
 
 ```sh
-WORKSHOP_MODE=mock pnpm run start
+WORKSHOP_MODE=live
+LIVE_LLM_ENABLED=true
+OPENROUTER_MODEL=openrouter/owl-alpha
+OPENROUTER_API_KEY=...
 ```
 
-If you see an API-key error during the default labs, check that `WORKSHOP_MODE` is not set to `live` in your shell.
+Then run:
+
+```sh
+pnpm run smoke
+pnpm run live:check
+```
+
+If OpenRouter returns `401`, the key loaded by the process is invalid or not the same key you expected. The repo `.env` is loaded by the workshop commands and the key is not printed.
 
 ## Missing Files
 

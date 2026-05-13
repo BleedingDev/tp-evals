@@ -6,6 +6,7 @@ import type {
 
 export type CapabilityApp = "translation" | "mobile_search" | "travel_summary";
 export type MockVariant = "baseline" | "flawed" | "improved";
+export type OutputVariant = MockVariant | "live";
 export type RuntimeMode = "mock" | "live";
 
 export type TranslationInput = TranslationRecord["input"];
@@ -19,14 +20,16 @@ export type SlotMap = Record<string, SlotValue>;
 
 export interface CapabilityTrace {
   readonly capability: CapabilityApp;
-  readonly variant: MockVariant;
-  readonly mode: "mock";
+  readonly variant: OutputVariant;
+  readonly mode: RuntimeMode;
   readonly failureModes: readonly string[];
+  readonly modelName?: string;
+  readonly promptName?: string;
 }
 
 export interface TranslationOutput {
   readonly capability: "translation";
-  readonly variant: MockVariant;
+  readonly variant: OutputVariant;
   readonly text: string;
   readonly preservedFragments: readonly string[];
   readonly changedFragments: readonly string[];
@@ -36,7 +39,7 @@ export interface TranslationOutput {
 
 export interface MobileSearchOutput {
   readonly capability: "mobile_search";
-  readonly variant: MockVariant;
+  readonly variant: OutputVariant;
   readonly intent: MobileSearchIntent;
   readonly slots: SlotMap;
   readonly missingSlots: readonly string[];
@@ -50,7 +53,7 @@ export interface MobileSearchOutput {
 
 export interface TravelSummaryOutput {
   readonly capability: "travel_summary";
-  readonly variant: MockVariant;
+  readonly variant: OutputVariant;
   readonly summary: string;
   readonly sentences: readonly string[];
   readonly insufficientSource: boolean;
@@ -76,11 +79,18 @@ export interface CapabilityRunOptions {
 
 export const createTrace = (
   capability: CapabilityApp,
-  variant: MockVariant,
+  variant: OutputVariant,
   failureModes: readonly string[] = [],
+  metadata: {
+    readonly mode?: RuntimeMode;
+    readonly modelName?: string;
+    readonly promptName?: string;
+  } = {},
 ): CapabilityTrace => ({
   capability,
   variant,
-  mode: "mock",
+  mode: metadata.mode ?? "mock",
   failureModes,
+  ...(metadata.modelName === undefined ? {} : { modelName: metadata.modelName }),
+  ...(metadata.promptName === undefined ? {} : { promptName: metadata.promptName }),
 });

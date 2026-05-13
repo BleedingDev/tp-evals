@@ -7,7 +7,7 @@ Check whether known good, borderline, and bad examples land in the expected judg
 ## Files To Inspect
 
 - `evals/08-judge-calibration.eval.ts`
-- `src/judges/mock-judge.ts`
+- `src/judges/live-judge.ts`
 - `src/judges/rubrics.ts`
 - `src/scorers/judge.ts`
 

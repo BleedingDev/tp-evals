@@ -4,11 +4,11 @@ This guide is instructor-only. Keep checkpoint names, rescue commands, and answe
 
 ## Workshop Shape
 
-Run the workshop in mock mode unless you are deliberately showing an optional live demo. The hands-on path is designed around deterministic fixtures, predictable failures, and case-level scorer inspection.
+Run the workshop in live mode through OpenRouter. The hands-on path is designed around synthetic fixtures, visible failures, and case-level scorer inspection while still exposing participants to real model variance.
 
 Recommended flow:
 
-1. Setup check: `pnpm run smoke`, then `pnpm run data:summary`.
+1. Setup check: `pnpm run smoke`, `pnpm run live:check`, then `pnpm run data:summary`.
 2. Lab 01 establishes dataset repair and schema discipline.
 3. Labs 02-03 move from deterministic translation guardrails into judge-assisted quality scoring.
 4. Labs 04-05 cover structured mobile-search intent extraction and conversation state.
@@ -122,28 +122,21 @@ Common rescues:
 - One participant is far behind: move them to the next checkpoint branch and have them observe the current discussion rather than trying to repair every earlier edit live.
 - A checkpoint branch is missing locally: run `git branch -a --list '*checkpoint*'`; if it is absent remotely too, use the last known good branch and continue with instructor screen share.
 
-## Mock And Optional Live Mode
+## Live Model Mode
 
-Default mock mode:
+Default live setup:
 
-- `.env.example` starts with `WORKSHOP_MODE=mock`.
-- Mock mode requires no provider keys.
-- The lab tasks use deterministic fixtures and mock variants so every participant sees the same failures.
-- Use mock mode for hands-on exercises, scoring discussions, and release-gating examples.
+- `.env.example` starts with `WORKSHOP_MODE=live`.
+- `OPENROUTER_MODEL` and `OPENROUTER_JUDGE_MODEL` default to `openrouter/owl-alpha`.
+- `pnpm run smoke` verifies that live mode and the key are visible to the process.
+- `pnpm run live:check` makes one small model call without printing the key.
+- Record the model name, run time, threshold, dataset version, and retries when discussing results.
 
-Optional live judge demo:
+Fallback mock mode:
 
-- The judge scorer can call a live judge endpoint when `TP_EVALS_LIVE_JUDGE=1` or `TP_EVALS_LIVE_JUDGE=true`.
-- Set `TP_EVALS_LIVE_JUDGE_ENDPOINT` to the HTTP endpoint that accepts `{ rubric, input, output, expected }` and returns score/dimension data.
-- By default, live judge failures fall back to the mock judge. Tell participants when this fallback happened before interpreting scores.
-- Use this as a short instructor demo, then unset the variables before hands-on work.
-
-Optional live app-provider demo:
-
-- The runtime has a provider seam for live translation, mobile-search, and summary calls.
-- A live provider must be registered by code and `WORKSHOP_LIVE_PROVIDER=registered` must be set before `WORKSHOP_MODE=live` can work.
-- The shipped lab eval files intentionally pin mock variants. Do not ask participants to switch them to live during the core workshop.
-- If you run a live demo, record the provider, prompt/model name, run time, threshold, and any retries. Treat live variance as a discussion point, not as the answer key.
+- The code still contains deterministic local variants for private dry runs and recovery.
+- Switch to `WORKSHOP_MODE=mock` only if connectivity blocks the room.
+- If you switch modes, tell participants that scores are no longer live model evidence.
 
 ## Dry-Run Checklist
 
@@ -153,6 +146,7 @@ One week before:
 - Confirm runtime versions: Node `>=26.0.0`, pnpm `>=10.33.4`.
 - Run `pnpm install --frozen-lockfile`.
 - Run `pnpm run smoke`.
+- Run `pnpm run live:check`.
 - Run `pnpm run data:summary`.
 - Run `pnpm run data:check`.
 - Run `pnpm run typecheck`.
@@ -166,12 +160,13 @@ Day before:
 - Open the Evalite UI from `pnpm run eval:dev` and confirm the lab files load.
 - Confirm `.evalite/results/` is writable.
 - Make sure no long-running local server owns the ports you plan to use.
-- Keep provider keys out of participant machines unless you are explicitly running a live demo.
+- Confirm each participant has the workshop OpenRouter key in local `.env`.
 - Prepare one terminal for instructor commands and one clean terminal for participant-paced commands.
 
 Thirty minutes before:
 
 - Run `pnpm run smoke` again.
+- Run `pnpm run live:check` again.
 - Run the first lab command, `pnpm run lab:01`, and confirm the expected failure details are visible.
 - Run one later lab, such as `pnpm run lab:09`, so prompt-injection scoring is known-good.
 - Confirm screen sharing shows scorer details and columns clearly.

@@ -4,7 +4,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { z } from "zod";
 
+import { loadWorkshopEnv } from "../src/env.js";
+
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+loadWorkshopEnv(rootDir);
 
 const PackageJsonSchema = z.object({
   type: z.literal("module"),
@@ -17,6 +20,7 @@ const PackageJsonSchema = z.object({
 const requiredScripts = [
   "setup",
   "smoke",
+  "live:check",
   "data:check",
   "data:summary",
   "lab:01",
@@ -51,6 +55,7 @@ const requiredFiles = [
   ".env.example",
   "scripts/smoke.ts",
   "scripts/run-lab.ts",
+  "scripts/openrouter-smoke.ts",
 ] as const;
 
 const fail = (message: string): never => {
@@ -100,7 +105,7 @@ const main = async (): Promise<void> => {
     await assertFileExists(relativePath);
   }
 
-  const mode = process.env["WORKSHOP_MODE"] ?? "mock";
+  const mode = process.env["WORKSHOP_MODE"] ?? "live";
   if (!["mock", "live"].includes(mode)) {
     fail("WORKSHOP_MODE must be either mock or live.");
   }
@@ -112,10 +117,23 @@ const main = async (): Promise<void> => {
     fail("evalite.config.ts must export an Evalite config object.");
   }
 
+  const liveEnabled =
+    mode === "live" || process.env["LIVE_LLM_ENABLED"] === "true";
+  const openRouterKey = process.env["OPENROUTER_API_KEY"] ?? "";
+  const openRouterModel =
+    process.env["OPENROUTER_MODEL"] ??
+    process.env["LIVE_MODEL"] ??
+    "openrouter/owl-alpha";
+
+  if (liveEnabled && openRouterKey.trim().length === 0) {
+    fail("OPENROUTER_API_KEY is required for live workshop mode.");
+  }
+
   console.log("Runtime smoke check passed.");
   console.log(`Mode: ${mode}`);
+  console.log(`Live model: ${openRouterModel}`);
   console.log(`Package manager: ${packageJson.packageManager}`);
-  console.log("API keys are not required for mock mode.");
+  console.log(liveEnabled ? "OpenRouter key detected." : "Live API calls are disabled.");
 };
 
 await main();

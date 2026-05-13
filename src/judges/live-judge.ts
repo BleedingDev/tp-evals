@@ -1,4 +1,6 @@
 import { clampScore } from "../scorers/common.js";
+import { loadWorkshopEnv } from "../env.js";
+import { isOpenRouterConfigured, judgeWithOpenRouter } from "../providers/openrouter.js";
 import {
   combineDimensionJudgments,
   createCalibrationMetadata,
@@ -9,6 +11,8 @@ import {
   type WorkshopRubricId,
 } from "./rubrics.js";
 import { mockJudge, type MockJudgeRequest } from "./mock-judge.js";
+
+loadWorkshopEnv();
 
 export interface LiveJudgeOptions {
   enabled?: boolean;
@@ -22,13 +26,13 @@ interface LiveJudgeDimensionResponse {
   score: number;
   name?: string;
   rationale?: string;
-  evidence?: string[];
+  evidence?: readonly string[];
 }
 
 interface LiveJudgeResponse {
   score?: number;
   summary?: string;
-  dimensions?: LiveJudgeDimensionResponse[];
+  dimensions?: readonly LiveJudgeDimensionResponse[];
   raw?: unknown;
 }
 
@@ -43,7 +47,9 @@ function liveJudgeEnabled(options: LiveJudgeOptions = {}): boolean {
   }
 
   return process.env["TP_EVALS_LIVE_JUDGE"] === "1"
-    || process.env["TP_EVALS_LIVE_JUDGE"] === "true";
+    || process.env["TP_EVALS_LIVE_JUDGE"] === "true"
+    || process.env["LIVE_LLM_ENABLED"] === "true"
+    || process.env["WORKSHOP_MODE"] === "live";
 }
 
 function liveJudgeEndpoint(options: LiveJudgeOptions = {}): string {
@@ -181,10 +187,31 @@ export async function judgeWithOptionalLive(
   const endpoint = liveJudgeEndpoint(live);
 
   if (endpoint.length === 0) {
-    return {
-      ...mockJudge(request),
-      raw: { liveJudge: "missing_endpoint" },
-    };
+    if (!isOpenRouterConfigured()) {
+      return {
+        ...mockJudge(request),
+        raw: { liveJudge: "missing_openrouter_key" },
+      };
+    }
+
+    try {
+      const response = await judgeWithOpenRouter(request, rubric);
+
+      return resultFromLiveResponse(response, rubric, threshold);
+    } catch (error) {
+      if (!fallbackToMock) {
+        throw error;
+      }
+
+      return {
+        ...mockJudge(request),
+        raw: {
+          liveJudge: "fallback_to_mock",
+          provider: "openrouter",
+          error: error instanceof Error ? error.message : String(error),
+        },
+      };
+    }
   }
 
   try {

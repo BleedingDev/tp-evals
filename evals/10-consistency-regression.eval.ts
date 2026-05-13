@@ -14,7 +14,7 @@ import {
 import { loadLabData, workshopColumns } from "./lab-utils.js";
 
 interface ConsistencyOutput {
-  readonly variant: "mock-consistency-suite";
+  readonly variant: "recorded-consistency-suite";
   readonly outputs: readonly unknown[];
   readonly regressionCases: readonly {
     readonly id: string;
@@ -27,7 +27,7 @@ interface ConsistencyOutput {
 const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
   if (record.id === "consistency-search-slots") {
     return {
-      variant: "mock-consistency-suite",
+      variant: "recorded-consistency-suite",
       outputs: [
         {
           intent: "find_item",
@@ -56,7 +56,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
 
   if (record.id === "consistency-summary-warning") {
     return {
-      variant: "mock-consistency-suite",
+      variant: "recorded-consistency-suite",
       outputs: [
         {
           upperTerrace: "may close if wind increases",
@@ -85,7 +85,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
 
   if (record.id === "consistency-refusal-scope") {
     return {
-      variant: "mock-consistency-suite",
+      variant: "recorded-consistency-suite",
       outputs: [
         {
           label: "schedule update",
@@ -110,7 +110,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
   }
 
   return {
-    variant: "mock-consistency-suite",
+    variant: "recorded-consistency-suite",
     outputs: [
       {
         freeChangeWindow: "2 hours",

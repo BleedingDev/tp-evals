@@ -1,6 +1,6 @@
 # Setup
 
-Use one path. The workshop defaults to mock mode, so you do not need API keys.
+Use one path. The workshop defaults to live OpenRouter calls, so each machine needs a local `.env` with `OPENROUTER_API_KEY`.
 
 ## Option 1: Mise
 
@@ -11,6 +11,7 @@ mise trust
 mise install
 mise run setup
 mise run start
+mise run live:check
 ```
 
 `mise trust` is required the first time because Mise will not run tasks from a new repository until you approve its local config.
@@ -30,6 +31,7 @@ Proto reads `.prototools` and installs the same tool versions.
 proto install
 pnpm install --frozen-lockfile
 pnpm run start
+pnpm run live:check
 ```
 
 If your shell cannot find `pnpm` after `proto install`, restart the terminal or run the shell initialization command printed by Proto.
@@ -45,6 +47,7 @@ corepack prepare pnpm@10.33.4 --activate
 pnpm --version
 pnpm install --frozen-lockfile
 pnpm run start
+pnpm run live:check
 ```
 
 Expected versions:
@@ -59,6 +62,7 @@ Docker is the fallback path when local tool installation is blocked.
 ```sh
 docker compose build lab
 docker compose run --rm lab pnpm run start
+docker compose run --rm lab pnpm run live:check
 ```
 
 Run one lab in Docker:
@@ -80,14 +84,18 @@ Docker mounts the repository into `/workspace` and keeps dependencies in a named
 The default environment is equivalent to `.env.example`.
 
 ```sh
-WORKSHOP_MODE=mock
+WORKSHOP_MODE=live
 EVALITE_DB_PATH=.evalite/evalite.db
 EVALITE_RESULT_PATH=.evalite/results/latest.json
 EVALITE_PORT=3006
-EVALITE_SCORE_THRESHOLD=70
+EVALITE_SCORE_THRESHOLD=60
 EVALITE_MAX_CONCURRENCY=4
-EVALITE_TEST_TIMEOUT_MS=30000
-LIVE_LLM_ENABLED=false
+EVALITE_TEST_TIMEOUT_MS=90000
+LIVE_LLM_ENABLED=true
+OPENROUTER_MODEL=openrouter/owl-alpha
+OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
+OPENROUTER_TIMEOUT_MS=60000
+OPENROUTER_API_KEY=...
 ```
 
-Use mock mode unless the facilitator explicitly asks for live model experiments.
+Do not commit `.env`. The smoke command confirms mode and model without printing the key.

@@ -11,7 +11,7 @@ import {
   createEvaliteScorer,
   makeResult,
 } from "../src/scorers/index.js";
-import { runMobileSearchVariant } from "../src/variants/index.js";
+import { runMobileSearch } from "../src/variants/index.js";
 
 import { loadLabData, workshopColumns } from "./lab-utils.js";
 
@@ -33,7 +33,7 @@ evalite<MobileSearchRecord, MobileSearchOutput, MobileSearchRecord["expected"]>(
     data: () =>
       loadLabData("data/evals/mobile-search-intents.jsonl", MobileSearchRecordSchema),
     task: (record) =>
-      runMobileSearchVariant(record.input, {
+      runMobileSearch(record.input, {
         variant: record.caseType === "failing" ? "baseline" : "improved",
       }),
     scorers: [
@@ -48,7 +48,7 @@ evalite<MobileSearchRecord, MobileSearchOutput, MobileSearchRecord["expected"]>(
       }),
       createEvaliteScorer({
         name: "disallowed_slots",
-        description: "Checks that the mock app does not invent blocked slots.",
+        description: "Checks that the evaluated output does not invent blocked slots.",
         scorer: ({ output, expected }) => {
           const present = expected.disallowedSlots.filter(
             (slot) => output.slots[slot] !== undefined || output.inventedSlots.includes(slot),

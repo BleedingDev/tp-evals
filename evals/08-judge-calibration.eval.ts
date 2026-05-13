@@ -1,6 +1,6 @@
 import { evalite } from "evalite";
 
-import { mockJudge, type WorkshopRubricId } from "../src/judges/index.js";
+import { judgeWithOptionalLive, type WorkshopRubricId } from "../src/judges/index.js";
 import {
   createEvaliteScorer,
   makeResult,
@@ -25,7 +25,7 @@ interface CalibrationExpected {
 }
 
 interface CalibrationOutput {
-  readonly variant: "mock-judge";
+  readonly variant: "rubric-judge";
   readonly judgeScore: number;
   readonly judgeSummary: string;
   readonly dimensionScores: Readonly<Record<string, number>>;
@@ -119,16 +119,17 @@ evalite<CalibrationInput, CalibrationOutput, CalibrationExpected>(
   "Lab 08 - Judge Calibration",
   {
     data: calibrationData,
-    task: (input) => {
-      const result = mockJudge({
+    task: async (input) => {
+      const result = await judgeWithOptionalLive({
         rubric: input.rubric,
         input: input.input,
         output: input.output,
         expected: input.expected,
+        live: { fallbackToMock: false },
       });
 
       return {
-        variant: "mock-judge",
+        variant: "rubric-judge",
         judgeScore: result.score,
         judgeSummary: result.summary,
         dimensionScores: Object.fromEntries(
@@ -148,8 +149,8 @@ evalite<CalibrationInput, CalibrationOutput, CalibrationExpected>(
           return makeResult(
             inBand ? 1 : 0,
             inBand
-              ? `Mock judge score is in the ${expected.targetBand} band.`
-              : `Mock judge score is outside the ${expected.targetBand} band.`,
+              ? `Judge score is in the ${expected.targetBand} band.`
+              : `Judge score is outside the ${expected.targetBand} band.`,
             {
               judgeScore: output.judgeScore,
               expected,

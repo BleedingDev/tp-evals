@@ -11,7 +11,10 @@ import { fileURLToPath } from "node:url";
 
 import { z } from "zod";
 
+import { loadWorkshopEnv } from "../src/env.js";
+
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+loadWorkshopEnv(rootDir);
 const objectRecordSchema = z.record(z.string(), z.unknown());
 
 type LabDefinition = {

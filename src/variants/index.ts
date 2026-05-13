@@ -17,6 +17,8 @@ import {
   type TravelSummaryInput,
   type TravelSummaryOutput,
 } from "../apps/index.js";
+import { loadWorkshopEnv } from "../env.js";
+import { createOpenRouterProvider } from "../providers/openrouter.js";
 
 export type VariantId =
   | "translation.baseline"
@@ -45,20 +47,29 @@ export type AnyVariantDefinition =
   | VariantDefinition<MobileSearchInput, MobileSearchOutput>
   | VariantDefinition<TravelSummaryInput, TravelSummaryOutput>;
 
-export interface LiveProvider {
-  readonly translate?: (input: TranslationInput) => Promise<TranslationOutput> | TranslationOutput;
-  readonly extractMobileSearchIntent?:
-    | ((input: MobileSearchInput) => Promise<MobileSearchOutput> | MobileSearchOutput)
-    | undefined;
-  readonly summarizeTravelInfo?:
-    | ((input: TravelSummaryInput) => Promise<TravelSummaryOutput> | TravelSummaryOutput)
-    | undefined;
-}
-
 export interface RunVariantOptions {
   readonly mode?: RuntimeMode;
   readonly variant?: MockVariant;
   readonly variantId?: VariantId;
+}
+
+export interface LiveProvider {
+  readonly translate?: (
+    input: TranslationInput,
+    options: RunVariantOptions,
+  ) => Promise<TranslationOutput> | TranslationOutput;
+  readonly extractMobileSearchIntent?:
+    | ((
+      input: MobileSearchInput,
+      options: RunVariantOptions,
+    ) => Promise<MobileSearchOutput> | MobileSearchOutput)
+    | undefined;
+  readonly summarizeTravelInfo?:
+    | ((
+      input: TravelSummaryInput,
+      options: RunVariantOptions,
+    ) => Promise<TravelSummaryOutput> | TravelSummaryOutput)
+    | undefined;
 }
 
 const definitions = [
@@ -175,6 +186,9 @@ const defaultVariantIds = {
 
 let liveProvider: LiveProvider | undefined;
 
+loadWorkshopEnv();
+liveProvider = createOpenRouterProvider();
+
 export const registerLiveProvider = (provider: LiveProvider): void => {
   liveProvider = provider;
 };
@@ -184,7 +198,7 @@ export const resolveRuntimeMode = (requested?: RuntimeMode): RuntimeMode => {
     return requested;
   }
 
-  return process.env["WORKSHOP_MODE"] === "live" ? "live" : "mock";
+  return process.env["WORKSHOP_MODE"] === "mock" ? "mock" : "live";
 };
 
 export const listVariants = (capability?: CapabilityApp): readonly AnyVariantDefinition[] => {
@@ -225,12 +239,9 @@ const variantFromId = (
 };
 
 const requireLiveProvider = (): LiveProvider => {
-  if (
-    liveProvider === undefined ||
-    process.env["WORKSHOP_LIVE_PROVIDER"] !== "registered"
-  ) {
+  if (liveProvider === undefined) {
     throw new Error(
-      "Live mode is only a provider seam. Register a live provider and set WORKSHOP_LIVE_PROVIDER=registered, or use the default mock mode.",
+      "Live mode requires a registered provider. The default provider uses OPENROUTER_API_KEY.",
     );
   }
 
@@ -292,21 +303,21 @@ export async function runCapability(
     const provider = requireLiveProvider();
 
     if (capability === "translation" && provider.translate !== undefined) {
-      return await provider.translate(input as TranslationInput);
+      return await provider.translate(input as TranslationInput, options);
     }
 
     if (
       capability === "mobile_search" &&
       provider.extractMobileSearchIntent !== undefined
     ) {
-      return await provider.extractMobileSearchIntent(input as MobileSearchInput);
+      return await provider.extractMobileSearchIntent(input as MobileSearchInput, options);
     }
 
     if (
       capability === "travel_summary" &&
       provider.summarizeTravelInfo !== undefined
     ) {
-      return await provider.summarizeTravelInfo(input as TravelSummaryInput);
+      return await provider.summarizeTravelInfo(input as TravelSummaryInput, options);
     }
 
     throw new Error(`No live provider registered for ${capability}.`);
@@ -322,5 +333,20 @@ export async function runCapability(
 
   return runTravelSummaryVariant(input as TravelSummaryInput, options);
 }
+
+export const runTranslation = (
+  input: TranslationInput,
+  options: RunVariantOptions = {},
+): Promise<TranslationOutput> => runCapability("translation", input, options);
+
+export const runMobileSearch = (
+  input: MobileSearchInput,
+  options: RunVariantOptions = {},
+): Promise<MobileSearchOutput> => runCapability("mobile_search", input, options);
+
+export const runTravelSummary = (
+  input: TravelSummaryInput,
+  options: RunVariantOptions = {},
+): Promise<TravelSummaryOutput> => runCapability("travel_summary", input, options);
 
 export { defaultVariantIds, definitions as variantRegistry };

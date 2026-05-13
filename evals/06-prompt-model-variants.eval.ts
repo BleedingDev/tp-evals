@@ -11,15 +11,15 @@ import {
 } from "../src/scorers/index.js";
 import {
   getVariant,
-  runTranslationVariant,
+  runTranslation,
   type VariantId,
 } from "../src/variants/index.js";
 
 import { loadLabData, outputText, workshopColumns } from "./lab-utils.js";
 
 const variants: Array<{ name: string; input: VariantId }> = [
-  { name: "plain-ui-translation / mock-stable", input: "translation.baseline" },
-  { name: "guardrailed-translation / mock-guarded", input: "translation.improved" },
+  { name: "plain-ui-translation", input: "translation.baseline" },
+  { name: "guardrailed-translation", input: "translation.improved" },
 ];
 
 evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
@@ -39,7 +39,7 @@ evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["
         ].includes(record.input.id),
       );
     },
-    task: (record, variantId) => runTranslationVariant(record.input, { variantId }),
+    task: (record, variantId) => runTranslation(record.input, { variantId }),
     scorers: [
       createTextGuardrailScorer({
         output: outputText,

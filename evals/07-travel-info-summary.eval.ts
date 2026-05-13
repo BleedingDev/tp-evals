@@ -9,7 +9,7 @@ import {
   createJudgeScorer,
   createSummaryScorer,
 } from "../src/scorers/index.js";
-import { runTravelSummaryVariant } from "../src/variants/index.js";
+import { runTravelSummary } from "../src/variants/index.js";
 
 import { loadLabData, summaryText, workshopColumns } from "./lab-utils.js";
 
@@ -19,7 +19,7 @@ evalite<TravelSummaryRecord, TravelSummaryOutput, TravelSummaryRecord["expected"
     data: () =>
       loadLabData("data/evals/travel-info-summary.jsonl", TravelSummaryRecordSchema),
     task: (record) =>
-      runTravelSummaryVariant(record.input, {
+      runTravelSummary(record.input, {
         variant: record.caseType === "failing" ? "flawed" : "improved",
       }),
     scorers: [

@@ -12,7 +12,7 @@ import {
   scoreIntentClassification,
   scoreMissingFieldBehavior,
 } from "../src/scorers/index.js";
-import { runMobileSearchVariant } from "../src/variants/index.js";
+import { runMobileSearch } from "../src/variants/index.js";
 
 import {
   loadLabData,
@@ -28,7 +28,7 @@ evalite<MobileSearchRecord, MobileSearchOutput, MobileSearchRecord["expected"]>(
         "data/evals/mobile-search-conversation.jsonl",
         MobileSearchRecordSchema,
       ),
-    task: (record) => runMobileSearchVariant(record.input, { variant: "baseline" }),
+    task: (record) => runMobileSearch(record.input, { variant: "baseline" }),
     scorers: [
       createStructuredOutputScorer({
         spec: ({ expected }) => ({
