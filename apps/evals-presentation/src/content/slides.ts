@@ -366,17 +366,17 @@ bad:        0.00 - 0.65`,
     eyebrow: "Ne autopilot",
     hint: "<code>docs/agent-prompts/lab-11-agentic-eval-authoring.md</code>",
     items: [
-      "Agent může rychle navrhnout dataset case nebo eval file",
+      "Účastník nejdřív sám formuluje úkol pro agenta",
+      "Agent má přidat dataset case a malou kontrolu ve scoreru",
       "QA musí vlastnit expected behavior, risk a threshold",
-      "Agentovi dáme omezený scope a zakážeme reálná data",
-      "Diff se kontroluje stejně přísně jako produkční test",
-      "Hotový výsledek musí projít data:check a konkrétním labem",
+      "Scope: povolené soubory, syntetická data, ověřovací příkazy",
+      "Fallback prompt existuje jen pro zaseknuté účastníky",
     ],
-    code: `agent dostane:
-- allowed files
-- syntetický use case
-- schema požadavky
-- příkazy k ověření
+    code: `vlastní zadání agentovi:
+- přidej 1 synthetic case
+- přidej 1 malou kontrolu ve scoreru
+- použij jen allowed files
+- spusť data:check + lab:11
 
 QA kontroluje:
 - diff
@@ -388,17 +388,18 @@ QA kontroluje:
     title: "11 Agentic Eval Authoring",
     eyebrow: "Vlastní dataset s agentem",
     hint: "<code>evals/11-agentic-eval-authoring.eval.ts</code>, <code>data/evals/agent-authored-summary.jsonl</code>",
-    task: "Použijte Cline, GitHub Copilot nebo jiného agenta k přidání nového synthetic case a potom sami ověřte, jestli je QA použitelný",
+    task: "Zadejte Cline, GitHub Copilot nebo jinému agentovi vlastní úkol: přidat nový synthetic case a malou kontrolu v eval kódu. Potom sami rozhodněte, jestli je výsledek QA použitelný.",
     items: [
       "Příkaz: pnpm run lab:11",
-      "Prompt pro agenta je v docs/agent-prompts",
-      "Agent přidá jeden case, ne celý dataset dump",
+      "Nejdřív napište vlastní zadání pro agenta",
+      "Fallback prompt je v docs/agent-prompts",
+      "Agent přidá jeden case a jednu malou kontrolu ve scoreru",
       "Vy kontrolujete expectedBehavior, requiredFacts, forbiddenClaims a risk",
       "Na konci musí projít pnpm run data:check a pnpm run lab:11",
     ],
     code: `pnpm run lab:11
 
-# agent upraví dataset
+# agent upraví dataset + eval kód
 pnpm run data:check
 pnpm run lab:11
 

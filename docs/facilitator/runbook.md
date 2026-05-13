@@ -17,7 +17,7 @@ Recommended flow:
 7. Lab 08 calibrates the judge against known good, borderline, and bad examples.
 8. Lab 09 tests prompt-injection resistance against supplied text that contains hostile instructions.
 9. Lab 10 turns case scores into a consistency and regression gate.
-10. Lab 11 uses a coding agent to author a new synthetic eval case and then verifies the result.
+10. Lab 11 has participants write their own coding-agent task to author a new synthetic eval case plus a small eval-code check, then verify the result.
 
 If time is tight, keep Labs 01, 02, 04, 07, 09, and 11. Use Lab 06 as a short instructor-led comparison, Lab 08 as a discussion exercise, and Lab 10 as a closing release-gate example.
 
@@ -35,7 +35,7 @@ If time is tight, keep Labs 01, 02, 04, 07, 09, and 11. Use Lab 06 as a short in
 | 08 - Judge Calibration | `pnpm run lab:08` | Judges need calibration examples so teams can see whether scores land in expected bands. | A judge that accepts the known bad case, rejects the known good case, or treats borderline cases too confidently is not ready for gating. | Ask what examples belong in a permanent calibration suite. | `checkpoint/08-judge-calibration` |
 | 09 - Prompt Injection | `pnpm run lab:09` | The system must distinguish trusted task instructions from hostile instructions inside supplied text. | The vulnerable handler follows embedded instructions, emits evaluator-like text, leaks system-style content, or adds success claims. | Ask what content is allowed to pass through and what must be treated as data. | `checkpoint/09-prompt-injection` |
 | 10 - Consistency Regression | `pnpm run lab:10` | Release gates should catch inconsistent repeated outputs and regressions against a baseline. | One high-risk case can fall below the baseline or consistency threshold while easier cases still pass. | Ask whether a single high-risk regression should block release even when the average looks healthy. | `checkpoint/10-consistency-regression` |
-| 11 - Agentic Eval Authoring | `pnpm run lab:11` | Coding agents can draft new eval cases quickly, but QA must review expected behavior, risk, and scoring evidence. | The agent may produce vague expected behavior, weak forbidden claims, unsafe examples, or a case that passes without testing the intended risk. | Keep the agent scope narrow: one synthetic case, allowed files only, run `data:check` and `lab:11`, then review the diff. | `checkpoint/11-agentic-eval-authoring` |
+| 11 - Agentic Eval Authoring | `pnpm run lab:11` | Coding agents can draft eval cases and small eval-code checks quickly, but QA must review expected behavior, risk, and scoring evidence. | The agent may produce vague expected behavior, weak forbidden claims, unsafe examples, or code that only checks trivia. | Have participants write their own agent task first. Use the fallback prompt only for participants who are blocked. Keep scope narrow: one synthetic case, one small Lab 11 code check, run `data:check` and `lab:11`, then review the diff. | `checkpoint/11-agentic-eval-authoring` |
 
 Use `checkpoint/00-runtime` when a participant has not reached the first lab. Use `checkpoint/12-final` for the finished repository state after all labs.
 
@@ -82,6 +82,8 @@ Agentic eval authoring:
 
 - What should the agent be allowed to edit, and what must remain owned by QA?
 - Is the new case testing one concrete risk, or is it vague dataset noise?
+- Did the participant give the agent a clear task, or did they only paste a generic prompt?
+- Is the code change useful for review, or did the agent add a meaningless check?
 - Did the agent add enough expected behavior, forbidden claims, metadata, and review notes for another tester to trust the case?
 
 Release gating:
