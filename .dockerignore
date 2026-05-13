@@ -1,8 +1,11 @@
 node_modules/
+**/node_modules/
 .git/
 .evalite/
 evalite-export/
 dist/
+apps/*/.astro/
+apps/*/dist/
 coverage/
 .env
 *.log

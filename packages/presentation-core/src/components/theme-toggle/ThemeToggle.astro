@@ -1,0 +1,102 @@
+---
+// Theme toggle component for light/dark mode switching
+---
+
+<button
+  id="theme-toggle"
+  aria-label="Toggle color scheme"
+  title="Toggle between light and dark mode"
+  class="fixed top-6 right-6 cursor-pointer z-[200] p-2 rounded-full backdrop-blur-sm border-2 border-theme-500/60 hover:bg-theme-500/20 hover:border-theme-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 opacity-85 hover:opacity-100"
+  style="background-color: hsl(0 0% 4% / 0.9);"
+>
+  <svg
+    class="sun-icon block dark:hidden text-theme-500 w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="12" cy="12" r="5" stroke-width="2"></circle>
+    <line x1="12" y1="1" x2="12" y2="3" stroke-width="2"></line>
+    <line x1="12" y1="21" x2="12" y2="23" stroke-width="2"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke-width="2"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke-width="2"></line>
+    <line x1="1" y1="12" x2="3" y2="12" stroke-width="2"></line>
+    <line x1="21" y1="12" x2="23" y2="12" stroke-width="2"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke-width="2"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke-width="2"></line>
+  </svg>
+  <svg
+    class="moon-icon hidden dark:block text-white w-5 h-5"
+    viewBox="0 0 313 313"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill="currentColor"
+      d="M305.6,178.053c-3.2-0.8-6.4,0-9.2,2c-10.4,8.8-22.4,16-35.6,20.8c-12.4,4.8-26,7.2-40.4,7.2c-32.4,0-62-13.2-83.2-34.4
+      c-21.2-21.2-34.4-50.8-34.4-83.2c0-13.6,2.4-26.8,6.4-38.8c4.4-12.8,10.8-24.4,19.2-34.4c3.6-4.4,2.8-10.8-1.6-14.4
+      c-2.8-2-6-2.8-9.2-2c-34,9.2-63.6,29.6-84.8,56.8c-20.4,26.8-32.8,60-32.8,96.4c0,43.6,17.6,83.2,46.4,112s68.4,46.4,112,46.4
+      c36.8,0,70.8-12.8,98-34c27.6-21.6,47.6-52.4,56-87.6C314.4,184.853,311.2,179.253,305.6,178.053z M244.4,261.653
+      c-23.2,18.4-52.8,29.6-85.2,29.6c-38,0-72.4-15.6-97.2-40.4c-24.8-24.8-40.4-59.2-40.4-97.2c0-31.6,10.4-60.4,28.4-83.6
+      c12.4-16,28-29.2,46-38.4c-2,4.4-4,8.8-5.6,13.6c-5.2,14.4-7.6,29.6-7.6,45.6c0,38,15.6,72.8,40.4,97.6s59.6,40.4,97.6,40.4
+      c16.8,0,32.8-2.8,47.6-8.4c5.2-2,10.4-4,15.2-6.4C274,232.453,260.8,248.853,244.4,261.653z"
+    ></path>
+  </svg>
+</button>
+
+<script>
+  import {
+    toggleTheme,
+    applyTheme,
+    watchSystemTheme,
+  } from "../../config/theme.config";
+
+  // Theme toggle functionality
+  function initTheme() {
+    const btnToggle = document.getElementById("theme-toggle");
+    if (!btnToggle) return;
+
+    const sunIcon = btnToggle.querySelector(".sun-icon") as HTMLElement;
+    const moonIcon = btnToggle.querySelector(".moon-icon") as HTMLElement;
+
+    // Update icon visibility based on current state
+    const updateIcons = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      if (isDark) {
+        // Dark mode: show moon, hide sun
+        sunIcon?.classList.add("hidden");
+        moonIcon?.classList.remove("hidden");
+      } else {
+        // Light mode: show sun, hide moon
+        sunIcon?.classList.remove("hidden");
+        moonIcon?.classList.add("hidden");
+      }
+    };
+
+    // Initialize icons based on current theme
+    updateIcons();
+
+    // Toggle theme on button click
+    btnToggle.addEventListener("click", () => {
+      toggleTheme();
+      updateIcons();
+    });
+
+    // Watch for system theme changes
+    const cleanup = watchSystemTheme((theme) => {
+      applyTheme(theme);
+      updateIcons();
+    });
+
+    return cleanup;
+  }
+
+  // Initialize on page load
+  let cleanup = initTheme();
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener("astro:page-load", () => {
+    if (cleanup) cleanup();
+    cleanup = initTheme();
+  });
+</script>

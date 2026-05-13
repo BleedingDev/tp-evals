@@ -45,6 +45,17 @@ pnpm run eval:dev
 
 Then open `http://localhost:3006`.
 
+## Presentation
+
+The workshop deck is an Astro presentation in `apps/evals-presentation`.
+
+```sh
+pnpm run slides:dev
+pnpm run slides:build
+```
+
+The local presentation server runs on `http://127.0.0.1:4445`.
+
 ## Labs
 
 Each lab has a short participant handout under `docs/labs`.

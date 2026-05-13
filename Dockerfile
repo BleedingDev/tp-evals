@@ -32,7 +32,9 @@ RUN bash -c 'bash <(curl -fsSL https://moonrepo.dev/install/proto.sh)'
 
 WORKDIR /workspace
 
-COPY .prototools package.json pnpm-lock.yaml ./
+COPY .prototools package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/evals-presentation/package.json apps/evals-presentation/package.json
+COPY packages/presentation-core/package.json packages/presentation-core/package.json
 RUN proto install
 RUN pnpm install --frozen-lockfile
 

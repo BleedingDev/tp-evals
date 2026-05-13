@@ -1,0 +1,188 @@
+---
+import Heart from "../heart/Heart.astro";
+
+interface Props {
+  title?: string;
+  desc?: string;
+  order?: number;
+  sampleUrl?: string;
+  image?: {
+    url: string;
+    width?: number;
+    height?: number;
+    alt?: string;
+  };
+  center?: boolean;
+  speaker?: boolean;
+  outro?: boolean;
+}
+
+const { title, desc, order, sampleUrl, image, center, speaker, outro } =
+  Astro.props;
+const hasRightSlot = Astro.slots.has("right");
+const hasRightContent = Boolean(image) || hasRightSlot;
+
+// Base classes for different layouts
+const getSlideClasses = () => {
+  const base =
+    "h-svh grid gap-[8svb] p-[8svb] backdrop-blur-lg relative z-50 transition-colors duration-300";
+  if (speaker) return `${base} grid-rows-[auto_1fr] content-start`;
+  if (center) return `${base} content-center`;
+  return `${base} content-start`;
+};
+
+const getTitleClasses = () => {
+  const base = "font-bold text-theme-500";
+  return center ? `${base} text-8xl text-center` : `${base} text-6xl`;
+};
+
+const getContentClasses = () => {
+  const base = "max-w-none left [&:empty]:hidden";
+  if (center && hasRightContent) return `${base} col-span-2`;
+  if (center) return base;
+  if (speaker) return `${base} self-start`;
+  return base;
+};
+
+const getGridColumnsClasses = () => {
+  if (!hasRightContent) return "grid-cols-1";
+  if (speaker) return "grid-cols-[5fr_7fr]";
+  return "grid-cols-[7fr_5fr]";
+};
+---
+
+<style>
+  section {
+    position: relative;
+    overflow: clip;
+    container-type: scroll-state;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    counter-increment: slides-counter;
+
+    &:last-of-type .top + div {
+      display: none;
+    }
+
+    &::scroll-marker {
+      color: transparent;
+      text-decoration: 0;
+      line-height: 1;
+      content: counter(slides-counter);
+      background-color: var(--marker-bg, var(--black-trans));
+      inline-size: 1rem;
+      block-size: 1rem;
+      font-size: 0.65em;
+      display: grid;
+      place-items: center;
+      box-sizing: border-box;
+      border-radius: 100vmax;
+      border: 2px solid var(--color-theme-500);
+      scale: 1 !important;
+      z-index: 1;
+      transition: scale 0.2s ease-out;
+    }
+
+    &::scroll-marker:target-current {
+      --marker-bg: var(--color-theme-500);
+      color: white;
+      opacity: 1;
+      scale: 1.5 !important;
+      z-index: 2;
+    }
+    :where(.top, .left, .right) {
+      opacity: 1;
+      transition: opacity 200ms ease-in;
+    }
+
+    .right:has(> img.speaker-image) {
+      opacity: 1;
+      align-items: end;
+      justify-items: end;
+      transform: translate3d(0, 0, 0);
+      will-change: transform, opacity;
+      contain: paint;
+      overflow: clip;
+      transition-delay: 0ms !important;
+      transition:
+        opacity 160ms linear,
+        transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+
+      @container scroll-state(not (snapped: block)) {
+        transform: translate3d(0, 110%, 0);
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    .top {
+      transition-delay: 500ms;
+    }
+
+    .left {
+      transition-delay: 600ms;
+    }
+    .right {
+      transition-delay: 700ms;
+    }
+  }
+</style>
+
+<section class={getSlideClasses()} data-order={order} style="background-color: var(--color-bg-secondary);">
+  {outro && <Heart />}
+  <div
+    class={`top ${sampleUrl ? "flex flex-row flex-nowrap justify-between items-start" : ""}`}
+  >
+    <h2 class={getTitleClasses()}>
+      <slot name="title">{title}</slot>
+      {
+        desc && (
+          <small class="text-theme-500 font-semibold block mt-[.35em] text-[.6em]">
+            {desc}
+          </small>
+        )
+      }
+    </h2>
+    {
+      sampleUrl && (
+        <a
+          href={sampleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="bg-theme-500 hover:bg-theme-600 transition-colors duration-200 ease-in-out font-semibold px-10 py-5 text-3xl rounded-[.25em] uppercase text-white"
+        >
+          Demo
+        </a>
+      )
+    }
+  </div>
+
+  <div class={`grid ${getGridColumnsClasses()} gap-[8svb] align-start`}>
+    <div class={getContentClasses()}>
+      <slot name="left">
+        <slot />
+      </slot>
+    </div>
+    {
+      hasRightContent && (
+        <div class={`right relative grid items-center [&:empty]:hidden ${speaker ? "min-h-[62svb]" : ""}`}>
+          <slot name="right">
+            {
+              image && (
+                <img
+                  src={image.url}
+                  loading={speaker ? "eager" : "lazy"}
+                  fetchpriority={speaker ? "high" : "auto"}
+                  alt={image.alt}
+                  width={image.width}
+                  height={image.height}
+                  class={`${speaker ? "speaker-image absolute right-[-6svb] bottom-0 max-h-[62svb] max-w-[46svi]" : "max-h-[70svb] max-w-[768px] absolute"} object-contain w-auto rounded-[.5em]`}
+                />
+              )
+            }
+          </slot>
+        </div>
+      )
+    }
+  </div>
+</section>
