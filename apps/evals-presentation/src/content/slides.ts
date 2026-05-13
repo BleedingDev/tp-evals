@@ -117,16 +117,21 @@ kontrola povinných termínů`,
     eyebrow: "Rubrika místo dojmu",
     hint: "<code>src/judges/rubrics.ts</code>, <code>src/judges/live-judge.ts</code>",
     items: [
-      "Judge musí mít jasnou rubriku, jinak jen odhaduje podle pocitu",
-      "Score musí ukázat dílčí dimenze, aby šlo výsledek zpochybnit nebo opravit",
-      "Kalibrační příklady drží judge při zemi",
-      "Judge hodnotí kvalitu textu, ale nenahrazuje deterministické scorery",
+      "Judge použijeme tam, kde nestačí pevné pravidlo: význam, úplnost, srozumitelnost",
+      "Rubrika říká, podle čeho se odpověď hodnotí a co už je problém",
+      "Jedno číslo nestačí: výsledek musí ukázat, které kritérium score zhoršilo",
+      "Kalibrační příklady ověří, že good, bad a borderline výstupy padají do správných pásem",
+      "Judge je další signál pro QA rozhodnutí, ne náhrada deterministických scorerů",
     ],
-    code: `Rubrika říká:
-- co je dobrý výstup
-- co je částečný problém
-- co je selhání
-- které dimenze mají větší váhu`,
+    code: `rubrika:
+  věcná správnost     40 %
+  úplnost odpovědi    30 %
+  práce s nejistotou  20 %
+  srozumitelnost      10 %
+
+výsledek:
+  score: 0.74
+  review: chybí důležité varování`,
     language: "md",
   },
   {
