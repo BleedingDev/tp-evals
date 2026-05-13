@@ -101,7 +101,7 @@ QA rozhodnutí:
     hint: "<code>src/scorers/text-quality.ts</code>, <code>src/scorers/structured-output.ts</code>",
     items: [
       "Placeholdery jako {{count}} se nesmí přepsat ani ztratit",
-      "Tagy typu <strong> a produktové kódy jako KIT-42 musí zůstat přesně stejné",
+      "Tagy typu &lt;strong&gt; a produktové kódy jako KIT-42 musí zůstat přesně stejné",
       "Schema a povinná pole nejsou věc názoru",
       "Zakázané fráze a vymyšlená data patří do hard failu",
       "LLM as a Judge má řešit až věci, které nejdou rozumně zapsat pravidlem",
@@ -204,7 +204,7 @@ pnpm run eval:export`,
     task: "Oddělte pravidla, která musí projít přesně, od subjektivní kvality textu",
     items: [
       "Placeholdery typu {{count}}",
-      "Tagy typu <strong>",
+      "Tagy typu &lt;strong&gt;",
       "Produktové kódy",
       "Zakázané fráze",
       "Glosářové termíny",
