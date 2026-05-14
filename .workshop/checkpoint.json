@@ -1,0 +1,6 @@
+{
+  "checkpoint": "checkpoint/10-consistency-regression",
+  "title": "Checkpoint 10 - Consistency Regression",
+  "nextLab": "lab:11",
+  "baseCommit": "290f60728a00b26020c13b89ab0ee1e99b886a00"
+}
