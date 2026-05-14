@@ -138,6 +138,17 @@ výsledek:
       "Bezpečnost: prompt injection, nechtěný únik obsahu",
       "Release: case risk, trend, threshold a export evidence",
     ],
+    code: `slot = hodnota, kterou model vytáhne ze vstupu
+
+příklad:
+input: "lety z Prahy do Madridu zítra pro 2 osoby"
+intent: search_flights
+slots:
+  origin: Praha
+  destination: Madrid
+  date: zítra
+  passengers: 2`,
+    language: "md",
   },
   {
     title: "Threshold není dekorace",
@@ -241,10 +252,11 @@ QA: low dimension score needs review reason`,
     title: "04 Mobile Search Intent",
     eyebrow: "Strukturovaný výstup",
     hint: "<code>evals/04-mobile-search-intent.eval.ts</code>, <code>src/apps/mobile-search.ts</code>",
-    task: "Zkontrolujte intent, slots, confidence a chování při neúplném vstupu",
+    task: "Zkontrolujte intent, vytažené slots, confidence a chování při neúplném vstupu",
     items: [
-      "Intent určuje další produktový krok",
-      "Slots jsou hodnoty vytažené z dotazu, ne domyšlené",
+      "Intent určuje další produktový krok: search, filter, sort, compare, ask",
+      "Slot je konkrétní hodnota z dotazu: origin, destination, date, passengers, maxPrice",
+      "Chybějící slot má skončit v missing fields, ne jako vymyšlená hodnota",
       "Missing fields chrání proti předčasné akci",
       "Confidence threshold odděluje continue od review",
     ],
