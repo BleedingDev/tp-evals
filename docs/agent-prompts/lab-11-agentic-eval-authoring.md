@@ -1,31 +1,44 @@
-# Lab 11 Fallback Agent Prompt: Author A New Eval Case And Check
+# Lab 11 Fallback Agent Prompt: nový eval case a kontrola
 
-Use this only as a fallback if you are stuck writing your own task. The primary lab path is to formulate your own bounded coding-agent assignment from the repository root.
+Použijte jen jako fallback, pokud se zaseknete při psaní vlastního assignmentu pro coding agenta. Primární cesta labu je, že účastník nejdřív sám ohraničí QA engineering úkol z rootu repozitáře.
 
 ```text
-You are helping with an Evalite QA workshop repository.
+Pomáháš v Evalite QA workshop repozitáři.
 
-Goal:
-Add one new synthetic eval case for Lab 11 and one small eval-code check that makes the case reviewable. The case should test travel summary quality, unsupported claims, warning handling, or missing source information.
+Kontext:
+- Cílem je Lab 11, ne úprava celé eval infrastruktury.
+- QA vlastník chce jeden nový syntetický travel summary eval case a jednu malou eval-code kontrolu.
+- Data musí být share-safe a nesmí používat reálné company, customer, passenger, booking, airport ani route údaje.
 
-Allowed files:
+Cíl:
+Přidej jeden nový syntetický case pro Lab 11 a jednu malou kontrolu, která zlepší reviewovatelnost případu. Case má testovat jedno z těchto rizik: unsupported claims, warning handling, missing source information, délka/clarity regression, nebo high-risk selhání skryté průměrem.
+
+Povolené soubory:
 - data/evals/agent-authored-summary.jsonl
 - evals/11-agentic-eval-authoring.eval.ts
 
-Rules:
-- Do not use real company, customer, passenger, booking, airport, or route data.
-- Keep the case synthetic and safe to share.
-- Follow the existing TravelSummaryRecord JSONL shape exactly.
-- Add clear expectedBehavior, labels, risk, metadata.reviewHint, requiredFacts, forbiddenClaims, and notes.
-- Add one small scorer, metadata assertion, or review check in evals/11-agentic-eval-authoring.eval.ts.
-- Keep the eval-code change local to Lab 11 and easy for a QA reviewer to understand.
-- Prefer one focused high-value case over a large dataset dump.
-- Do not change unrelated labs.
+Úkol:
+1. Přidej přesně jeden nový JSONL řádek do data/evals/agent-authored-summary.jsonl.
+2. Dodrž existující TravelSummaryRecord shape.
+3. Použij syntetický sourceText a syntetické fictional detaily.
+4. Vyplň jasné expectedBehavior, labels, risk, metadata.reviewHint, metadata.participantEditTargets, requiredFacts, forbiddenClaims a notes.
+5. Přidej jednu malou lokální kontrolu v evals/11-agentic-eval-authoring.eval.ts:
+   - scorer,
+   - metadata assertion,
+   - nebo review check.
+6. Kontrola musí pomáhat QA reviewerovi rozhodnout, ne jen ověřovat triviální existenci pole.
+7. Neměň ostatní labs, package/config, slides, src mimo explicitně povolený soubor ani evals mimo Lab 11.
+8. Preferuj jeden přesný high-value case před větším dataset dumpem.
 
-After editing:
-- Run pnpm run data:check.
-- Run pnpm run lab:11.
-- Report the files changed, what code check you added, what risk the new case covers, and whether the eval result is a release blocker or a review signal.
+Gate / ověření:
+- Spusť pnpm run data:check.
+- Spusť pnpm run lab:11.
+
+Report:
+- Vyjmenuj changed files.
+- Popiš přidaný eval-code check.
+- Popiš pokryté riziko.
+- Řekni, jestli výsledek považuješ za release blocker, review signal, nebo weak case k přepsání.
 ```
 
-Review the agent's diff before accepting it. The agent can draft the case, but QA owns the final expected behavior and scoring decision.
+Po agentově diffu proveďte vlastní QA review. Agent může draftovat case, ale konečné expected behavior, threshold a release rozhodnutí patří QA vlastníkovi.

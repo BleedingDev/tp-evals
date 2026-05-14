@@ -71,12 +71,13 @@ EVALITE_LAB_PORT=3116 pnpm run lab:04
 
 ## OpenRouter API Key
 
-The workshop expects live OpenRouter calls. Check `.env` first:
+The workshop expects live OpenRouter calls by default. Check `.env` first:
 
 ```sh
 WORKSHOP_MODE=live
 LIVE_LLM_ENABLED=true
 OPENROUTER_MODEL=openrouter/owl-alpha
+OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
 OPENROUTER_API_KEY=...
 ```
 
@@ -87,7 +88,7 @@ pnpm run smoke
 pnpm run live:check
 ```
 
-If OpenRouter returns `401`, the key loaded by the process is invalid or not the same key you expected. The repo `.env` is loaded by the workshop commands and the key is not printed.
+If OpenRouter returns `401`, the key loaded by the process is invalid or not the same key you expected. The repo `.env` is loaded by the workshop commands and the key is not printed. Do not paste the key into issue comments, chat transcripts, slides, or lab handouts.
 
 ## Missing Files
 
@@ -108,7 +109,7 @@ pnpm run data:check
 
 ## Lab Result Looks Unexpected
 
-Open the matching handout in `docs/labs`, then inspect the lab file and dataset it names. Focus on:
+Open the matching handout in `docs/labs`, then inspect only the lab file and dataset it names. Keep the investigation inside the current lab scope and focus on:
 
 - The `task` function that produces output.
 - The `scorers` array that decides pass or fail.
@@ -119,4 +120,10 @@ Re-run only the lab you changed:
 
 ```sh
 pnpm run lab:01
+```
+
+If you changed dataset rows, also run:
+
+```sh
+pnpm run data:check
 ```

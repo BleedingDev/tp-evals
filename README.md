@@ -1,8 +1,8 @@
 # Evalite QA Workshop
 
-This repository is a hands-on QA workshop for evaluating AI application behavior with live model calls, synthetic datasets, and visible scoring evidence.
+This repository is a hands-on QA workshop for evaluating AI application behavior with live OpenRouter calls, synthetic datasets, and visible scoring evidence.
 
-You will inspect test data, run one lab at a time, compare passing, borderline, and failing cases, make small edits to expectations, thresholds, labels, or prompts, and use a coding agent to author a new synthetic eval case.
+You will inspect test data, run one lab at a time, compare passing, borderline, and failing cases, make small edits to expectations, thresholds, labels, or prompts, and use a coding agent to author a new synthetic eval case. Keep work inside the current lab scope and use only synthetic workshop data.
 
 ## Prerequisites
 
@@ -10,9 +10,9 @@ You will inspect test data, run one lab at a time, compare passing, borderline, 
 - pnpm `10.33.4`
 - One setup path from [docs/setup.md](docs/setup.md): Mise, Proto, direct pnpm, or Docker
 - A terminal in the repository root
-- `OPENROUTER_API_KEY` in local `.env`
+- `OPENROUTER_API_KEY` in a local `.env`
 
-The default workshop mode uses OpenRouter with `openrouter/owl-alpha`.
+The default workshop mode is live OpenRouter using `openrouter/owl-alpha`.
 
 ## First Commands
 
@@ -89,5 +89,7 @@ pnpm run eval:all
 pnpm run data:check
 pnpm run verify
 ```
+
+Use `pnpm run verify` as the full workshop gate. For narrow edits, run the matching lab command and `pnpm run data:check` when datasets change.
 
 If setup or Evalite does not behave as expected, use [docs/troubleshooting.md](docs/troubleshooting.md).

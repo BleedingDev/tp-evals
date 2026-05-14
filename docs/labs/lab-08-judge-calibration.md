@@ -1,60 +1,49 @@
 # Lab 08: Judge Calibration
 
-## Goal
+## Kontext
 
-Check whether known good, borderline, and bad examples land in the expected judge score bands.
+LLM as a Judge pomáhá hodnotit kvalitu, která nejde snadno zkontrolovat exact matchem: význam, unsupported claims, warning handling nebo srozumitelnost. Judge ale nesmí být černá skříňka. Nejdřív ho musíte kalibrovat na known good, borderline a known bad příkladech.
 
-## Before You Start
+Pokud calibration failne, neznamená to automaticky, že aplikace je špatná. Nejdřív zkontrolujte rubric, příklady, score bands a samotný judge output.
 
-LLM as a Judge means that one model evaluates the output produced by the application or another model. This is useful for quality questions that are hard to check with simple code, such as:
+## Cíl
 
-- Did the answer keep the important meaning?
-- Did it include the required warning?
-- Did it add unsupported claims?
-- Is it clear enough for a user?
+Ověřit, že známé příklady padají do očekávaných score bands a že borderline případ zůstává reviewovatelný místo toho, aby byl falešně zelený nebo červený.
 
-Calibration means checking the judge against examples where we already know the expected outcome:
-
-- `known good`: should receive a high score,
-- `known bad`: should receive a low score,
-- `borderline`: should land in a review band, not be treated as clearly good or clearly bad.
-
-If calibration fails, do not immediately assume the tested app is bad. First inspect:
-
-- the judging criteria,
-- the calibration examples,
-- the score bands,
-- the judge model output.
-
-## Files To Inspect
+## Soubory
 
 - `evals/08-judge-calibration.eval.ts`
 - `src/judges/live-judge.ts`
 - `src/judges/rubrics.ts`
 - `src/scorers/judge.ts`
 
-## Command
+## Úkol
+
+Spusťte lab:
 
 ```sh
 pnpm run lab:08
 ```
 
-## Participant Task
+V `evals/08-judge-calibration.eval.ts` najděte `calibrationData`. Pro každý příklad porovnejte:
 
-Run the lab:
+1. `output`, který judge hodnotí.
+2. `expectedBehavior`, tedy proč je příklad good, borderline nebo bad.
+3. `expected.targetBand`, `minScore` a `maxScore`.
+4. Skutečný `judgeScore`.
+5. `dimensionScores`, které score táhnou nahoru nebo dolů.
 
-```sh
-pnpm run lab:08
-```
+Pak navrhněte jednu kalibrační změnu. Typicky zpřesněte hranici borderline pásma, aby známý hraniční případ nebyl automaticky považovaný za release pass. Nehýbejte pásmem jen proto, aby aktuální výstup prošel; napište QA důvod.
 
-Then open `evals/08-judge-calibration.eval.ts` and inspect `calibrationData`.
+## Gate / ověření
 
-For each calibration example, compare:
+- `pnpm run lab:08` doběhne.
+- Known good je v good band, known bad v bad band, borderline má prostor pro review.
+- Umíte identifikovat dimenzi, která způsobila odchylku.
+- Judge threshold je obhajitelný pro daný typ rizika.
 
-1. `output`: the text being judged,
-2. `expectedBehavior`: what should happen,
-3. `expected.targetBand`: expected band (`good`, `borderline`, `bad`),
-4. `judgeScore`: actual score from the judge,
-5. `dimensionScores`: which criterion pulled the score up or down.
+## QA rozhodnutí
 
-Make one small calibration edit, such as narrowing or widening the score band for the borderline example. Re-run `pnpm run lab:08` and decide whether the band is useful for tester review.
+Rozhodněte, jestli je judge připravený jako gate pro další laby, nebo zatím jen jako review signal.
+
+Pokud kalibrace nedrží na known bad prompt injection nebo unsupported summary příkladu, nepoužívejte judge jako jediný release gate.

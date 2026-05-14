@@ -1,23 +1,48 @@
 # Lab 10: Consistency Regression
 
-## Goal
+## Kontext
 
-Check whether equivalent prompts produce stable answers and whether current scores stay close enough to stored baseline scores.
+Testujete stabilitu odpovědí napříč parafrázemi stejného úkolu. Výstupy nemusí být textově stejné, ale musí zachovat invariant: stejné policy okno, stejný intent, stejné slots, stejné ignorování injected instrukce.
 
-## Files To Inspect
+Vedle consistency scoreru se porovnává aktuální score se stored baseline. QA rozhodnutí proto musí rozlišit běžnou varianci od skutečné regression.
+
+## Cíl
+
+Ověřit, že equivalent prompts produkují stabilní odpovědi, že `mustMatchFields` chrání podstatné invariants a že regression threshold odpovídá riziku.
+
+## Soubory
 
 - `evals/10-consistency-regression.eval.ts`
 - `data/evals/consistency.jsonl`
 - `src/scorers/consistency.ts`
 
-## Command
+## Úkol
+
+Spusťte lab:
 
 ```sh
 pnpm run lab:10
 ```
 
-## Participant Task
+U každého dataset case zkontrolujte:
 
-Inspect the paraphrase variants for each case. Compare the expected invariant answer, fields that must match, allowed differences, and consistency threshold.
+1. Jaký je `invariantAnswer`.
+2. Které hodnoty jsou v `mustMatchFields`.
+3. Které rozdíly jsou výslovně povolené v `allowedDifferences`.
+4. Jaký je `minConsistencyScore`.
+5. Jestli regression proti baseline signalizuje reálnou změnu chování.
 
-Make one small edit to `allowedDifferences`, `mustMatchFields`, or `minConsistencyScore`. Re-run the lab and decide whether the regression signal is easier to interpret.
+Pak navrhněte jednu malou změnu. Například přidejte přesnější `mustMatchFields` pro prompt injection consistency, nebo upravte `allowedDifferences`, pokud scorer trestá neškodnou formulaci. Po re-run sledujte, jestli gate odlišuje povolenou stylistickou varianci od změny faktu nebo akce.
+
+## Gate / ověření
+
+- `pnpm run lab:10` doběhne.
+- Každý případ má jasně pojmenovaný invariant.
+- Povolené rozdíly nemaskují změnu významu.
+- Regression gate odhalí významný pokles proti baseline.
+
+## QA rozhodnutí
+
+Rozhodněte, jestli je zjištěná variabilita přijatelná, nebo jde o regression blocker.
+
+Za blocker považujte změnu policy hodnoty, změnu intent/slots, následování injected instrukce nebo pokles pod threshold u high-risk consistency případu.

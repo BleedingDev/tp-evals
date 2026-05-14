@@ -1,6 +1,6 @@
 # Setup
 
-Use one path. The workshop defaults to live OpenRouter calls, so each machine needs a local `.env` with `OPENROUTER_API_KEY`.
+Use one path. The workshop defaults to live OpenRouter calls, so each machine needs a local `.env` with `OPENROUTER_API_KEY`. Keep the file local and do not share, print, or commit the key.
 
 ## Option 1: Mise
 
@@ -81,7 +81,7 @@ Docker mounts the repository into `/workspace` and keeps dependencies in a named
 
 ## Environment Defaults
 
-The default environment is equivalent to `.env.example`.
+The default environment is equivalent to `.env.example`. It is tuned for live QA exercises with OpenRouter and Evalite result persistence under `.evalite/`.
 
 ```sh
 WORKSHOP_MODE=live
@@ -91,6 +91,9 @@ EVALITE_PORT=3006
 EVALITE_SCORE_THRESHOLD=60
 EVALITE_MAX_CONCURRENCY=4
 EVALITE_TEST_TIMEOUT_MS=90000
+EVALITE_TRIAL_COUNT=1
+EVALITE_CACHE=true
+EVALITE_HIDE_TABLE=false
 LIVE_LLM_ENABLED=true
 OPENROUTER_MODEL=openrouter/owl-alpha
 OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
@@ -98,4 +101,10 @@ OPENROUTER_TIMEOUT_MS=60000
 OPENROUTER_API_KEY=...
 ```
 
-Do not commit `.env`. The smoke command confirms mode and model without printing the key.
+Do not commit `.env`. The smoke command confirms mode and model without printing the key. Run the live check before lab work that depends on model calls:
+
+```sh
+pnpm run live:check
+```
+
+For narrow workshop edits, prefer the smallest useful gate: `pnpm run data:check` after dataset edits, the relevant `pnpm run lab:NN` after lab edits, and `pnpm run verify` before broad workshop changes are considered ready.

@@ -45,54 +45,105 @@ const firstUserHistory = (input: MobileSearchInput): string | undefined => {
   return input.conversation?.find((turn) => turn.role === "user")?.content;
 };
 
-const categoryFromHistory = (input: MobileSearchInput): string | undefined => {
+const flightSlotsFromHistory = (input: MobileSearchInput): SlotMap => {
   const content = firstUserHistory(input);
   if (content === undefined) {
-    return undefined;
+    return {};
   }
 
-  const match = /(?:find|show me|search for)\s+(.+)$/iu.exec(content.trim());
-  const category = match?.[1]?.trim();
-  return category && category.length > 0 ? category : undefined;
+  const slots: SlotMap = {};
+  const route = /from\s+(.+?)\s+to\s+(.+?)(?:\s+(?:departing|on|for)\b|$)/iu.exec(
+    content,
+  );
+  const departure = /(?:departing|on)\s+(\d{4}-\d{2}-\d{2})/iu.exec(content);
+  const returnDate = /returning\s+(\d{4}-\d{2}-\d{2})/iu.exec(content);
+  const passengers = /for\s+(\d+)\s+(?:passengers?|travelers?|adults?)/iu.exec(
+    content,
+  );
+
+  if (route?.[1] !== undefined) {
+    slots["origin"] = route[1].trim();
+  }
+
+  if (route?.[2] !== undefined) {
+    slots["destination"] = route[2].trim();
+  }
+
+  if (departure?.[1] !== undefined) {
+    slots["departureDate"] = departure[1];
+  }
+
+  if (returnDate?.[1] !== undefined) {
+    slots["returnDate"] = returnDate[1];
+  }
+
+  if (passengers?.[1] !== undefined) {
+    slots["passengers"] = Number(passengers[1]);
+  }
+
+  return slots;
 };
 
 const improvedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
   const utterance = normalize(input.utterance);
-  const historyCategory = categoryFromHistory(input);
+  const historyFlightSlots = flightSlotsFromHistory(input);
+  const hasFlightContext =
+    historyFlightSlots["origin"] !== undefined &&
+    historyFlightSlots["destination"] !== undefined;
 
-  if (utterance === "show hiking socks under 40 with breathable fabric") {
+  if (
+    utterance ===
+    "find flights from sfo to tokyo on 2026-06-12 returning 2026-06-20 for 2 adults in economy nonstop under 900"
+  ) {
     return makeOutput(
       "improved",
       "find_item",
-      { category: "hiking socks", maxPrice: 40, material: "breathable fabric" },
+      {
+        origin: "SFO",
+        destination: "Tokyo",
+        departureDate: "2026-06-12",
+        returnDate: "2026-06-20",
+        passengers: 2,
+        cabinClass: "economy",
+        directOnly: true,
+        maxPrice: 900,
+      },
       [],
       "none",
-      0.93,
+      0.94,
     );
   }
 
-  if (utterance === "i need something light for tomorrow") {
+  if (utterance === "i need a flight to denver friday morning") {
     return makeOutput(
       "improved",
       "ask_clarification",
-      { timeframe: "tomorrow" },
-      ["category", "use_case"],
+      { destination: "Denver" },
+      ["origin", "departureDate"],
       "high",
       0.68,
       [],
       [],
-      "What type of item are you looking for?",
+      "Where are you flying from, and which Friday should I use?",
     );
   }
 
-  if (utterance === "find waterproof bags") {
+  if (
+    utterance ===
+    "show morning flights from austin to seattle on 2026-07-08 for 1 passenger"
+  ) {
     return makeOutput(
       "improved",
       "find_item",
-      { category: "bags", feature: "waterproof" },
-      ["size", "price"],
+      {
+        origin: "Austin",
+        destination: "Seattle",
+        departureDate: "2026-07-08",
+        passengers: 1,
+      },
+      ["returnDate", "cabinClass"],
       "low",
-      0.84,
+      0.86,
     );
   }
 
@@ -100,7 +151,7 @@ const improvedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
     return makeOutput(
       "improved",
       "ask_clarification",
-      { ordinal: 3 },
+      { resultPositions: ["3"] },
       ["result_list"],
       "high",
       0.72,
@@ -110,17 +161,17 @@ const improvedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
     );
   }
 
-  if (utterance === "only under 25") {
+  if (utterance === "only under 550") {
     return makeOutput(
       "improved",
       "filter_results",
       {
-        category: historyCategory ?? "current results",
-        maxPrice: 25,
+        ...historyFlightSlots,
+        maxPrice: 550,
       },
-      historyCategory === undefined ? ["category"] : [],
-      historyCategory === undefined ? "high" : "none",
-      historyCategory === undefined ? 0.7 : 0.9,
+      hasFlightContext ? [] : ["result_list"],
+      hasFlightContext ? "none" : "high",
+      hasFlightContext ? 0.91 : 0.7,
     );
   }
 
@@ -129,44 +180,45 @@ const improvedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
       "improved",
       "compare_options",
       {
+        ...historyFlightSlots,
         resultPositions: ["1", "2"],
-        category: historyCategory ?? "current results",
       },
-      historyCategory === undefined ? ["result_list"] : [],
-      historyCategory === undefined ? "high" : "low",
-      historyCategory === undefined ? 0.7 : 0.86,
+      hasFlightContext ? [] : ["result_list"],
+      hasFlightContext ? "low" : "high",
+      hasFlightContext ? 0.86 : 0.7,
     );
   }
 
-  if (utterance === "show me the blue one") {
+  if (utterance === "show me the nonstop one") {
     return makeOutput(
       "improved",
       "ask_clarification",
       {
-        color: "blue",
-        category: historyCategory ?? "current results",
+        ...historyFlightSlots,
+        directOnly: true,
+        resultPositions: ["1", "3"],
       },
       ["unique_result"],
       "high",
       0.74,
       [],
       [],
-      "Do you mean the small blue result or the large blue result?",
+      "Do you mean the 7:10 AM nonstop or the 5:45 PM nonstop?",
     );
   }
 
-  if (utterance === "put cheapest first") {
+  if (utterance === "put shortest flights first") {
     return makeOutput(
       "improved",
       "sort_results",
       {
-        sortBy: "price",
+        ...historyFlightSlots,
+        sortBy: "duration",
         sortDirection: "ascending",
-        category: historyCategory ?? "current results",
       },
-      historyCategory === undefined ? ["result_list"] : [],
-      historyCategory === undefined ? "high" : "none",
-      historyCategory === undefined ? 0.72 : 0.91,
+      hasFlightContext ? [] : ["result_list"],
+      hasFlightContext ? "none" : "high",
+      hasFlightContext ? 0.91 : 0.72,
     );
   }
 
@@ -179,23 +231,23 @@ const improvedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
     0.35,
     [],
     [],
-    "What would you like to search for?",
+    "What flight would you like to search for?",
   );
 };
 
 const baselineMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
   const utterance = normalize(input.utterance);
 
-  if (utterance === "i need something light for tomorrow") {
+  if (utterance === "i need a flight to denver friday morning") {
     return makeOutput(
       "baseline",
       "find_item",
-      { category: "lightweight jackets", timeframe: "tomorrow" },
+      { destination: "Denver", departureDate: "2026-05-15" },
       [],
       "low",
       0.58,
       ["invented-field", "changed-intent", "missing-follow-up-question"],
-      ["category"],
+      ["departureDate"],
     );
   }
 
@@ -203,37 +255,37 @@ const baselineMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
     return makeOutput(
       "baseline",
       "open_result",
-      { ordinal: 3, resultPosition: 3 },
+      { resultPositions: ["3"], resultId: "flight-option-3" },
       [],
       "low",
       0.6,
       ["invented-field", "changed-intent", "missing-follow-up-question"],
-      ["resultPosition"],
+      ["resultId"],
     );
   }
 
-  if (utterance === "only under 25") {
+  if (utterance === "only under 550") {
     return makeOutput(
       "baseline",
       "filter_results",
-      { maxPrice: 25 },
-      ["category"],
+      { maxPrice: 550 },
+      ["origin", "destination"],
       "high",
       0.76,
       ["conversation-history-ignored"],
     );
   }
 
-  if (utterance === "show me the blue one") {
+  if (utterance === "show me the nonstop one") {
     return makeOutput(
       "baseline",
       "open_result",
-      { color: "blue", resultPosition: 1 },
+      { directOnly: true, resultId: "flight-option-1" },
       [],
       "low",
       0.62,
       ["ambiguous-reference-opened", "invented-field"],
-      ["resultPosition"],
+      ["resultId"],
     );
   }
 
@@ -248,42 +300,60 @@ const baselineMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
 const flawedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
   const utterance = normalize(input.utterance);
 
-  if (utterance === "show hiking socks under 40 with breathable fabric") {
+  if (
+    utterance ===
+    "find flights from sfo to tokyo on 2026-06-12 returning 2026-06-20 for 2 adults in economy nonstop under 900"
+  ) {
     return makeOutput(
       "flawed",
       "find_item",
-      { category: "hiking socks", maxPrice: 40, brand: "invented-brand" },
-      ["material"],
+      {
+        origin: "SFO",
+        destination: "Tokyo",
+        departureDate: "2026-06-12",
+        passengers: 2,
+        airline: "invented-airline",
+      },
+      ["returnDate", "cabinClass"],
       "none",
       0.81,
       ["invented-field", "missing-slot"],
-      ["brand"],
+      ["airline"],
     );
   }
 
-  if (utterance === "i need something light for tomorrow") {
+  if (utterance === "i need a flight to denver friday morning") {
     return makeOutput(
       "flawed",
       "find_item",
-      { category: "light jacket", timeframe: "tomorrow", priceRange: "low" },
+      { origin: "current location", destination: "Denver", departureDate: "2026-05-15" },
       [],
       "low",
       0.64,
       ["invented-field", "changed-intent", "missing-follow-up-question"],
-      ["category", "priceRange"],
+      ["origin", "departureDate"],
     );
   }
 
-  if (utterance === "find waterproof bags") {
+  if (
+    utterance ===
+    "show morning flights from austin to seattle on 2026-07-08 for 1 passenger"
+  ) {
     return makeOutput(
       "flawed",
       "find_item",
-      { category: "travel bags", feature: "waterproof", color: "blue" },
+      {
+        origin: "Austin",
+        destination: "Seattle",
+        departureDate: "2026-07-08",
+        passengers: 1,
+        cabinClass: "business",
+      },
       [],
       "none",
       0.86,
       ["invented-field", "missing-refinement-slots"],
-      ["color"],
+      ["cabinClass"],
     );
   }
 
@@ -291,25 +361,25 @@ const flawedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
     return makeOutput(
       "flawed",
       "open_result",
-      { ordinal: 3, resultId: "result-3", category: "current results" },
+      { resultPositions: ["3"], resultId: "flight-option-3" },
       [],
       "none",
       0.77,
       ["invented-field", "changed-intent", "missing-follow-up-question"],
-      ["resultId", "category"],
+      ["resultId"],
     );
   }
 
-  if (utterance === "only under 25") {
+  if (utterance === "only under 550") {
     return makeOutput(
       "flawed",
       "find_item",
-      { category: "items", maxPrice: 25 },
+      { destination: "anywhere", maxPrice: 550 },
       [],
       "low",
       0.65,
       ["conversation-history-ignored", "changed-intent", "invented-field"],
-      ["category"],
+      ["destination"],
     );
   }
 
@@ -325,24 +395,24 @@ const flawedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
     );
   }
 
-  if (utterance === "show me the blue one") {
+  if (utterance === "show me the nonstop one") {
     return makeOutput(
       "flawed",
       "open_result",
-      { color: "blue", resultPosition: 1 },
+      { directOnly: true, resultId: "flight-option-1" },
       [],
       "none",
       0.69,
       ["ambiguous-reference-opened", "invented-field"],
-      ["resultPosition"],
+      ["resultId"],
     );
   }
 
-  if (utterance === "put cheapest first") {
+  if (utterance === "put shortest flights first") {
     return makeOutput(
       "flawed",
       "filter_results",
-      { sortBy: "price", maxPrice: 25 },
+      { sortBy: "duration", maxPrice: 550 },
       [],
       "low",
       0.67,
@@ -354,7 +424,7 @@ const flawedMobileSearch = (input: MobileSearchInput): MobileSearchOutput => {
   return makeOutput(
     "flawed",
     "find_item",
-    { category: "popular items" },
+    { destination: "popular destinations" },
     [],
     "low",
     0.42,

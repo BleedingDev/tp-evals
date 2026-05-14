@@ -1,24 +1,47 @@
 # Lab 07: Travel Info Summary
 
-## Goal
+## Kontext
 
-Evaluate summaries against supplied source text, required facts, forbidden claims, source uncertainty, and warning handling.
+Testujete summary výstupy proti dodanému source textu. Model má shrnout užitečné informace, ale nesmí přidat schedule, cost, pravidla nebo varování, která ve zdroji nejsou. V cestovním kontextu je problém hlavně confident unsupported claim.
 
-## Files To Inspect
+## Cíl
+
+Ověřit required facts, forbidden claims, source uncertainty, warning handling a sentence limit tak, aby summary scorer i judge dávaly čitelné QA rozhodnutí.
+
+## Soubory
 
 - `evals/07-travel-info-summary.eval.ts`
 - `data/evals/travel-info-summary.jsonl`
 - `src/apps/travel-summary.ts`
 - `src/scorers/summary.ts`
 
-## Command
+## Úkol
+
+Spusťte lab:
 
 ```sh
 pnpm run lab:07
 ```
 
-## Participant Task
+Vyberte jeden případ s úplným source textem a jeden případ, kde source nestačí na uživatelovu otázku. U každého porovnejte:
 
-Pick a case where the source text is complete and a case where the source text is insufficient. Compare the summary output with `requiredFacts`, `forbiddenClaims`, `includeWarning`, and `insufficientSource`.
+1. `requiredFacts` proti skutečnému source textu.
+2. `forbiddenClaims` proti věcem, které by model mohl lákavě domyslet.
+3. `includeWarning` a `insufficientSource`.
+4. `maxSentences` a jestli podporuje uživatelsky použitelný output.
+5. `minFactCoverage` a jeho vztah k riziku.
 
-Make one small edit to a summary expectation, such as adding a forbidden claim or changing `maxSentences`. Re-run the lab and check whether the scorer highlights the summary behavior you wanted to test.
+Navrhněte jednu malou expectation změnu: například přidejte forbidden claim, který by v produkci byl nebezpečný, nebo upravte `maxSentences`, pokud nutí model vynechat podstatné upozornění. Po re-run sledujte, jestli scorer vysvětluje změnu konkrétně.
+
+## Gate / ověření
+
+- `pnpm run lab:07` doběhne.
+- Summary neobsahuje unsupported claims.
+- Pokud je source insufficient, výstup to jasně říká místo domýšlení detailů.
+- Warning není změněný z podmíněného na jistý stav.
+
+## QA rozhodnutí
+
+Rozhodněte, jestli je summary výstup vhodný pro release gate, review signal, nebo blocker.
+
+Za blocker považujte hlavně vymyšlený policy detail, chybějící safety warning nebo zamlčení toho, že source text neobsahuje odpověď.

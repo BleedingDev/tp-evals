@@ -172,9 +172,9 @@ export const WORKSHOP_RUBRICS = {
     calibrationExamples: [
       {
         id: "filter-price",
-        output: "filter_results with category compact chargers and maxPrice 25",
+        output: "filter_results with origin Boston, destination Lisbon, and maxPrice 550",
         expectedScore: 1,
-        rationale: "It keeps the conversation category and applies the new price filter.",
+        rationale: "It keeps the conversation route and applies the new price filter.",
       },
     ],
   },

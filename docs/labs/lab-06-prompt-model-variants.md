@@ -1,61 +1,52 @@
 # Lab 06: Live Prompt Variants
 
-## Goal
+## Kontext
 
-Compare two live OpenRouter prompt variants on the same translation cases and decide which failures are caused by the prompt, the model behavior, or the expectation.
+Porovnáváte dvě live OpenRouter prompt varianty na stejné sadě překladových edge cases. Slabší varianta může mít lepší průměr na jednoduchých případech, ale selhat na jednom high-risk fragmentu. Silnější QA závěr proto musí být case-level, ne jen average score.
 
-The point is not to trust the average score. The point is to compare the same cases across variants and find which exact case got better, worse, or stayed risky.
+## Cíl
 
-## Files To Inspect
+Vyhodnotit, jestli rozdíl mezi `plain-ui-translation` a `guardrailed-translation` pochází z promptu, model behavior, nebo z výběru dataset cases.
+
+## Soubory
 
 - `evals/06-prompt-model-variants.eval.ts`
 - `data/evals/translations-edge-cases.jsonl`
 - `src/variants/index.ts`
 - `src/apps/translation.ts`
 
-## Command
+## Úkol
+
+Spusťte lab:
 
 ```sh
 pnpm run lab:06
 ```
 
-## Participant Task
+V `evals/06-prompt-model-variants.eval.ts` najděte:
 
-Run the lab:
+1. `variants`, kde jsou definované dvě porovnávané varianty.
+2. `records.filter(...)`, kde je omezený výběr dataset cases.
 
-```sh
-pnpm run lab:06
-```
+V Evalite porovnejte varianty po jednotlivých řádcích:
 
-Then open `evals/06-prompt-model-variants.eval.ts` and find two things:
+1. Zůstaly placeholders přesně stejné?
+2. Zůstaly tagy vyvážené?
+3. Zůstaly protected codes přesné?
+4. Zlepšila se glossary konzistence, nebo jen judge score?
+5. Skrývá průměr jeden high-risk fail?
 
-1. `variants`: this defines which variants are compared.
-2. `records.filter(...)`: this defines which dataset cases are included.
+Proveďte jeden kontrolovaný experiment: přidejte do výběru case ID `translation-edge-mode-de`, znovu spusťte lab a porovnejte, jestli se QA závěr o lepší variantě změnil. Pokud chcete silnější kontrast, změňte první variantu z `translation.baseline` na `translation.flawed` a sledujte, jestli scorer rozdíl zachytí na správných cases.
 
-The starting comparison is:
+## Gate / ověření
 
-- `plain-ui-translation`: a weaker prompt with fewer instructions,
-- `guardrailed-translation`: a stricter prompt with explicit guardrails,
-- three selected cases from `data/evals/translations-edge-cases.jsonl`.
+- `pnpm run lab:06` doběhne.
+- Víte, které cases jsou v porovnání zahrnuté a proč.
+- Rozdíl mezi variantami umíte popsat case-level, ne jen průměrem.
+- OpenRouter live behavior neinterpretujete jako deterministický výsledek bez kontroly konkrétních outputů.
 
-Both variants call the same live OpenRouter model. The lab changes the prompt instructions and payload.
+## QA rozhodnutí
 
-In Evalite, compare the two variants case by case:
+Rozhodněte, která prompt varianta je bezpečnější pro další testovací kolo a jaké riziko ještě zůstává.
 
-- Did placeholders stay unchanged?
-- Did tags stay balanced?
-- Did protected product codes stay exact?
-- Did glossary terms improve or regress?
-- Is a single high-risk failure hidden by a better average?
-
-Run one controlled experiment:
-
-1. In `records.filter(...)`, add `translation-edge-mode-de` to the selected case IDs.
-2. Re-run `pnpm run lab:06`.
-3. Compare whether the average score and the case-level failures tell the same story.
-
-This is not a random edit. You are changing the scope of the eval suite to see whether the QA conclusion still holds when the dataset selection changes.
-
-Optional stronger contrast: change the first variant input from `translation.baseline` to `translation.flawed`, then rerun `pnpm run lab:06`.
-
-Re-run `pnpm run lab:06` and confirm that the comparison now focuses on the cases you intended to study.
+Pokud jedna varianta zlepší average score, ale rozbije protected fragment, označte ji jako review risk nebo release blocker podle dopadu fragmentu.

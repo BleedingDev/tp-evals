@@ -1,10 +1,16 @@
 # Lab 11: Agentic Eval Authoring
 
-## Goal
+## Kontext
 
-Use a coding agent to create a new eval case and a small eval-code change, then verify the result yourself. The agent can draft the dataset and code changes, but QA owns the expected behavior, risk level, and release decision.
+V tomto labu používáte coding agenta k vytvoření nového eval case a malé eval-code kontroly. Agent může navrhnout dataset a kód, ale QA vlastní očekávané chování, risk level, threshold a release rozhodnutí.
 
-## Files To Inspect
+Důležité: nejdřív napište vlastní assignment pro agenta. Fallback prompt v `docs/agent-prompts/lab-11-agentic-eval-authoring.md` použijte až ve chvíli, kdy se zaseknete.
+
+## Cíl
+
+Zadat agentovi ohraničený QA engineering úkol, nechat ho přidat jeden syntetický Lab 11 case a jednu malou review kontrolu, a potom jeho diff nezávisle zreviewovat.
+
+## Soubory
 
 - `docs/agent-prompts/lab-11-agentic-eval-authoring.md`
 - `evals/11-agentic-eval-authoring.eval.ts`
@@ -12,74 +18,61 @@ Use a coding agent to create a new eval case and a small eval-code change, then 
 - `src/scorers/summary.ts`
 - `src/judges/rubrics.ts`
 
-## Command
+## Úkol
+
+Nejdřív spusťte existující lab:
 
 ```sh
 pnpm run lab:11
 ```
 
-## Participant Task
+Potom napište vlastní assignment pro Cline, GitHub Copilot Chat nebo jiného coding agenta. Nezačínejte copy-paste fallback promptem. Assignment má být krátký, ale přesný:
 
-Start by running the existing lab:
+1. Vyberte jedno riziko: unsupported claims, missing source information, warning handling, length/clarity regression, nebo high-risk case skrytý průměrem.
+2. Povolte agentovi jen ty soubory, které opravdu potřebuje pro Lab 11.
+3. Vyžádejte přesně jeden nový syntetický JSONL case v `data/evals/agent-authored-summary.jsonl`.
+4. Vyžádejte přesně jednu malou review kontrolu, scorer nebo metadata assertion v `evals/11-agentic-eval-authoring.eval.ts`.
+5. Zakažte reálná zákaznická, cestovní, booking, airport nebo route data.
+6. Řekněte agentovi, že JSONL shape musí odpovídat existujícím řádkům.
+7. Vyžádejte gate příkazy `pnpm run data:check` a `pnpm run lab:11`.
+8. Vyžádejte závěrečný report: changed files, covered risk, přidaný check a QA rozhodnutí.
+
+Teprve pokud se zaseknete, použijte fallback prompt:
 
 ```sh
-pnpm run lab:11
+docs/agent-prompts/lab-11-agentic-eval-authoring.md
 ```
 
-Then write your own task for Cline, GitHub Copilot Chat, or another coding agent. Do not start by pasting the fallback prompt. The point is to practice giving an agent a bounded QA engineering task.
+Po agentově změně diff nepřebírejte slepě. Zreviewujte:
 
-Ask the agent to make two changes:
+1. Je case syntetický a share-safe?
+2. Je `expectedBehavior` srozumitelný pro dalšího testera?
+3. Jsou `requiredFacts` a `forbiddenClaims` konkrétní?
+4. Odpovídá `risk` business dopadu?
+5. Je nový eval-code check skutečně užitečný, nebo jen kosmetický?
+6. Vysvětluje scorer output výsledek?
 
-1. Add one new synthetic case to `data/evals/agent-authored-summary.jsonl`.
-2. Add one small review check, scorer, or metadata assertion in `evals/11-agentic-eval-authoring.eval.ts` that makes the new case easier to review.
-
-Pick one risk:
-
-- unsupported claims,
-- missing source information,
-- warning handling,
-- length or clarity regression,
-- high-risk case that should not be hidden by the average.
-
-Your agent task should include:
-
-- the chosen risk,
-- the allowed files,
-- the requirement to use only synthetic share-safe data,
-- the expected JSONL shape should match existing rows,
-- the eval-code change should stay small and local to Lab 11,
-- the verification commands: `pnpm run data:check` and `pnpm run lab:11`,
-- the report you expect back: changed files, covered risk, and release decision.
-
-If you get stuck, use `docs/agent-prompts/lab-11-agentic-eval-authoring.md` as a fallback prompt.
-
-After the agent edits the repo, do not accept the change blindly. Review:
-
-1. Is the case synthetic and safe to share?
-2. Is `expectedBehavior` clear enough for another tester?
-3. Are `requiredFacts` and `forbiddenClaims` concrete?
-4. Does `risk` match the business impact?
-5. Is the new eval-code check actually useful, or is it just a cosmetic assertion?
-6. Does the scorer output explain the result?
-
-Run:
+Nakonec spusťte:
 
 ```sh
 pnpm run data:check
 pnpm run lab:11
 ```
 
-Decide whether the new case is:
+## Gate / ověření
 
-- a release blocker,
-- a review signal,
-- or a weak case that should be rewritten.
+- `pnpm run data:check` projde.
+- `pnpm run lab:11` projde nebo selže očekávaným, vysvětlitelným způsobem.
+- Agent změnil jen Lab 11 dataset/eval scope.
+- Nový case má `agent-authored` label, review metadata a jasné notes.
+- Nový check zvyšuje review kvalitu, ne jen počet assertion.
 
-## Stretch Task
+## QA rozhodnutí
 
-Ask the agent to create a new eval file by cloning the Lab 11 pattern for a different capability, such as translation or mobile search. Keep the scope small:
+Rozhodněte, jestli agentem přidaný case je:
 
-- one dataset file,
-- one eval file,
-- one command or documented way to run it,
-- one clear QA decision.
+- release blocker,
+- review signal,
+- nebo weak case, který se má přepsat.
+
+QA rozhodnutí napište vlastními slovy. Agentův report je evidence, ne autorita.

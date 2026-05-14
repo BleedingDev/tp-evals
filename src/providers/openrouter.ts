@@ -399,6 +399,41 @@ const normalizeMobileSlots = (
     slots["resultPositions"] = resultPositions;
   }
 
+  const origin = slots["origin"] ?? slots["from"] ?? slots["departureCity"] ?? slots["departureAirport"];
+  if (origin !== undefined) {
+    slots["origin"] = origin;
+  }
+
+  const destination = slots["destination"] ?? slots["to"] ?? slots["arrivalCity"] ?? slots["arrivalAirport"];
+  if (destination !== undefined) {
+    slots["destination"] = destination;
+  }
+
+  const departureDate = slots["departureDate"] ?? slots["departDate"] ?? slots["date"] ?? slots["outboundDate"];
+  if (departureDate !== undefined) {
+    slots["departureDate"] = departureDate;
+  }
+
+  const returnDate = slots["returnDate"] ?? slots["inboundDate"];
+  if (returnDate !== undefined) {
+    slots["returnDate"] = returnDate;
+  }
+
+  const passengers = numericSlot(slots["passengers"]) ?? numericSlot(slots["passengerCount"]) ?? numericSlot(slots["pax"]);
+  if (passengers !== undefined) {
+    slots["passengers"] = passengers;
+  }
+
+  const cabinClass = slots["cabinClass"] ?? slots["cabin"] ?? slots["travelClass"];
+  if (cabinClass !== undefined) {
+    slots["cabinClass"] = cabinClass;
+  }
+
+  const directOnly = slots["directOnly"] ?? slots["nonstop"] ?? slots["directFlightsOnly"];
+  if (directOnly !== undefined) {
+    slots["directOnly"] = directOnly;
+  }
+
   const sortOrder = String(slots["sortOrder"] ?? slots["sort"] ?? "").toLowerCase();
   if (sortOrder.includes("cheap") || sortOrder.includes("price")) {
     slots["sortBy"] = "price";
@@ -416,6 +451,22 @@ const normalizeMobileSlots = (
     "targets",
     "sortOrder",
     "sort",
+    "from",
+    "departureCity",
+    "departureAirport",
+    "to",
+    "arrivalCity",
+    "arrivalAirport",
+    "departDate",
+    "date",
+    "outboundDate",
+    "inboundDate",
+    "passengerCount",
+    "pax",
+    "cabin",
+    "travelClass",
+    "nonstop",
+    "directFlightsOnly",
   ]) {
     delete slots[alias];
   }
@@ -509,7 +560,7 @@ export const extractMobileSearchIntentWithOpenRouter = async (
             "Convert the user's mobile search utterance into a structured intent.",
             "Allowed intents: find_item, filter_results, sort_results, open_result, compare_options, ask_clarification, unknown.",
             "Return JSON with keys: intent, slots, missingSlots, ambiguity, confidence, followUpQuestions, inventedSlots.",
-            "Use canonical slot keys: category, maxPrice, material, feature, color, ordinal, resultPositions, sortBy, sortDirection.",
+            "Use canonical slot keys for flight search: origin, destination, departureDate, returnDate, passengers, cabinClass, directOnly, maxPrice, resultPositions, sortBy, sortDirection.",
             "If the user refers to missing context, ask for clarification instead of inventing a result.",
             "If multiple visible results match the utterance, use intent ask_clarification and missingSlots [\"unique_result\"].",
           ].join(" "),

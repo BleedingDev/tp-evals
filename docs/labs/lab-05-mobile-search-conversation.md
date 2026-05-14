@@ -1,53 +1,56 @@
 # Lab 05: Mobile Search Conversation
 
-## Goal
+## Kontext
 
-Check whether conversation history is used correctly when a mobile search command depends on prior turns.
+Tento lab testuje follow-up příkazy v mobilním flight-search flow. Poslední věta často nestačí sama o sobě: „only under 550“, „compare the first two“ nebo „show me the nonstop one“ vyžadují conversation history. Model musí správně přenést route, dates a visible results, ale nesmí si domyslet jednoznačnost, která v historii není.
 
-This lab is about follow-up commands. The latest user sentence often does not contain enough information by itself. The model must combine it with `conversation` history, or ask a clarification question when the reference is not unique.
+Ordinal reference znamená odkaz pořadím, například „first two flights“, „third option“ nebo „the second result“. U flight search je to rizikové, protože model nesmí otevřít nebo porovnat špatný výsledek jen proto, že věta zní jasně.
 
-## Terms
+## Cíl
 
-- `intent`: what the user wants to do, such as `filter_results`, `sort_results`, `compare_options`, or `ask_clarification`.
-- `slots`: extracted values the app needs to act on the intent, such as `category`, `maxPrice`, `color`, or `resultPositions`.
-- `ordinal reference`: an order-based reference like "the first one", "the second", or "compare the first two".
-- `missingSlots`: values that are required before the app can safely continue.
+Ověřit, že eval rozlišuje slots převzaté z historie, slots z aktuální utterance, missing slots a clarification behavior pro nejednoznačné reference.
 
-## Files To Inspect
+## Soubory
 
 - `evals/05-mobile-search-conversation.eval.ts`
 - `data/evals/mobile-search-conversation.jsonl`
 - `src/apps/mobile-search.ts`
 - `src/scorers/structured-output.ts`
 
-## Command
+## Úkol
+
+Spusťte lab:
 
 ```sh
 pnpm run lab:05
 ```
 
-## Participant Task
+Otevřete `data/evals/mobile-search-conversation.jsonl`. Pro každý řádek vytvořte krátkou trace tabulku:
 
-Run the lab, then open `data/evals/mobile-search-conversation.jsonl`.
+1. Expected `intent`.
+2. `slots`, které pochází z `conversation`.
+3. `slots`, které pochází z aktuální `utterance`.
+4. `missingSlots`, které brání bezpečné app akci.
+5. Jestli má model odpovědět akcí, nebo clarification otázkou.
 
-For each row, answer three questions:
+Příklad:
 
-1. What is the expected `intent`?
-2. Which `slots` come from `conversation` history?
-3. Which `slots` come from the latest `utterance`?
-
-Example:
-
-- history: `Result 1 is a shell jacket. Result 2 is a fleece jacket.`
-- latest utterance: `compare the first two`
+- history: `Result 1 departs 09:15 with one stop. Result 2 departs 13:40 nonstop.`
+- utterance: `compare the first two`
 - expected intent: `compare_options`
 - expected slots: `resultPositions: ["1", "2"]`
 
-Then inspect the scorer details in Evalite. The important checks are:
+Potom udělejte jeden řízený experiment: u ambiguous případu změňte assistant history tak, aby reference byla jednoznačná, nebo naopak z jednoznačného případu udělejte ambiguous. Re-run ukáže, jestli se změní intent, carried slots a missing-slot behavior.
 
-- intent classification,
-- carried slots from history,
-- missing-slot behavior,
-- clarification behavior for ambiguous references.
+## Gate / ověření
 
-Make one small edit to a conversation row, such as changing assistant history to make a reference unique or ambiguous. Re-run the lab and check whether intent, carried slots, and missing-slot behavior still match the expected result.
+- `pnpm run lab:05` doběhne.
+- U každého případu umíte vysvětlit, odkud pochází každý slot.
+- Scorer `conversation_state` odděleně ukazuje intent, carried slots a missing-slot behavior.
+- Clarification případ nevypadá jako běžná search action.
+
+## QA rozhodnutí
+
+Rozhodněte, jestli conversation state extraction může spustit navazující UI akci bez lidského zásahu.
+
+Za blocker považujte zejména špatně přenesený route/date context, ignorovanou nejednoznačnost nebo vymyšlený `resultId`.

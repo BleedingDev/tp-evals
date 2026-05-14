@@ -31,21 +31,24 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
       outputs: [
         {
           intent: "find_item",
-          category: "compact umbrellas",
-          maxPrice: 30,
-          answer: "find_item with category compact umbrellas and maxPrice 30",
+          origin: "Boston",
+          destination: "Lisbon",
+          maxPrice: 550,
+          answer: "find_item with origin Boston, destination Lisbon, and maxPrice 550",
         },
         {
           intent: "find_item",
-          category: "compact umbrellas",
-          maxPrice: 30,
-          answer: "find_item with category compact umbrellas and maxPrice 30",
+          origin: "Boston",
+          destination: "Lisbon",
+          maxPrice: 550,
+          answer: "find_item with origin Boston, destination Lisbon, and maxPrice 550",
         },
         {
           intent: "find_item",
-          category: "compact umbrellas",
-          maxPrice: 30,
-          answer: "find_item with category compact umbrellas and maxPrice 30",
+          origin: "Boston",
+          destination: "Lisbon",
+          maxPrice: 550,
+          answer: "find_item with origin Boston, destination Lisbon, and maxPrice 550",
         },
       ],
       regressionCases: [

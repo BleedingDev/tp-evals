@@ -1,31 +1,49 @@
 # Lab 04: Mobile Search Intent
 
-## Goal
+## Kontext
 
-Evaluate single-turn mobile search intent extraction, required slots, missing slots, ambiguity, and disallowed invented fields.
+Testujete single-turn mobile search intent extraction. Uživatel napíše krátkou větu v mobilní aplikaci a model má vrátit strukturovaný výstup: `intent`, `slots`, `missingSlots`, `ambiguity`, `confidence` a seznam nechtěně vymyšlených polí.
 
-## Terms
+Pro QA je riziko dvojí: model může podextrahovat důležité flight slots, nebo naopak vymyslet origin, airline, fare cap či datum, které uživatel neřekl. Slot je konkrétní hodnota vytažená z dotazu, například `origin`, `destination`, `departureDate`, `passengers` nebo `maxPrice`.
 
-- `intent`: what the user wants to do, for example `find_item`, `filter_results`, or `ask_clarification`.
-- `slots`: extracted values needed by the app, for example `category`, `maxPrice`, `material`, `color`, or `resultPositions`.
-- `missingSlots`: values the model says are missing before the app can safely continue.
-- `confidence`: how sure the model claims to be about the selected intent.
+## Cíl
 
-## Files To Inspect
+Ověřit, že structured-output scorer postihuje intent, required slots, missing slots, disallowed slots a threshold pro confidence tak, aby výstup šel použít jako automatizační gate.
+
+## Soubory
 
 - `evals/04-mobile-search-intent.eval.ts`
 - `data/evals/mobile-search-intents.jsonl`
 - `src/providers/openrouter.ts`
 - `src/scorers/structured-output.ts`
 
-## Command
+## Úkol
+
+Spusťte lab:
 
 ```sh
 pnpm run lab:04
 ```
 
-## Participant Task
+Vyberte jeden přímý search případ a jeden ambiguous případ. U každého ručně porovnejte dataset `expected` s model output v Evalite:
 
-Pick one direct search case and one ambiguous utterance. Compare the dataset's `expected` object with the live model output in Evalite.
+1. Je `intent` správný pro další app action?
+2. Jsou `requiredSlots` skutečně řečené uživatelem?
+3. Jsou `missingSlots` blokující, nebo jen užitečné pro refinement?
+4. Obsahují `disallowedSlots` pole, která by model mohl nebezpečně vymyslet?
+5. Odpovídá `minIntentConfidence` riziku daného případu?
 
-Make one small dataset edit, such as adding a disallowed slot, clarifying a missing slot, or adjusting `minIntentConfidence`. Re-run the lab and confirm whether the structured-output score explains the change.
+Pak navrhněte jednu úzkou změnu v datasetu: například přidejte `airline` do `disallowedSlots`, zpřesněte `missingSlots`, nebo upravte confidence threshold u ambiguous věty. Po změně znovu spusťte lab a sledujte, jestli scorer popisuje přesně ten problém, který jste chtěli zachytit.
+
+## Gate / ověření
+
+- `pnpm run lab:04` doběhne.
+- Structured output odpovídá schématu a neobsahuje vymyšlené zakázané slots.
+- Ambiguous případ buď žádá o upřesnění, nebo má jasně obhájené nízké riziko.
+- Confidence threshold není nastavený jen tak, aby případ prošel.
+
+## QA rozhodnutí
+
+Rozhodněte, jestli by daný intent extraction výstup mohl bezpečně spustit akci v aplikaci, nebo musí skončit v clarification flow.
+
+Release blocker je hlavně vymyšlený slot, špatná akce, nebo příliš sebejistý output u nejednoznačného vstupu.
