@@ -20,7 +20,7 @@ export const slides: DeckSlide[] = [
       "Porovnat prompt, model a data na stejné sadě případů",
       "Dát QA týmu opakovatelný release gate",
     ],
-    note: "Cíl: praktický eval proces pro pokročilé QA testery, kteří potřebují řídit riziko AI výstupů",
+    note: "Cíl: praktický eval proces pro pokročilé QA, kteří potřebují řídit riziko AI výstupů",
     center: true,
   },
   {
@@ -54,7 +54,7 @@ dataset + score + failing cases + threshold + run metadata`,
     hint: "<code>data/evals/*.jsonl</code>, <code>src/datasets/schemas.ts</code>",
     items: [
       "Jeden JSONL řádek je jeden QA case",
-      "Každý case má riziko, expected behavior a edit targets",
+      "Každý case má riziko, expected behaviour a edit targets",
       "Syntetická data musí být anonymní a sdílitelná",
       "Slabý dataset vytvoří falešně zelený gate",
     ],
@@ -191,7 +191,7 @@ pnpm run eval:export`,
     hint: "<code>evals/01-dataset-quality.eval.ts</code>, <code>data/evals/dataset-quality-broken.jsonl</code>",
     task: "Najděte slabá metadata a určete, jestli dataset může být release evidence",
     items: [
-      "Labels a expected behavior říkají, proč case existuje",
+      "Labels a expected behaviour říkají, proč case existuje",
       "Risk a capability musí odpovídat shared schema",
       "Anonymization flags rozhodují, jestli data smí do workshopu",
       "Participant edit targets dělají case opravovatelný",
@@ -333,7 +333,7 @@ QA: uncalibrated judge is not a release gate`,
       "Instruction override nesmí změnit systémové chování",
       "System-like content nesmí uniknout do odpovědi",
       "Schema bypass je hard fail",
-      "Allowed content a forbidden behavior musí být oddělené",
+      "Allowed content a forbidden behaviour musí být oddělené",
     ],
     code: `pnpm run lab:09
 
@@ -355,7 +355,7 @@ QA: leakage or secret-like output = stop`,
     code: `pnpm run lab:10
 
 gate: consistency + regression_gate
-QA: behavior drift in high-risk case = stop`,
+QA: behaviour drift in high-risk case = stop`,
     language: "bash",
   },
   {
@@ -365,7 +365,7 @@ QA: behavior drift in high-risk case = stop`,
     task: "Zadejte agentovi úzký eval-authoring úkol a rozhodněte, jestli výsledek může do QA evidence",
     items: [
       "Agentic work je vážný QA acceleration pattern",
-      "QA vlastní risk, expected behavior, threshold a review hint",
+      "QA vlastní risk, expected behaviour, threshold a review hint",
       "Agent smí navrhnout case a scorer check v jasném scope",
       "Diff a výsledky gate jsou povinná evidence",
     ],
@@ -405,6 +405,42 @@ QA: agent diff without reviewable metadata = reject`,
     code: `pnpm run eval:all
 pnpm run eval:export`,
     language: "bash",
+  },
+  {
+    title: "Nástroje: co patří do repertoáru",
+    eyebrow: "Ne jeden tool, ale stack",
+    items: [
+      "Eval harness: repo-first testy nad datasety, scorery a thresholdy",
+      "Observability: tracing, prompt/model verze, produkční příklady a feedback",
+      "Red teaming: prompt injection, leakage, jailbreak a schema bypass sady",
+      "Collaboration: prompt playground, test history, review workflow",
+      "Governance: AGENTS.md, CODEOWNERS, CI gate a auditovatelná evidence",
+    ],
+    code: `core stack:
+  Evalite     -> evals jako kód
+  Langfuse    -> traces, datasets, feedback
+  Promptfoo   -> red team + model/prompt matrix
+  LangTail    -> volitelný prompt playground pro product/QA`,
+    language: "md",
+  },
+  {
+    title: "Doporučený směr pro vás",
+    eyebrow: "AI-native tým + coding agents",
+    items: [
+      "Source of truth držet v GitLabu, ne v externím dashboardu",
+      "Každá změna promptu/modelu/RAG logiky má přidat nebo aktualizovat eval case",
+      "Produkční failure se stává regression case",
+      "Coding agent může psát návrhy datasetů/scorerů, QA drží risk a schválení",
+      "Dashboard používat na debug a sběr dat; release gate běží v CI",
+    ],
+    code: `release loop:
+production traces
+  -> curated dataset
+  -> Evalite regression suite
+  -> Promptfoo safety suite
+  -> GitLab CI gate
+  -> QA continue / review / stop`,
+    language: "md",
   },
   {
     title: "Co si odnést",
