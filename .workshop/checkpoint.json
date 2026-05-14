@@ -1,0 +1,6 @@
+{
+  "checkpoint": "checkpoint/03-translation-quality",
+  "title": "Checkpoint 03 - Translation Quality",
+  "nextLab": "lab:04",
+  "baseCommit": "290f60728a00b26020c13b89ab0ee1e99b886a00"
+}
