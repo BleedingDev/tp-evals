@@ -1,0 +1,6 @@
+{
+  "checkpoint": "checkpoint/06-prompt-model-variants",
+  "title": "Checkpoint 06 - Prompt And Model Variants",
+  "nextLab": "lab:07",
+  "baseCommit": "290f60728a00b26020c13b89ab0ee1e99b886a00"
+}
