@@ -1,0 +1,6 @@
+{
+  "checkpoint": "checkpoint/00-runtime",
+  "title": "Checkpoint 00 - Runtime Ready",
+  "nextLab": "lab:01",
+  "baseCommit": "290f60728a00b26020c13b89ab0ee1e99b886a00"
+}
