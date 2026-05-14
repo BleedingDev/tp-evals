@@ -1,0 +1,6 @@
+{
+  "checkpoint": "checkpoint/01-dataset-quality",
+  "title": "Checkpoint 01 - Dataset Quality",
+  "nextLab": "lab:02",
+  "baseCommit": "290f60728a00b26020c13b89ab0ee1e99b886a00"
+}
