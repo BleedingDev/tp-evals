@@ -268,21 +268,54 @@ QA: invented slot in high-risk flow = stop`,
   },
   {
     title: "05 Conversation State",
-    eyebrow: "Historie mění očekávání",
-    hint: "<code>evals/05-mobile-search-conversation.eval.ts</code>, <code>data/evals/mobile-search-conversation.jsonl</code>",
-    task: "Ověřte, jestli model správně spojí aktuální větu s conversation history",
+    eyebrow: "Follow-up dotaz bez historie nedává smysl",
+    hint: "<code>data/evals/mobile-search-conversation.jsonl</code>",
+    task: "Rozdělte, co přišlo z historie a co z aktuální věty",
     items: [
-      "Slots z historie nesmí přepsat aktuální instrukci",
-      "Ordinal reference typu první/druhý/třetí musí ukázat na správné výsledky",
-      "Změna intentu nesmí zůstat ve starém flow",
-      "Nejasný odkaz má skončit jako ask_clarification",
+      "Aktuální věta často není celý požadavek",
+      "Route, dates a passengers se přenáší z historie",
+      "Nová věta přidá filtr, sort nebo compare akci",
+      "Správný výstup je buď app action, nebo clarification",
     ],
-    code: `pnpm run lab:05
+    code: `history:
+Boston -> Lisbon
+Sep 3 -> Sep 12
+2 travelers
 
-edit point: data/evals/mobile-search-conversation.jsonl
-gate: structured_output + conversation_state + rubric_judge >= 0.68
-QA: ambiguous reference without clarification = stop`,
-    language: "bash",
+utterance:
+only under 550
+
+expected:
+intent: filter_results
+carried slots: origin, destination, dates, passengers
+new slot: maxPrice
+missing: []`,
+    language: "md",
+  },
+  {
+    title: "05 Ambiguous Reference",
+    eyebrow: "Když výraz sedí na víc výsledků",
+    hint: "<code>evals/05-mobile-search-conversation.eval.ts</code>",
+    task: "Ověřte, že model nevybere náhodný výsledek",
+    items: [
+      "„the nonstop one“ nestačí, pokud jsou nonstop výsledky dva",
+      "Model nesmí otevřít první shodu jen proto, že může",
+      "Správné chování je ask_clarification",
+      "Scorer má chytit vymyšlený resultId",
+    ],
+    code: `history:
+Result 1: nonstop
+Result 2: one stop
+Result 3: nonstop
+
+utterance:
+show me the nonstop one
+
+expected:
+intent: ask_clarification
+missing: unique_result
+do not return: resultId`,
+    language: "md",
   },
   {
     title: "06 Live Prompt Variants",
