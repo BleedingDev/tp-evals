@@ -1,0 +1,6 @@
+{
+  "checkpoint": "checkpoint/09-prompt-injection",
+  "title": "Checkpoint 09 - Prompt Injection",
+  "nextLab": "lab:10",
+  "baseCommit": "290f60728a00b26020c13b89ab0ee1e99b886a00"
+}
