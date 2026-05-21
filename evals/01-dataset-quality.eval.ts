@@ -26,10 +26,10 @@ interface DatasetQualityExpected {
 
 interface DatasetQualityOutput {
   readonly detectedIssueTypes: readonly string[];
-  readonly repairChecklist: readonly string[];
-  readonly anonymizedAfterRepair: boolean;
+  readonly suggestedFixes: readonly string[];
+  readonly safeToShareAfterFix: boolean;
   readonly completenessScore: number;
-  readonly variant: "dataset-repair-audit";
+  readonly variant: "dataset-quality-audit";
 }
 
 const expectedById = new Map<string, DatasetQualityExpected>([
@@ -98,10 +98,10 @@ const inspectRecord = (sampleRecord: unknown): DatasetQualityOutput => {
   if (!isRecord(sampleRecord)) {
     return {
       detectedIssueTypes: ["record"],
-      repairChecklist: ["make each JSONL line an object"],
-      anonymizedAfterRepair: false,
+      suggestedFixes: ["make each JSONL line an object"],
+      safeToShareAfterFix: false,
       completenessScore: 0,
-      variant: "dataset-repair-audit",
+      variant: "dataset-quality-audit",
     };
   }
 
@@ -180,10 +180,10 @@ const inspectRecord = (sampleRecord: unknown): DatasetQualityOutput => {
 
   return {
     detectedIssueTypes: issues,
-    repairChecklist: [...new Set(checklist)],
-    anonymizedAfterRepair: !issues.some((issue) => issue.startsWith("source.")),
+    suggestedFixes: [...new Set(checklist)],
+    safeToShareAfterFix: !issues.some((issue) => issue.startsWith("source.")),
     completenessScore: issues.length === 0 ? 1 : Math.max(0.25, 1 - issues.length / 6),
-    variant: "dataset-repair-audit",
+    variant: "dataset-quality-audit",
   };
 };
 
@@ -212,14 +212,14 @@ const loadBrokenData = async () => {
 };
 
 evalite<DatasetQualityInput, DatasetQualityOutput, DatasetQualityExpected>(
-  "Lab 01 - Dataset Quality Repair",
+  "Lab 01 - Dataset Quality Audit",
   {
     data: loadBrokenData,
     task: (input) => inspectRecord(input.sampleRecord),
     scorers: [
       createEvaliteScorer({
-        name: "detected_repair_issues",
-        description: "Checks that the repair exercise finds the intended broken fields.",
+        name: "detected_dataset_issues",
+        description: "Checks that the audit finds the intended broken fields.",
         scorer: ({ output, expected }) => {
           const detected = new Set(output.detectedIssueTypes);
           const matched = expected.issueTypes.filter((issue) => detected.has(issue));
@@ -231,25 +231,25 @@ evalite<DatasetQualityInput, DatasetQualityOutput, DatasetQualityExpected>(
           return makeResult(
             score,
             unexpected.length === 0 && score === 1
-              ? "Expected dataset repair issues were detected."
-              : "Dataset repair issue detection needs review.",
+              ? "Expected dataset issues were detected."
+              : "Dataset issue detection needs review.",
             { matched, missing: expected.issueTypes.filter((issue) => !detected.has(issue)), unexpected },
             0.9,
           );
         },
       }),
       createEvaliteScorer({
-        name: "repair_checklist",
-        description: "Checks that the participant-facing repair checklist is small.",
+        name: "suggested_fix_checklist",
+        description: "Checks that the audit suggests the required minimal fixes.",
         scorer: ({ output, expected }) => {
           const covered = expected.fixChecklist.filter((item) =>
-            output.repairChecklist.includes(item),
+            output.suggestedFixes.includes(item),
           );
 
           return makeResult(
             covered.length / expected.fixChecklist.length,
-            "Repair checklist coverage for this broken row.",
-            { covered, repairChecklist: output.repairChecklist },
+            "Suggested fix coverage for this broken dataset row.",
+            { covered, suggestedFixes: output.suggestedFixes },
             0.8,
           );
         },

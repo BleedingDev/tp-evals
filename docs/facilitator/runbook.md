@@ -9,7 +9,7 @@ Run the workshop in live mode through the AI proxy. The hands-on path is designe
 Recommended flow:
 
 1. Setup check: `pnpm run smoke`, `pnpm run live:check`, then `pnpm run data:summary`.
-2. Lab 01 establishes dataset repair and schema discipline.
+2. Lab 01 establishes dataset audit and schema discipline.
 3. Labs 02-03 move from deterministic translation guardrails into judge-assisted quality scoring.
 4. Labs 04-05 cover structured mobile-search intent extraction and conversation state.
 5. Lab 06 compares live prompt variants on the same dataset cases.
@@ -25,7 +25,7 @@ If time is tight, keep Labs 01, 02, 04, 07, 09, and 11. Use Lab 06 as a short in
 
 | Lab | Command | Learning Point | Expected Failure Mode | Facilitator Cue | Rescue Target |
 | --- | --- | --- | --- | --- | --- |
-| 01 - Dataset Quality Repair | `pnpm run lab:01` | Eval results are only as useful as the dataset metadata, expected behavior, and repair checklist. | Broken rows should expose missing labels, invalid risk/capability values, unsafe source flags, empty edit targets, and out-of-range thresholds. | Ask which fields affect scoring, filtering, and reviewer trust. Emphasize that dataset quality is part of the test, not pre-work. | `checkpoint/01-dataset-quality` |
+| 01 - Dataset Quality Audit | `pnpm run lab:01` | Eval results are only as useful as the dataset metadata, expected behavior, and suggested fixes. | Broken rows should expose missing labels, invalid risk/capability values, unsafe source flags, empty edit targets, and out-of-range thresholds. | Emphasize that green score means the audit found the intended defects, not that the dataset is clean. Ask which fields affect scoring, filtering, and reviewer trust. | `checkpoint/01-dataset-quality` |
 | 02 - Translation Guardrails | `pnpm run lab:02` | Deterministic scorers catch protected text, placeholders, tags, glossary terms, and forbidden phrases before a subjective quality discussion. | Failing translation cases break placeholders or tags, drift on glossary terms, or include forbidden patterns. | Ask participants to separate exact invariants from language-quality judgments. | `checkpoint/02-translation-guardrails` |
 | 03 - Translation Quality Judge | `pnpm run lab:03` | A criteria-based judge can supplement hard guardrails when semantic quality matters. | Output may preserve protected text but still miss meaning, terminology, or quality thresholds. | Ask what the deterministic scorer should own versus what the judge should own. | `checkpoint/03-translation-quality` |
 | 04 - Mobile Search Intent | `pnpm run lab:04` | Structured-output evals should verify schema, intent, slots, missing fields, confidence, and invented data. | Baseline cases invent disallowed slots, miss ambiguity, return low confidence, or fail the expected shape. | Ask which fields would block release and which should only trigger review. | `checkpoint/04-mobile-search-intent` |

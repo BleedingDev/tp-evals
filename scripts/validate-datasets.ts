@@ -46,7 +46,7 @@ async function main(): Promise<void> {
         );
       } else {
         console.log(
-          `ok ${relativePath}: ${schemaIssues.length} expected schema issue(s) for the repair lab`,
+          `ok ${relativePath}: ${schemaIssues.length} expected schema issue(s) for the audit lab`,
         );
       }
       continue;

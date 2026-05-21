@@ -68,7 +68,7 @@ Each lab has a short participant handout under `docs/labs`.
 
 | Lab | Focus | Handout |
 | --- | --- | --- |
-| 01 | Dataset quality repair signals | [Lab 01](docs/labs/lab-01-dataset-quality.md) |
+| 01 | Dataset quality audit signals | [Lab 01](docs/labs/lab-01-dataset-quality.md) |
 | 02 | Translation guardrails | [Lab 02](docs/labs/lab-02-translation-guardrails.md) |
 | 03 | Translation quality judge | [Lab 03](docs/labs/lab-03-translation-quality.md) |
 | 04 | Mobile search intent extraction | [Lab 04](docs/labs/lab-04-mobile-search-intent.md) |
