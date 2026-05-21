@@ -194,6 +194,9 @@ const formatAuditOutput = (audit: DatasetQualityAudit): DatasetQualityOutput =>
   JSON.stringify({
     rowStatus: audit.rowStatus,
     issues: audit.detectedIssueTypes,
+    fixPlan: audit.detectedIssueTypes.map((issue, index) =>
+      `${issue} -> ${audit.suggestedFixes[index] ?? "review manually"}`,
+    ),
     fixes: audit.suggestedFixes,
     safeAfterFix: audit.safeToShareAfterFix,
   });

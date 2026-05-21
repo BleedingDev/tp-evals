@@ -142,6 +142,80 @@ const resultPathFor = (name: string): string =>
 
 const threshold = (): string => process.env["EVALITE_SCORE_THRESHOLD"] ?? "70";
 
+const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const readStringField = (
+  value: Record<string, unknown>,
+  key: string,
+): string | undefined => {
+  const candidate = value[key];
+  return typeof candidate === "string" ? candidate : undefined;
+};
+
+const readStringArrayField = (
+  value: Record<string, unknown>,
+  key: string,
+): string[] => {
+  const candidate = value[key];
+  return Array.isArray(candidate)
+    ? candidate.filter((item): item is string => typeof item === "string")
+    : [];
+};
+
+const printLab01ReadingGuide = async (resultPath: string): Promise<void> => {
+  const parsed = JSON.parse(await readFile(resultPath, "utf8")) as unknown;
+
+  if (!isUnknownRecord(parsed) || !Array.isArray(parsed["suites"])) {
+    return;
+  }
+
+  const suite = parsed["suites"].find(isUnknownRecord);
+  if (suite === undefined || !Array.isArray(suite["evals"])) {
+    return;
+  }
+
+  console.log("");
+  console.log("Jak číst Lab 01:");
+  console.log("- Dataset rows jsou schválně rozbité workshopové fixtures.");
+  console.log("- 100% score znamená, že audit našel plánované vady.");
+  console.log("- Neznamená to, že dataset row je čistý nebo připravený do release gate.");
+  console.log("");
+  console.log("Jak určit, co fixnout:");
+  console.log("- Nehádejte z čísla Score.");
+  console.log("- Vezměte konkrétní case ID, otevřete stejný řádek v data/evals/dataset-quality-broken.jsonl.");
+  console.log("- V `fixPlan` čtěte každý řádek jako: rozbitý field -> minimální oprava.");
+  console.log("");
+  console.log("Souhrn cases:");
+
+  for (const item of suite["evals"]) {
+    if (!isUnknownRecord(item)) {
+      continue;
+    }
+
+    const input = readStringField(item, "input") ?? "unknown";
+    const outputText = readStringField(item, "output") ?? "{}";
+    const caseId = input.split(" | ")[0] ?? input;
+    const output = JSON.parse(outputText) as unknown;
+
+    if (!isUnknownRecord(output)) {
+      continue;
+    }
+
+    const rowStatus = readStringField(output, "rowStatus") ?? "unknown";
+    const fixPlan = readStringArrayField(output, "fixPlan");
+
+    console.log(`- ${caseId}: rowStatus=${rowStatus}`);
+    for (const fix of fixPlan) {
+      console.log(`  - ${fix}`);
+    }
+  }
+
+  console.log("");
+  console.log("Úkol pro účastníky:");
+  console.log("Ke každému case řekněte: 1. co je rozbité, 2. proč je to QA riziko, 3. jaký je minimální fix.");
+};
+
 const labPortFor = (lab: LabDefinition): string => {
   const labIndex = labs.findIndex((candidate) => candidate.command === lab.command);
   return process.env["EVALITE_LAB_PORT"] ?? String(3100 + Math.max(labIndex, 0) * 10);
@@ -297,11 +371,26 @@ const runDataSummary = async (): Promise<never> => {
 const runLab = async (lab: LabDefinition): Promise<never> => {
   await assertPathsExist([lab.file]);
   console.log(`Running ${lab.label}: ${lab.file}`);
-  return runEvalite(
-    ["run", lab.file, "--threshold", threshold()],
-    resultPathFor(lab.command.replace(":", "-")),
-    { EVALITE_PORT: labPortFor(lab) },
-  );
+  const resultPath = resultPathFor(lab.command.replace(":", "-"));
+  await mkdir(dirname(resultPath), { recursive: true });
+
+  const exitCode = await run("pnpm", [
+    "exec",
+    "evalite",
+    "run",
+    lab.file,
+    "--threshold",
+    threshold(),
+    "--outputPath",
+    resultPath,
+    ...passthroughArgs,
+  ], { EVALITE_PORT: labPortFor(lab) });
+
+  if (exitCode === 0 && lab.command === "lab:01") {
+    await printLab01ReadingGuide(resultPath);
+  }
+
+  process.exit(exitCode);
 };
 
 const runLabAll = async (): Promise<never> => {
@@ -323,6 +412,10 @@ const runLabAll = async (): Promise<never> => {
 
     if (exitCode !== 0) {
       process.exit(exitCode);
+    }
+
+    if (lab.command === "lab:01") {
+      await printLab01ReadingGuide(resultPathFor(lab.command.replace(":", "-")));
     }
   }
 
