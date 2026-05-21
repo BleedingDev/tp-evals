@@ -5,12 +5,12 @@ import { evalite } from "evalite";
 import {
   INTENTIONALLY_BROKEN_DATASET,
   parseJsonl,
-} from "../src/datasets/index.ts";
+} from "../src/datasets/jsonl";
 import {
   createEvaliteScorer,
   isRecord,
   makeResult,
-} from "../src/scorers/index.ts";
+} from "../src/scorers/common";
 
 interface DatasetQualityInput {
   readonly id: string;

@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import {
   REQUIRED_DATASET_FILES,
   loadJsonlFile,
-} from "../src/datasets/index.ts";
+} from "../src/datasets/jsonl";
 
 function countBy<T extends string>(values: T[]): string {
   const counts = new Map<T, number>();

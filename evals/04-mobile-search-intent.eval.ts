@@ -1,19 +1,19 @@
 import { evalite } from "evalite";
 import { z } from "zod";
 
-import type { MobileSearchOutput } from "../src/apps/index.ts";
+import type { MobileSearchOutput } from "../src/apps/types";
 import {
   MobileSearchRecordSchema,
   type MobileSearchRecord,
-} from "../src/datasets/index.ts";
+} from "../src/datasets/schemas";
 import {
-  createStructuredOutputScorer,
   createEvaliteScorer,
   makeResult,
-} from "../src/scorers/index.ts";
-import { runMobileSearch } from "../src/variants/index.ts";
+} from "../src/scorers/common";
+import { createStructuredOutputScorer } from "../src/scorers/structured-output";
+import { runMobileSearch } from "../src/variants/run-variants";
 
-import { loadLabData, workshopColumns } from "./lab-utils.ts";
+import { loadLabData, workshopColumns } from "./lab-utils";
 
 const MobileSearchOutputSchema = z.object({
   capability: z.literal("mobile_search"),

@@ -4,15 +4,15 @@ import type { ZodType } from "zod";
 import {
   formatDatasetIssue,
   loadJsonlFile,
-  type CaseType,
-} from "../src/datasets/index.ts";
+} from "../src/datasets/jsonl";
+import type { CaseType } from "../src/datasets/schemas";
 import {
   average,
   createEvaliteScorer,
   makeResult,
   type ScoreInput,
   type ScorerResult,
-} from "../src/scorers/index.ts";
+} from "../src/scorers/common";
 
 export interface LabRecordBase<TExpected = unknown> {
   readonly id: string;

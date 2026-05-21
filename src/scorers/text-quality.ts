@@ -12,7 +12,7 @@ import {
   type ScorerResult,
   type TextMatchOptions,
   type ThresholdOptions,
-} from "./common.ts";
+} from "./common";
 
 export type OutputSelector<TInput, TOutput, TExpected> = (
   input: ScoreInput<TInput, TOutput, TExpected>,

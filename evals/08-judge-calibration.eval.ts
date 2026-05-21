@@ -1,10 +1,11 @@
 import { evalite } from "evalite";
 
-import { judgeWithOptionalLive, type WorkshopRubricId } from "../src/judges/index.ts";
+import { judgeWithOptionalLive } from "../src/judges/live-judge";
+import type { WorkshopRubricId } from "../src/judges/rubrics";
 import {
   createEvaliteScorer,
   makeResult,
-} from "../src/scorers/index.ts";
+} from "../src/scorers/common";
 
 interface CalibrationInput {
   readonly id: string;

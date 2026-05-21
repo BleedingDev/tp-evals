@@ -1,24 +1,30 @@
 import {
   extractMobileSearchIntent,
   mobileSearchVariants,
-  summarizeTravelInfo,
+} from "../apps/mobile-search";
+import {
   translate,
   translationVariants,
+} from "../apps/translation";
+import {
+  summarizeTravelInfo,
   travelSummaryVariants,
-  type AnyCapabilityInput,
-  type AnyCapabilityOutput,
-  type CapabilityApp,
-  type MockVariant,
-  type MobileSearchInput,
-  type MobileSearchOutput,
-  type RuntimeMode,
-  type TranslationInput,
-  type TranslationOutput,
-  type TravelSummaryInput,
-  type TravelSummaryOutput,
-} from "../apps/index.ts";
-import { loadWorkshopEnv } from "../env.ts";
-import { createLiveModelProvider } from "../providers/live-model.ts";
+} from "../apps/travel-summary";
+import type {
+  AnyCapabilityInput,
+  AnyCapabilityOutput,
+  CapabilityApp,
+  MockVariant,
+  MobileSearchInput,
+  MobileSearchOutput,
+  RuntimeMode,
+  TranslationInput,
+  TranslationOutput,
+  TravelSummaryInput,
+  TravelSummaryOutput,
+} from "../apps/types";
+import { loadWorkshopEnv } from "../env";
+import { createLiveModelProvider } from "../providers/live-model";
 
 export type VariantId =
   | "translation.baseline"

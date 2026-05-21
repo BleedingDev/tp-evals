@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { z } from "zod";
 
-import { loadWorkshopEnv } from "../src/env.ts";
+import { loadWorkshopEnv } from "../src/env";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 loadWorkshopEnv(rootDir);

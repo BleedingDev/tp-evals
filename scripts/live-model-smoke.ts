@@ -1,9 +1,9 @@
-import { loadWorkshopEnv } from "../src/env.ts";
+import { loadWorkshopEnv } from "../src/env";
 import {
   getLiveProviderName,
   getLiveModelName,
   translateWithLiveModel,
-} from "../src/providers/live-model.ts";
+} from "../src/providers/live-model";
 
 loadWorkshopEnv();
 

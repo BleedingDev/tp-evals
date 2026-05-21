@@ -12,16 +12,16 @@ import type {
   TranslationOutput,
   TravelSummaryInput,
   TravelSummaryOutput,
-} from "../apps/index.ts";
-import { createTrace } from "../apps/index.ts";
-import { loadWorkshopEnv } from "../env.ts";
-import type { MockJudgeRequest } from "../judges/mock-judge.ts";
+} from "../apps/types";
+import { createTrace } from "../apps/types";
+import { loadWorkshopEnv } from "../env";
+import type { MockJudgeRequest } from "../judges/mock-judge";
 import type {
   DimensionJudgment,
   Rubric,
-} from "../judges/rubrics.ts";
-import { clampScore } from "../scorers/common.ts";
-import type { RunVariantOptions } from "../variants/index.ts";
+} from "../judges/rubrics";
+import { clampScore } from "../scorers/common";
+import type { RunVariantOptions } from "../variants/run-variants";
 
 loadWorkshopEnv();
 

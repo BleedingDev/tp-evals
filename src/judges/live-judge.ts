@@ -1,10 +1,10 @@
-import { clampScore } from "../scorers/common.ts";
-import { loadWorkshopEnv } from "../env.ts";
+import { clampScore } from "../scorers/common";
+import { loadWorkshopEnv } from "../env";
 import {
   getLiveProviderName,
   isLiveModelConfigured,
   judgeWithLiveModel,
-} from "../providers/live-model.ts";
+} from "../providers/live-model";
 import {
   combineDimensionJudgments,
   createCalibrationMetadata,
@@ -13,8 +13,8 @@ import {
   type JudgeResult,
   type Rubric,
   type WorkshopRubricId,
-} from "./rubrics.ts";
-import { mockJudge, type MockJudgeRequest } from "./mock-judge.ts";
+} from "./rubrics";
+import { mockJudge, type MockJudgeRequest } from "./mock-judge";
 
 loadWorkshopEnv();
 

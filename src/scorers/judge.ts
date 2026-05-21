@@ -1,12 +1,12 @@
-import { judgeWithOptionalLive, type LiveJudgeOptions } from "../judges/live-judge.ts";
-import { mockJudge } from "../judges/mock-judge.ts";
-import type { Rubric, WorkshopRubricId } from "../judges/rubrics.ts";
+import { judgeWithOptionalLive, type LiveJudgeOptions } from "../judges/live-judge";
+import { mockJudge } from "../judges/mock-judge";
+import type { Rubric, WorkshopRubricId } from "../judges/rubrics";
 import {
   createEvaliteScorer,
   makeResult,
   type ScoreInput,
   type ScorerResult,
-} from "./common.ts";
+} from "./common";
 
 export interface JudgeScoringRequest {
   rubric?: Rubric | WorkshopRubricId;

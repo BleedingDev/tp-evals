@@ -6,7 +6,7 @@ import {
   REQUIRED_DATASET_FILES,
   formatDatasetIssue,
   loadJsonlFile,
-} from "../src/datasets/index.ts";
+} from "../src/datasets/jsonl";
 
 const args = new Set(process.argv.slice(2));
 const strictBroken = args.has("--strict-broken");
