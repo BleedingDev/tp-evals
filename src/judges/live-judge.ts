@@ -1,6 +1,10 @@
 import { clampScore } from "../scorers/common.js";
 import { loadWorkshopEnv } from "../env.js";
-import { isOpenRouterConfigured, judgeWithOpenRouter } from "../providers/openrouter.js";
+import {
+  getLiveProviderName,
+  isOpenRouterConfigured,
+  judgeWithOpenRouter,
+} from "../providers/openrouter.js";
 import {
   combineDimensionJudgments,
   createCalibrationMetadata,
@@ -190,7 +194,7 @@ export async function judgeWithOptionalLive(
     if (!isOpenRouterConfigured()) {
       return {
         ...mockJudge(request),
-        raw: { liveJudge: "missing_openrouter_key" },
+        raw: { liveJudge: "missing_live_provider_key" },
       };
     }
 
@@ -207,7 +211,7 @@ export async function judgeWithOptionalLive(
         ...mockJudge(request),
         raw: {
           liveJudge: "fallback_to_mock",
-          provider: "openrouter",
+          provider: getLiveProviderName(),
           error: error instanceof Error ? error.message : String(error),
         },
       };

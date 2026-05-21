@@ -1,6 +1,6 @@
 # Setup
 
-Use one path. The workshop defaults to live OpenRouter calls, so each machine needs a local `.env` with `OPENROUTER_API_KEY`. Keep the file local and do not share, print, or commit the key.
+Use one path. The workshop defaults to live AI proxy calls, so each machine needs a local `.env` with `AI_PROXY_API_KEY`. Keep the file local and do not share, print, or commit the key.
 
 ## Option 1: Mise
 
@@ -81,7 +81,7 @@ Docker mounts the repository into `/workspace` and keeps dependencies in a named
 
 ## Environment Defaults
 
-The default environment is equivalent to `.env.example`. It is tuned for live QA exercises with OpenRouter and Evalite result persistence under `.evalite/`.
+The default environment is equivalent to `.env.example`. It is tuned for live QA exercises with the AI proxy and Evalite result persistence under `.evalite/`.
 
 ```sh
 WORKSHOP_MODE=live
@@ -95,6 +95,12 @@ EVALITE_TRIAL_COUNT=1
 EVALITE_CACHE=true
 EVALITE_HIDE_TABLE=false
 LIVE_LLM_ENABLED=true
+AI_PROXY_BASE_URL=https://ai-proxy-zane.web-revolution.cz
+AI_PROXY_MODEL=gpt-5.2-codex
+AI_PROXY_JUDGE_MODEL=gpt-5.2-codex
+AI_PROXY_FALLBACK_MODELS=gpt-5.4-mini,gemini-3-flash-preview,claude-haiku-4.5,gpt-5.3-codex
+AI_PROXY_TIMEOUT_MS=60000
+AI_PROXY_API_KEY=...
 OPENROUTER_MODEL=nvidia/nemotron-3-super-120b-a12b:free
 OPENROUTER_JUDGE_MODEL=nvidia/nemotron-3-super-120b-a12b:free
 OPENROUTER_FALLBACK_MODELS=poolside/laguna-m.1:free,openai/gpt-oss-120b:free,openrouter/owl-alpha

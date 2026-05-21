@@ -2,7 +2,7 @@
 
 ## Kontext
 
-Porovnáváte dvě live OpenRouter prompt varianty na stejné sadě překladových edge cases. Slabší varianta může mít lepší průměr na jednoduchých případech, ale selhat na jednom high-risk fragmentu. Silnější QA závěr proto musí být case-level, ne jen average score.
+Porovnáváte dvě live prompt varianty přes AI proxy na stejné sadě překladových edge cases. Slabší varianta může mít lepší průměr na jednoduchých případech, ale selhat na jednom high-risk fragmentu. Silnější QA závěr proto musí být case-level, ne jen average score.
 
 ## Cíl
 
@@ -43,7 +43,7 @@ Proveďte jeden kontrolovaný experiment: přidejte do výběru case ID `transla
 - `pnpm run lab:06` doběhne.
 - Víte, které cases jsou v porovnání zahrnuté a proč.
 - Rozdíl mezi variantami umíte popsat case-level, ne jen průměrem.
-- OpenRouter live behavior neinterpretujete jako deterministický výsledek bez kontroly konkrétních outputů.
+- Live model behavior neinterpretujete jako deterministický výsledek bez kontroly konkrétních outputů.
 
 ## QA rozhodnutí
 

@@ -33,6 +33,14 @@ const DEFAULT_FALLBACK_MODELS = [
   "openai/gpt-oss-120b:free",
   "openrouter/owl-alpha",
 ];
+const DEFAULT_AI_PROXY_BASE_URL = "https://ai-proxy-zane.web-revolution.cz";
+const DEFAULT_AI_PROXY_MODEL = "gpt-5.2-codex";
+const DEFAULT_AI_PROXY_FALLBACK_MODELS = [
+  "gpt-5.4-mini",
+  "gemini-3-flash-preview",
+  "claude-haiku-4.5",
+  "gpt-5.3-codex",
+];
 
 const objectRecordSchema = z.record(z.string(), z.unknown());
 const translationResponseSchema = z.object({
@@ -53,9 +61,21 @@ const judgeDimensionResponseSchema = z.object({
 });
 const judgeResponseSchema = z.object({
   score: z.number(),
-  summary: z.string().catch("OpenRouter judge returned a score."),
+  summary: z.string().catch("Live judge returned a score."),
   dimensions: z.array(judgeDimensionResponseSchema).catch([]),
 });
+const aiProxyResponseSchema = z.object({
+  status: z.string().optional(),
+  output_text: z.string().nullable().optional(),
+  output: z.array(z.object({
+    content: z.array(z.object({
+      type: z.string().optional(),
+      text: z.string().optional(),
+    }).passthrough()).optional(),
+  }).passthrough()).optional(),
+  error: z.unknown().optional(),
+  incomplete_details: z.unknown().optional(),
+}).passthrough();
 
 type ChatMessage = {
   readonly role: "system" | "user";
@@ -74,10 +94,21 @@ const modelName = (override?: string): string =>
   DEFAULT_MODEL;
 
 const judgeModelName = (): string =>
+  process.env["AI_PROXY_JUDGE_MODEL"] ??
   process.env["OPENROUTER_JUDGE_MODEL"] ??
+  process.env["AI_PROXY_MODEL"] ??
   process.env["OPENROUTER_MODEL"] ??
   process.env["LIVE_MODEL"] ??
-  DEFAULT_MODEL;
+  (isAiProxyConfigured() ? DEFAULT_AI_PROXY_MODEL : DEFAULT_MODEL);
+
+const aiProxyModelName = (override?: string): string =>
+  override ??
+  process.env["AI_PROXY_MODEL"] ??
+  process.env["LIVE_MODEL"] ??
+  DEFAULT_AI_PROXY_MODEL;
+
+const aiProxyBaseUrl = (): string =>
+  (process.env["AI_PROXY_BASE_URL"] ?? DEFAULT_AI_PROXY_BASE_URL).replace(/\/+$/u, "");
 
 const openRouterBaseUrl = (): string | undefined => {
   const value = process.env["OPENROUTER_BASE_URL"]?.trim();
@@ -89,7 +120,11 @@ const openRouterBaseUrl = (): string | undefined => {
 };
 
 const timeoutMs = (): number => {
-  const parsed = Number(process.env["OPENROUTER_TIMEOUT_MS"] ?? "60000");
+  const parsed = Number(
+    process.env["AI_PROXY_TIMEOUT_MS"] ??
+    process.env["OPENROUTER_TIMEOUT_MS"] ??
+    "60000",
+  );
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 60_000;
 };
 
@@ -99,9 +134,16 @@ const temperature = (): number => {
 };
 
 export const isOpenRouterConfigured = (): boolean =>
-  (process.env["OPENROUTER_API_KEY"] ?? "").trim().length > 0;
+  isAiProxyConfigured() || (process.env["OPENROUTER_API_KEY"] ?? "").trim().length > 0;
 
-export const getOpenRouterModel = (): string => modelName();
+export const getOpenRouterModel = (): string =>
+  isAiProxyConfigured() ? aiProxyModelName() : modelName();
+
+export const getLiveProviderName = (): string =>
+  isAiProxyConfigured() ? "AI proxy" : "OpenRouter";
+
+const isAiProxyConfigured = (): boolean =>
+  (process.env["AI_PROXY_API_KEY"] ?? "").trim().length > 0;
 
 const fallbackModels = (): string[] => {
   const configured = process.env["OPENROUTER_FALLBACK_MODELS"]
@@ -123,10 +165,39 @@ const modelCandidates = (primaryModel: string): string[] => {
   return candidates;
 };
 
+const aiProxyFallbackModels = (): string[] => {
+  const configured = process.env["AI_PROXY_FALLBACK_MODELS"]
+    ?.split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+
+  return configured && configured.length > 0 ? configured : DEFAULT_AI_PROXY_FALLBACK_MODELS;
+};
+
+const aiProxyModelCandidates = (primaryModel: string): string[] => {
+  const candidates: string[] = [];
+  for (const value of [primaryModel, ...aiProxyFallbackModels()]) {
+    if (!candidates.includes(value)) {
+      candidates.push(value);
+    }
+  }
+
+  return candidates;
+};
+
 const requireApiKey = (): string => {
   const key = process.env["OPENROUTER_API_KEY"]?.trim();
   if (!key) {
     throw new Error("OPENROUTER_API_KEY is required when WORKSHOP_MODE=live.");
+  }
+
+  return key;
+};
+
+const requireAiProxyApiKey = (): string => {
+  const key = process.env["AI_PROXY_API_KEY"]?.trim();
+  if (!key) {
+    throw new Error("AI_PROXY_API_KEY is required when AI proxy live mode is enabled.");
   }
 
   return key;
@@ -138,6 +209,24 @@ const errorMessage = (error: unknown): string =>
 const isNonFallbackError = (error: unknown): boolean => {
   const message = errorMessage(error);
   return /\b(401|unauthorized|user not found|invalid api key)\b/iu.test(message);
+};
+
+const extractJson = (content: string): unknown => {
+  const trimmed = content.trim();
+  const fenced = /^```(?:json)?\s*([\s\S]*?)\s*```$/iu.exec(trimmed);
+  const candidate = fenced?.[1]?.trim() ?? trimmed;
+
+  try {
+    return JSON.parse(candidate) as unknown;
+  } catch {
+    const start = candidate.indexOf("{");
+    const end = candidate.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return JSON.parse(candidate.slice(start, end + 1)) as unknown;
+    }
+
+    throw new Error("Live response did not contain a JSON object.");
+  }
 };
 
 const messagesToPrompt = (messages: readonly ChatMessage[]): {
@@ -164,6 +253,101 @@ const createProvider = () => {
   });
 };
 
+const extractAiProxyText = (value: unknown): string => {
+  const parsed = aiProxyResponseSchema.parse(value);
+  if (parsed.error !== undefined && parsed.error !== null) {
+    throw new Error(`AI proxy returned error: ${JSON.stringify(parsed.error)}`);
+  }
+
+  if (parsed.status === "incomplete") {
+    throw new Error(
+      `AI proxy response incomplete: ${JSON.stringify(parsed.incomplete_details ?? {})}`,
+    );
+  }
+
+  if (typeof parsed.output_text === "string" && parsed.output_text.trim().length > 0) {
+    return parsed.output_text;
+  }
+
+  const text = parsed.output
+    ?.flatMap((item) => item.content ?? [])
+    .filter((item) => item.type === "output_text" || item.text !== undefined)
+    .map((item) => item.text ?? "")
+    .join("")
+    .trim();
+
+  if (text && text.length > 0) {
+    return text;
+  }
+
+  throw new Error("AI proxy response did not include output text.");
+};
+
+const aiProxyInput = (prompt: {
+  readonly system: string;
+  readonly prompt: string;
+}): string =>
+  [
+    prompt.system ? `System:\n${prompt.system}` : undefined,
+    "Return only valid JSON matching the requested schema. Do not wrap it in markdown.",
+    `User:\n${prompt.prompt}`,
+  ].filter((value) => value !== undefined).join("\n\n");
+
+const chatJsonWithAiProxy = async <T>(
+  messages: readonly ChatMessage[],
+  schema: z.ZodType<T>,
+  options: ChatJsonOptions,
+): Promise<T> => {
+  const prompt = messagesToPrompt(messages);
+  const errors: string[] = [];
+
+  for (const candidate of aiProxyModelCandidates(aiProxyModelName(options.model))) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs());
+    try {
+      const response = await fetch(`${aiProxyBaseUrl()}/v1/responses`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${requireAiProxyApiKey()}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: candidate,
+          input: aiProxyInput(prompt),
+          max_output_tokens: options.maxTokens,
+        }),
+        signal: controller.signal,
+      });
+      const body = await response.json().catch(async () => ({
+        error: await response.text(),
+      })) as unknown;
+
+      if (!response.ok) {
+        throw new Error(`AI proxy returned ${response.status}: ${JSON.stringify(body)}`);
+      }
+
+      return schema.parse(extractJson(extractAiProxyText(body)));
+    } catch (error) {
+      errors.push(`${candidate}: ${errorMessage(error)}`);
+      if (isNonFallbackError(error)) {
+        break;
+      }
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  throw new Error(
+    [
+      "AI proxy request failed for all configured models.",
+      `Tried: ${aiProxyModelCandidates(aiProxyModelName(options.model)).join(", ")}`,
+      "Errors:",
+      ...errors.map((error) => `- ${error}`),
+      "Tip: set AI_PROXY_MODEL or AI_PROXY_FALLBACK_MODELS in .env.",
+    ].join("\n"),
+  );
+};
+
 const modelSettings = (model: string) =>
   /(?:gpt-oss|trinity-large-thinking)/iu.test(model)
     ? { usage: { include: true } }
@@ -177,6 +361,10 @@ const chatJson = async <T>(
   schema: z.ZodType<T>,
   options: ChatJsonOptions,
 ): Promise<T> => {
+  if (isAiProxyConfigured()) {
+    return chatJsonWithAiProxy(messages, schema, options);
+  }
+
   const provider = createProvider();
   const prompt = messagesToPrompt(messages);
   const errors: string[] = [];
@@ -268,7 +456,7 @@ const makeLiveTrace = (
 ) =>
   createTrace(capability, liveVariant(options), [], {
     mode: "live",
-    modelName: modelName(),
+    modelName: getOpenRouterModel(),
     promptName: promptVariantName(options),
   });
 
@@ -562,7 +750,7 @@ const textFromTranslationResponse = (
     return fallback;
   }
 
-  throw new Error("OpenRouter translation response did not contain text.");
+  throw new Error("Live translation response did not contain text.");
 };
 
 const mobileSearchIntentValues = [
@@ -753,7 +941,7 @@ export const judgeWithOpenRouter = async (
       name: dimension.name,
       score: clampScore(judged?.score ?? 0),
       weight: dimension.weight,
-      rationale: judged?.rationale ?? "OpenRouter judge did not score this dimension.",
+      rationale: judged?.rationale ?? "Live judge did not score this dimension.",
       evidence: judged?.evidence ?? [],
     };
   });

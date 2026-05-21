@@ -1,5 +1,6 @@
 import { loadWorkshopEnv } from "../src/env.js";
 import {
+  getLiveProviderName,
   getOpenRouterModel,
   translateWithOpenRouter,
 } from "../src/providers/openrouter.js";
@@ -15,7 +16,8 @@ const result = await translateWithOpenRouter({
   protectedTerms: [],
 });
 
-console.log("OpenRouter smoke check passed.");
+console.log("Live model smoke check passed.");
+console.log(`Provider: ${getLiveProviderName()}`);
 console.log(`Model: ${getOpenRouterModel()}`);
 console.log(`Output length: ${result.text.length}`);
 console.log(`Preserved fragments: ${result.preservedFragments.length}`);

@@ -120,21 +120,25 @@ const main = async (): Promise<void> => {
 
   const liveEnabled =
     mode === "live" || process.env["LIVE_LLM_ENABLED"] === "true";
+  const aiProxyKey = process.env["AI_PROXY_API_KEY"] ?? "";
   const openRouterKey = process.env["OPENROUTER_API_KEY"] ?? "";
-  const openRouterModel =
+  const liveProvider = aiProxyKey.trim().length > 0 ? "AI proxy" : "OpenRouter";
+  const liveModel =
+    process.env["AI_PROXY_MODEL"] ??
     process.env["OPENROUTER_MODEL"] ??
     process.env["LIVE_MODEL"] ??
-    "openrouter/owl-alpha";
+    "gpt-5.2-codex";
 
-  if (liveEnabled && openRouterKey.trim().length === 0) {
-    fail("OPENROUTER_API_KEY is required for live workshop mode.");
+  if (liveEnabled && aiProxyKey.trim().length === 0 && openRouterKey.trim().length === 0) {
+    fail("AI_PROXY_API_KEY or OPENROUTER_API_KEY is required for live workshop mode.");
   }
 
   console.log("Runtime smoke check passed.");
   console.log(`Mode: ${mode}`);
-  console.log(`Live model: ${openRouterModel}`);
+  console.log(`Live provider: ${liveProvider}`);
+  console.log(`Live model: ${liveModel}`);
   console.log(`Package manager: ${packageJson.packageManager}`);
-  console.log(liveEnabled ? "OpenRouter key detected." : "Live API calls are disabled.");
+  console.log(liveEnabled ? `${liveProvider} key detected.` : "Live API calls are disabled.");
 };
 
 await main();

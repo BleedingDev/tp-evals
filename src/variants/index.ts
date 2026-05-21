@@ -241,7 +241,7 @@ const variantFromId = (
 const requireLiveProvider = (): LiveProvider => {
   if (liveProvider === undefined) {
     throw new Error(
-      "Live mode requires a registered provider. The default provider uses OPENROUTER_API_KEY.",
+      "Live mode requires a registered provider. The default provider uses AI_PROXY_API_KEY or OPENROUTER_API_KEY.",
     );
   }
 

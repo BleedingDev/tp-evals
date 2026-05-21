@@ -4,7 +4,7 @@ This guide is instructor-only. Keep checkpoint names, rescue commands, and answe
 
 ## Workshop Shape
 
-Run the workshop in live mode through OpenRouter. The hands-on path is designed around synthetic fixtures, visible failures, and case-level scorer inspection while still exposing participants to real model variance.
+Run the workshop in live mode through the AI proxy. The hands-on path is designed around synthetic fixtures, visible failures, and case-level scorer inspection while still exposing participants to real model variance.
 
 Recommended flow:
 
@@ -138,14 +138,14 @@ Common rescues:
 Default live setup:
 
 - `.env.example` starts with `WORKSHOP_MODE=live`.
-- `OPENROUTER_MODEL` and `OPENROUTER_JUDGE_MODEL` default to `nvidia/nemotron-3-super-120b-a12b:free`.
+- `AI_PROXY_MODEL` and `AI_PROXY_JUDGE_MODEL` default to `gpt-5.2-codex`.
 - `pnpm run smoke` verifies that live mode and the key are visible to the process.
 - `pnpm run live:check` makes one small model call without printing the key.
 - Record the model name, run time, threshold, dataset version, and retries when discussing results.
 
 Emergency-only mock mode:
 
-- The participant path is live OpenRouter only.
+- The participant path is live AI proxy only.
 - The code still contains deterministic local variants for instructor dry runs and recovery.
 - Switch to `WORKSHOP_MODE=mock` only if connectivity blocks the room and the live workshop would otherwise stop.
 - If you switch modes, tell participants that scores are no longer live model evidence.
@@ -172,7 +172,7 @@ Day before:
 - Open the Evalite UI from `pnpm run eval:dev` and confirm the lab files load.
 - Confirm `.evalite/results/` is writable.
 - Make sure no long-running local server owns the ports you plan to use.
-- Confirm each participant has the workshop OpenRouter key in local `.env`.
+- Confirm each participant has the workshop AI proxy key in local `.env`.
 - Prepare one terminal for instructor commands and one clean terminal for participant-paced commands.
 
 Thirty minutes before:
