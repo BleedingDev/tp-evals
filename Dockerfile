@@ -11,8 +11,9 @@ ENV EVALITE_SCORE_THRESHOLD=60
 ENV EVALITE_MAX_CONCURRENCY=4
 ENV EVALITE_TEST_TIMEOUT_MS=90000
 ENV LIVE_LLM_ENABLED=true
-ENV OPENROUTER_MODEL=openrouter/owl-alpha
-ENV OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
+ENV OPENROUTER_MODEL=nvidia/nemotron-3-super-120b-a12b:free
+ENV OPENROUTER_JUDGE_MODEL=nvidia/nemotron-3-super-120b-a12b:free
+ENV OPENROUTER_FALLBACK_MODELS=poolside/laguna-m.1:free,openai/gpt-oss-120b:free,openrouter/owl-alpha
 ENV OPENROUTER_TIMEOUT_MS=60000
 
 RUN apt-get update \
@@ -36,9 +37,7 @@ RUN bash -c 'bash <(curl -fsSL https://moonrepo.dev/install/proto.sh)'
 
 WORKDIR /workspace
 
-COPY .prototools package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/evals-presentation/package.json apps/evals-presentation/package.json
-COPY packages/presentation-core/package.json packages/presentation-core/package.json
+COPY .prototools package.json pnpm-lock.yaml ./
 RUN proto install
 RUN pnpm install --frozen-lockfile
 

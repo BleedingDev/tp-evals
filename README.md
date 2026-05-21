@@ -54,14 +54,13 @@ Then open `http://localhost:3006`.
 
 ## Presentation
 
-The workshop deck is an Astro presentation in `apps/evals-presentation`.
+The workshop deck lives in the shared presentations repository:
 
-```sh
-pnpm run slides:dev
-pnpm run slides:build
+```text
+BleedingDev/presentations/apps/tp-evals
 ```
 
-The local presentation server runs on `http://127.0.0.1:4445`.
+Keep this repository focused on labs, datasets, evals, and checkpoint branches.
 
 ## Labs
 
