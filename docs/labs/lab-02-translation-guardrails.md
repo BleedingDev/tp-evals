@@ -23,14 +23,31 @@ Spusťte lab:
 pnpm run lab:02
 ```
 
-V datasetu vyberte jeden případ s placeholders a jeden případ s tagy nebo protected code. Pro každý případ si zapište:
+Nejdřív si přečtěte existující fail:
+
+1. V tabulce najděte `translation-edge-tags-fr`.
+2. Otevřete `.evalite/results/lab-02.json`.
+3. Najděte stejný case a podívejte se na `scores`.
+4. Určete, které tvrdé pravidlo spadlo: tag, protected code, forbidden phrase, nebo glossary.
+
+Potom udělejte kontrolovaný experiment na passing case:
+
+1. Otevřete `data/evals/translations-edge-cases.jsonl`.
+2. Najděte `translation-edge-placeholders-es`.
+3. V `input.placeholders` změňte `{{first_name}}` na `{{first_namXe}}`.
+4. Spusťte znovu `pnpm run lab:02`.
+5. Sledujte, že scorer začne čekat jiný placeholder a score spadne.
+
+Pozor: pro tento placeholder case scorer čte očekávané placeholdery z `input.placeholders`, ne z `expected.mustPreserve`.
+
+Pro každý případ si zapište:
 
 1. Které hodnoty musí zůstat byte-for-byte stejné.
 2. Které hodnoty jsou glossary rozhodnutí, ne technická ochrana.
 3. Které `forbiddenPatterns` by měly failnout i při jinak dobrém překladu.
 4. Jaký business dopad má chyba: UI rozbití, špatný význam, nebo terminologická nekonzistence.
 
-Potom udělejte jeden malý kontrolovaný návrh změny v expectation: například přidejte chybějící forbidden pattern, zpřísněte `minQualityScore`, nebo doplňte `expected.notes`, aby bylo jasné, proč je fragment chráněný.
+Po experimentu vraťte `{{first_namXe}}` zpět na `{{first_name}}`. Smyslem není dataset trvale rozbít, ale pochopit vztah mezi dataset expectation, scorerem a výsledným score.
 
 V Evalite porovnejte scorery `text_guardrails`, `forbidden_phrases` a `protected_fragment_breakdown`. Zajímejte se o to, jestli selhání ukazuje konkrétní porušený fragment, ne jen nízký průměr.
 

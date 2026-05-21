@@ -218,6 +218,26 @@ const printLab01ReadingGuide = async (resultPath: string): Promise<void> => {
   console.log("Ke každému case řekněte: 1. co je rozbité, 2. proč je to QA riziko, 3. jaký je minimální fix.");
 };
 
+const printLab02ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 02:");
+  console.log("- Tabulka je triage dashboard. Neříká celý důvod, ale ukáže, kam se dívat.");
+  console.log("- Nejhorší case je připravený fail: `translation-edge-tags-fr`.");
+  console.log("- Detail důvodu hledejte v `.evalite/results/lab-02.json` pod `scores`.");
+  console.log("");
+  console.log("Kontrolovaný experiment:");
+  console.log("1. Otevřete `data/evals/translations-edge-cases.jsonl`.");
+  console.log("2. Najděte `translation-edge-placeholders-es`.");
+  console.log("3. V `input.placeholders` změňte `{{first_name}}` na `{{first_namXe}}`.");
+  console.log("4. Spusťte znovu `pnpm run lab:02`.");
+  console.log("5. Placeholder scorer začne čekat `{{first_namXe}}` a score spadne.");
+  console.log("");
+  console.log("Pozor:");
+  console.log("- U tohoto case scorer čte placeholdery z `input.placeholders`.");
+  console.log("- Změna `expected.mustPreserve` placeholder guardrail nerozbije.");
+  console.log("- Po experimentu vraťte změnu zpět.");
+};
+
 const labPortFor = (lab: LabDefinition): string => {
   const labIndex = labs.findIndex((candidate) => candidate.command === lab.command);
   return process.env["EVALITE_LAB_PORT"] ?? String(3100 + Math.max(labIndex, 0) * 10);
@@ -392,6 +412,10 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
     await printLab01ReadingGuide(resultPath);
   }
 
+  if (exitCode === 0 && lab.command === "lab:02") {
+    printLab02ReadingGuide();
+  }
+
   process.exit(exitCode);
 };
 
@@ -418,6 +442,10 @@ const runLabAll = async (): Promise<never> => {
 
     if (lab.command === "lab:01") {
       await printLab01ReadingGuide(resultPathFor(lab.command.replace(":", "-")));
+    }
+
+    if (lab.command === "lab:02") {
+      printLab02ReadingGuide();
     }
   }
 
