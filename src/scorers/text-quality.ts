@@ -1,6 +1,7 @@
 import {
   average,
   createEvaliteScorer,
+  escapeRegExp,
   findMissingTerms,
   findPresentTerms,
   makeResult,
@@ -271,7 +272,16 @@ export function scoreForbiddenPhrases(
   forbiddenPhrases: readonly string[],
   options: ForbiddenPhraseOptions = {},
 ): ScorerResult {
-  const matches = findPresentTerms(output, forbiddenPhrases, options);
+  const source = options.caseSensitive ? output : normalizeText(output);
+  const matches = forbiddenPhrases.filter((phrase) => {
+    const target = options.caseSensitive ? phrase : normalizeText(phrase);
+    const leftBoundary = target.startsWith("{") ? "(?<!\\{)" : "";
+    const rightBoundary = target.endsWith("}") ? "(?!\\})" : "";
+    const wholeWordBoundary = options.wholeWord ? "\\b" : "";
+    const pattern = `${wholeWordBoundary}${leftBoundary}${escapeRegExp(target)}${rightBoundary}${wholeWordBoundary}`;
+
+    return new RegExp(pattern, "u").test(source);
+  });
   const score = matches.length === 0 ? 1 : 0;
 
   return makeResult(

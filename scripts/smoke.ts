@@ -56,7 +56,7 @@ const requiredFiles = [
   ".env.example",
   "scripts/smoke.ts",
   "scripts/run-lab.ts",
-  "scripts/openrouter-smoke.ts",
+  "scripts/live-model-smoke.ts",
 ] as const;
 
 const fail = (message: string): never => {
@@ -121,24 +121,21 @@ const main = async (): Promise<void> => {
   const liveEnabled =
     mode === "live" || process.env["LIVE_LLM_ENABLED"] === "true";
   const aiProxyKey = process.env["AI_PROXY_API_KEY"] ?? "";
-  const openRouterKey = process.env["OPENROUTER_API_KEY"] ?? "";
-  const liveProvider = aiProxyKey.trim().length > 0 ? "AI proxy" : "OpenRouter";
   const liveModel =
     process.env["AI_PROXY_MODEL"] ??
-    process.env["OPENROUTER_MODEL"] ??
     process.env["LIVE_MODEL"] ??
     "gpt-5.2-codex";
 
-  if (liveEnabled && aiProxyKey.trim().length === 0 && openRouterKey.trim().length === 0) {
-    fail("AI_PROXY_API_KEY or OPENROUTER_API_KEY is required for live workshop mode.");
+  if (liveEnabled && aiProxyKey.trim().length === 0) {
+    fail("AI_PROXY_API_KEY is required for live workshop mode.");
   }
 
   console.log("Runtime smoke check passed.");
   console.log(`Mode: ${mode}`);
-  console.log(`Live provider: ${liveProvider}`);
+  console.log("Live provider: AI proxy");
   console.log(`Live model: ${liveModel}`);
   console.log(`Package manager: ${packageJson.packageManager}`);
-  console.log(liveEnabled ? `${liveProvider} key detected.` : "Live API calls are disabled.");
+  console.log(liveEnabled ? "AI proxy key detected." : "Live API calls are disabled.");
 };
 
 await main();

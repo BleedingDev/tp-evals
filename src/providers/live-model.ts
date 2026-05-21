@@ -1,5 +1,3 @@
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { generateObject } from "ai";
 import { z } from "zod";
 
 import type {
@@ -27,12 +25,6 @@ import type { RunVariantOptions } from "../variants/index.js";
 
 loadWorkshopEnv();
 
-const DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
-const DEFAULT_FALLBACK_MODELS = [
-  "poolside/laguna-m.1:free",
-  "openai/gpt-oss-120b:free",
-  "openrouter/owl-alpha",
-];
 const DEFAULT_AI_PROXY_BASE_URL = "https://ai-proxy-zane.web-revolution.cz";
 const DEFAULT_AI_PROXY_MODEL = "gpt-5.2-codex";
 const DEFAULT_AI_PROXY_FALLBACK_MODELS = [
@@ -87,19 +79,11 @@ interface ChatJsonOptions {
   readonly model?: string;
 }
 
-const modelName = (override?: string): string =>
-  override ??
-  process.env["OPENROUTER_MODEL"] ??
-  process.env["LIVE_MODEL"] ??
-  DEFAULT_MODEL;
-
 const judgeModelName = (): string =>
   process.env["AI_PROXY_JUDGE_MODEL"] ??
-  process.env["OPENROUTER_JUDGE_MODEL"] ??
   process.env["AI_PROXY_MODEL"] ??
-  process.env["OPENROUTER_MODEL"] ??
   process.env["LIVE_MODEL"] ??
-  (isAiProxyConfigured() ? DEFAULT_AI_PROXY_MODEL : DEFAULT_MODEL);
+  DEFAULT_AI_PROXY_MODEL;
 
 const aiProxyModelName = (override?: string): string =>
   override ??
@@ -110,60 +94,25 @@ const aiProxyModelName = (override?: string): string =>
 const aiProxyBaseUrl = (): string =>
   (process.env["AI_PROXY_BASE_URL"] ?? DEFAULT_AI_PROXY_BASE_URL).replace(/\/+$/u, "");
 
-const openRouterBaseUrl = (): string | undefined => {
-  const value = process.env["OPENROUTER_BASE_URL"]?.trim();
-  if (!value) {
-    return undefined;
-  }
-
-  return value.replace(/\/chat\/completions\/?$/u, "");
-};
-
 const timeoutMs = (): number => {
   const parsed = Number(
     process.env["AI_PROXY_TIMEOUT_MS"] ??
-    process.env["OPENROUTER_TIMEOUT_MS"] ??
     "60000",
   );
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 60_000;
 };
 
-const temperature = (): number => {
-  const parsed = Number(process.env["OPENROUTER_TEMPERATURE"] ?? "0.1");
-  return Number.isFinite(parsed) ? parsed : 0.1;
-};
+export const isLiveModelConfigured = (): boolean =>
+  isAiProxyConfigured();
 
-export const isOpenRouterConfigured = (): boolean =>
-  isAiProxyConfigured() || (process.env["OPENROUTER_API_KEY"] ?? "").trim().length > 0;
-
-export const getOpenRouterModel = (): string =>
-  isAiProxyConfigured() ? aiProxyModelName() : modelName();
+export const getLiveModelName = (): string =>
+  aiProxyModelName();
 
 export const getLiveProviderName = (): string =>
-  isAiProxyConfigured() ? "AI proxy" : "OpenRouter";
+  "AI proxy";
 
 const isAiProxyConfigured = (): boolean =>
   (process.env["AI_PROXY_API_KEY"] ?? "").trim().length > 0;
-
-const fallbackModels = (): string[] => {
-  const configured = process.env["OPENROUTER_FALLBACK_MODELS"]
-    ?.split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0);
-
-  return configured && configured.length > 0 ? configured : DEFAULT_FALLBACK_MODELS;
-};
-
-const modelCandidates = (primaryModel: string): string[] => {
-  const candidates: string[] = [];
-  for (const value of [primaryModel, ...fallbackModels()]) {
-    if (!candidates.includes(value)) {
-      candidates.push(value);
-    }
-  }
-
-  return candidates;
-};
 
 const aiProxyFallbackModels = (): string[] => {
   const configured = process.env["AI_PROXY_FALLBACK_MODELS"]
@@ -183,15 +132,6 @@ const aiProxyModelCandidates = (primaryModel: string): string[] => {
   }
 
   return candidates;
-};
-
-const requireApiKey = (): string => {
-  const key = process.env["OPENROUTER_API_KEY"]?.trim();
-  if (!key) {
-    throw new Error("OPENROUTER_API_KEY is required when WORKSHOP_MODE=live.");
-  }
-
-  return key;
 };
 
 const requireAiProxyApiKey = (): string => {
@@ -242,16 +182,6 @@ const messagesToPrompt = (messages: readonly ChatMessage[]): {
     .map((message) => message.content)
     .join("\n\n"),
 });
-
-const createProvider = () => {
-  const baseURL = openRouterBaseUrl();
-  return createOpenRouter({
-    apiKey: requireApiKey(),
-    ...(baseURL ? { baseURL } : {}),
-    appName: "Evals QA Workshop",
-    appUrl: "https://local-workshop.invalid",
-  });
-};
 
 const extractAiProxyText = (value: unknown): string => {
   const parsed = aiProxyResponseSchema.parse(value);
@@ -348,58 +278,16 @@ const chatJsonWithAiProxy = async <T>(
   );
 };
 
-const modelSettings = (model: string) =>
-  /(?:gpt-oss|trinity-large-thinking)/iu.test(model)
-    ? { usage: { include: true } }
-    : {
-        reasoning: { effort: "none", exclude: true } as const,
-        usage: { include: true },
-      };
-
 const chatJson = async <T>(
   messages: readonly ChatMessage[],
   schema: z.ZodType<T>,
   options: ChatJsonOptions,
 ): Promise<T> => {
-  if (isAiProxyConfigured()) {
-    return chatJsonWithAiProxy(messages, schema, options);
+  if (!isAiProxyConfigured()) {
+    throw new Error("AI_PROXY_API_KEY is required for live workshop mode.");
   }
 
-  const provider = createProvider();
-  const prompt = messagesToPrompt(messages);
-  const errors: string[] = [];
-
-  for (const candidate of modelCandidates(modelName(options.model))) {
-    try {
-      const result = await generateObject({
-        model: provider.chat(candidate, modelSettings(candidate)),
-        schema,
-        system: prompt.system,
-        prompt: prompt.prompt,
-        temperature: temperature(),
-        maxOutputTokens: options.maxTokens,
-        timeout: { totalMs: timeoutMs() },
-        maxRetries: 1,
-      });
-
-      return schema.parse(result.object);
-    } catch (error) {
-      errors.push(`${candidate}: ${errorMessage(error)}`);
-      if (isNonFallbackError(error)) {
-        break;
-      }
-    }
-  }
-
-  throw new Error(
-    [
-      "OpenRouter request failed for all configured models.",
-      `Tried: ${modelCandidates(modelName(options.model)).join(", ")}`,
-      "Errors:",
-      ...errors.map((error) => `- ${error}`),
-      "Tip: set OPENROUTER_MODEL or OPENROUTER_FALLBACK_MODELS in .env.",
-    ].join("\n"),
-  );
+  return chatJsonWithAiProxy(messages, schema, options);
 };
 
 const unique = (values: readonly string[]): string[] => {
@@ -456,7 +344,7 @@ const makeLiveTrace = (
 ) =>
   createTrace(capability, liveVariant(options), [], {
     mode: "live",
-    modelName: getOpenRouterModel(),
+    modelName: getLiveModelName(),
     promptName: promptVariantName(options),
   });
 
@@ -476,7 +364,7 @@ const translationPromptInstruction = (options?: RunVariantOptions): string => {
   }
 
   if (variant.includes("flawed")) {
-    return "Translate the UI text naturally into the target language. Prefer fluent wording over preserving technical formatting. Return JSON with key: text.";
+    return "Translate the UI text naturally into the target language. Strip HTML-like markup, rewrite technical-looking codes into readable prose, and for cancellation or other destructive-action buttons prefer softer pause/keep-style wording over a literal destructive verb. Return JSON with key: text.";
   }
 
   return "Translate UI text. Preserve placeholders, product codes, and HTML-like tags exactly. Apply glossary terms when provided. Return JSON with key: text.";
@@ -503,7 +391,7 @@ const translationPromptPayload = (
   return basePayload;
 };
 
-export const translateWithOpenRouter = async (
+export const translateWithLiveModel = async (
   input: TranslationInput,
   options?: RunVariantOptions,
 ): Promise<TranslationOutput> => {
@@ -775,7 +663,7 @@ const parseAmbiguity = (value: unknown): MobileSearchAmbiguity =>
     ? value as MobileSearchAmbiguity
     : "high";
 
-export const extractMobileSearchIntentWithOpenRouter = async (
+export const extractMobileSearchIntentWithLiveModel = async (
   input: MobileSearchInput,
   options?: RunVariantOptions,
 ): Promise<MobileSearchOutput> => {
@@ -789,6 +677,8 @@ export const extractMobileSearchIntentWithOpenRouter = async (
             "Allowed intents: find_item, filter_results, sort_results, open_result, compare_options, ask_clarification, unknown.",
             "Return JSON with keys: intent, slots, missingSlots, ambiguity, confidence, followUpQuestions, inventedSlots.",
             "Use canonical slot keys for flight search: origin, destination, departureDate, returnDate, passengers, cabinClass, directOnly, maxPrice, resultPositions, sortBy, sortDirection.",
+            "For follow-up utterances, carry route, dates, passengers, and visible result references from conversation history into slots when the history provides them.",
+            "For ordinal references such as first, second, third, or first two, set resultPositions to the referenced positions.",
             "If the user refers to missing context, ask for clarification instead of inventing a result.",
             "If multiple visible results match the utterance, use intent ask_clarification and missingSlots [\"unique_result\"].",
           ].join(" "),
@@ -847,7 +737,26 @@ const sentenceSplit = (summary: string): string[] =>
     .map((sentence) => sentence.trim())
     .filter((sentence) => sentence.length > 0);
 
-export const summarizeTravelInfoWithOpenRouter = async (
+const travelSummaryPromptInstruction = (options?: RunVariantOptions): string => {
+  const variant = promptVariantName(options);
+
+  if (variant.includes("flawed")) {
+    return [
+      "Summarize the travel information for the user.",
+      "Prefer a confident, helpful answer even when the supplied text is incomplete.",
+      "If a likely policy can be inferred from surrounding details, state it briefly.",
+      "Return JSON with keys: summary, insufficientSource, warningsIncluded, omittedWarnings, unsupportedClaims.",
+    ].join(" ");
+  }
+
+  return [
+    "Summarize only the supplied travel information.",
+    "Do not add unsupported claims. If the source is insufficient, say that the source does not provide the missing detail.",
+    "Return JSON with keys: summary, insufficientSource, warningsIncluded, omittedWarnings, unsupportedClaims.",
+  ].join(" ");
+};
+
+export const summarizeTravelInfoWithLiveModel = async (
   input: TravelSummaryInput,
   options?: RunVariantOptions,
 ): Promise<TravelSummaryOutput> => {
@@ -855,13 +764,7 @@ export const summarizeTravelInfoWithOpenRouter = async (
     [
       {
         role: "system",
-        content: systemInstruction(
-          [
-            "Summarize only the supplied travel information.",
-            "Do not add unsupported claims. If the source is insufficient, say that the source does not provide the missing detail.",
-            "Return JSON with keys: summary, insufficientSource, warningsIncluded, omittedWarnings, unsupportedClaims.",
-          ].join(" "),
-        ),
+        content: systemInstruction(travelSummaryPromptInstruction(options)),
       },
       {
         role: "user",
@@ -890,13 +793,13 @@ export const summarizeTravelInfoWithOpenRouter = async (
   };
 };
 
-export const createOpenRouterProvider = () => ({
-  translate: translateWithOpenRouter,
-  extractMobileSearchIntent: extractMobileSearchIntentWithOpenRouter,
-  summarizeTravelInfo: summarizeTravelInfoWithOpenRouter,
+export const createLiveModelProvider = () => ({
+  translate: translateWithLiveModel,
+  extractMobileSearchIntent: extractMobileSearchIntentWithLiveModel,
+  summarizeTravelInfo: summarizeTravelInfoWithLiveModel,
 });
 
-export const judgeWithOpenRouter = async (
+export const judgeWithLiveModel = async (
   request: MockJudgeRequest,
   rubric: Rubric,
 ): Promise<{
@@ -954,7 +857,7 @@ export const judgeWithOpenRouter = async (
   };
 };
 
-export const runPromptInjectionWithOpenRouter = async (input: {
+export const runPromptInjectionWithLiveModel = async (input: {
   readonly userRequest: string;
   readonly trustedInstruction: string;
   readonly suppliedText: string;

@@ -1,7 +1,7 @@
 # Evalite QA Workshop Agent Instructions
 
 This is an advanced QA workshop for evaluating AI behavior with Evalite,
-synthetic datasets, and live OpenRouter calls.
+synthetic datasets, and live AI proxy calls.
 
 Rules:
 
@@ -15,7 +15,7 @@ Rules:
   participant's machine only.
 - Prefer small, reviewable edits to prompts, expectations, labels, thresholds,
   scorers, and synthetic cases.
-- Keep OpenRouter as the live default unless the user explicitly asks for a
+- Keep AI proxy as the live default unless the user explicitly asks for a
   different provider or mock mode.
 - Run the narrowest useful gate after edits. Use `pnpm run data:check` after
   dataset changes, the relevant `pnpm run lab:NN` after lab changes,

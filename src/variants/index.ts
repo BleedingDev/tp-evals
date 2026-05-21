@@ -18,7 +18,7 @@ import {
   type TravelSummaryOutput,
 } from "../apps/index.js";
 import { loadWorkshopEnv } from "../env.js";
-import { createOpenRouterProvider } from "../providers/openrouter.js";
+import { createLiveModelProvider } from "../providers/live-model.js";
 
 export type VariantId =
   | "translation.baseline"
@@ -187,7 +187,7 @@ const defaultVariantIds = {
 let liveProvider: LiveProvider | undefined;
 
 loadWorkshopEnv();
-liveProvider = createOpenRouterProvider();
+liveProvider = createLiveModelProvider();
 
 export const registerLiveProvider = (provider: LiveProvider): void => {
   liveProvider = provider;
@@ -241,7 +241,7 @@ const variantFromId = (
 const requireLiveProvider = (): LiveProvider => {
   if (liveProvider === undefined) {
     throw new Error(
-      "Live mode requires a registered provider. The default provider uses AI_PROXY_API_KEY or OPENROUTER_API_KEY.",
+      "Live mode requires a registered provider. The default provider uses AI_PROXY_API_KEY.",
     );
   }
 

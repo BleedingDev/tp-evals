@@ -18,7 +18,7 @@ import {
 import { loadLabData, outputText, workshopColumns } from "./lab-utils.js";
 
 const variants: Array<{ name: string; input: VariantId }> = [
-  { name: "plain-ui-translation", input: "translation.baseline" },
+  { name: "plain-ui-translation", input: "translation.flawed" },
   { name: "guardrailed-translation", input: "translation.improved" },
 ];
 

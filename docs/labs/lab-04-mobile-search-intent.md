@@ -14,7 +14,7 @@ Ověřit, že structured-output scorer postihuje intent, required slots, missing
 
 - `evals/04-mobile-search-intent.eval.ts`
 - `data/evals/mobile-search-intents.jsonl`
-- `src/providers/openrouter.ts`
+- `src/providers/live-model.ts`
 - `src/scorers/structured-output.ts`
 
 ## Úkol

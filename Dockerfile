@@ -16,10 +16,6 @@ ENV AI_PROXY_MODEL=gpt-5.2-codex
 ENV AI_PROXY_JUDGE_MODEL=gpt-5.2-codex
 ENV AI_PROXY_FALLBACK_MODELS=gpt-5.4-mini,gemini-3-flash-preview,claude-haiku-4.5,gpt-5.3-codex
 ENV AI_PROXY_TIMEOUT_MS=60000
-ENV OPENROUTER_MODEL=nvidia/nemotron-3-super-120b-a12b:free
-ENV OPENROUTER_JUDGE_MODEL=nvidia/nemotron-3-super-120b-a12b:free
-ENV OPENROUTER_FALLBACK_MODELS=poolside/laguna-m.1:free,openai/gpt-oss-120b:free,openrouter/owl-alpha
-ENV OPENROUTER_TIMEOUT_MS=60000
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \

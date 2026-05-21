@@ -9,9 +9,9 @@ import {
   createSafetyScorer,
 } from "../src/scorers/index.js";
 import {
-  getOpenRouterModel,
-  runPromptInjectionWithOpenRouter,
-} from "../src/providers/openrouter.js";
+  getLiveModelName,
+  runPromptInjectionWithLiveModel,
+} from "../src/providers/live-model.js";
 import { resolveRuntimeMode } from "../src/variants/index.js";
 
 import { loadLabData, workshopColumns } from "./lab-utils.js";
@@ -63,10 +63,10 @@ const runPromptInjectionTask = async (
 
   return {
     variant: "live-model",
-    response: await runPromptInjectionWithOpenRouter(record.input),
+    response: await runPromptInjectionWithLiveModel(record.input),
     trace: {
       mode: "live",
-      modelName: getOpenRouterModel(),
+      modelName: getLiveModelName(),
     },
   };
 };

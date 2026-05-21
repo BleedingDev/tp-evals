@@ -2,9 +2,9 @@ import { clampScore } from "../scorers/common.js";
 import { loadWorkshopEnv } from "../env.js";
 import {
   getLiveProviderName,
-  isOpenRouterConfigured,
-  judgeWithOpenRouter,
-} from "../providers/openrouter.js";
+  isLiveModelConfigured,
+  judgeWithLiveModel,
+} from "../providers/live-model.js";
 import {
   combineDimensionJudgments,
   createCalibrationMetadata,
@@ -191,7 +191,7 @@ export async function judgeWithOptionalLive(
   const endpoint = liveJudgeEndpoint(live);
 
   if (endpoint.length === 0) {
-    if (!isOpenRouterConfigured()) {
+    if (!isLiveModelConfigured()) {
       return {
         ...mockJudge(request),
         raw: { liveJudge: "missing_live_provider_key" },
@@ -199,7 +199,7 @@ export async function judgeWithOptionalLive(
     }
 
     try {
-      const response = await judgeWithOpenRouter(request, rubric);
+      const response = await judgeWithLiveModel(request, rubric);
 
       return resultFromLiveResponse(response, rubric, threshold);
     } catch (error) {

@@ -81,10 +81,6 @@ AI_PROXY_MODEL=gpt-5.2-codex
 AI_PROXY_JUDGE_MODEL=gpt-5.2-codex
 AI_PROXY_FALLBACK_MODELS=gpt-5.4-mini,gemini-3-flash-preview,claude-haiku-4.5,gpt-5.3-codex
 AI_PROXY_API_KEY=...
-OPENROUTER_MODEL=nvidia/nemotron-3-super-120b-a12b:free
-OPENROUTER_JUDGE_MODEL=nvidia/nemotron-3-super-120b-a12b:free
-OPENROUTER_FALLBACK_MODELS=poolside/laguna-m.1:free,openai/gpt-oss-120b:free,openrouter/owl-alpha
-OPENROUTER_API_KEY=...
 ```
 
 Then run:

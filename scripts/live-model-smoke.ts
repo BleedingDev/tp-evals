@@ -1,13 +1,13 @@
 import { loadWorkshopEnv } from "../src/env.js";
 import {
   getLiveProviderName,
-  getOpenRouterModel,
-  translateWithOpenRouter,
-} from "../src/providers/openrouter.js";
+  getLiveModelName,
+  translateWithLiveModel,
+} from "../src/providers/live-model.js";
 
 loadWorkshopEnv();
 
-const result = await translateWithOpenRouter({
+const result = await translateWithLiveModel({
   sourceLanguage: "en",
   targetLanguage: "es",
   sourceText: "Hi {{first_name}}, you have {{count}} saved filters.",
@@ -18,6 +18,6 @@ const result = await translateWithOpenRouter({
 
 console.log("Live model smoke check passed.");
 console.log(`Provider: ${getLiveProviderName()}`);
-console.log(`Model: ${getOpenRouterModel()}`);
+console.log(`Model: ${getLiveModelName()}`);
 console.log(`Output length: ${result.text.length}`);
 console.log(`Preserved fragments: ${result.preservedFragments.length}`);
