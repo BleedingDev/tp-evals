@@ -12,11 +12,7 @@ import {
   makeResult,
 } from "../src/scorers/common";
 
-interface DatasetQualityInput {
-  readonly id: string;
-  readonly lineNumber: number;
-  readonly sampleRecord: unknown;
-}
+type DatasetQualityInput = string;
 
 interface DatasetQualityExpected {
   readonly issueTypes: readonly string[];
@@ -24,13 +20,16 @@ interface DatasetQualityExpected {
   readonly minCompletenessScore: number;
 }
 
-interface DatasetQualityOutput {
+interface DatasetQualityAudit {
+  readonly rowStatus: "broken" | "invalid" | "clean";
   readonly detectedIssueTypes: readonly string[];
   readonly suggestedFixes: readonly string[];
   readonly safeToShareAfterFix: boolean;
   readonly completenessScore: number;
   readonly variant: "dataset-quality-audit";
 }
+
+type DatasetQualityOutput = string;
 
 const expectedById = new Map<string, DatasetQualityExpected>([
   [
@@ -83,6 +82,8 @@ const expectedById = new Map<string, DatasetQualityExpected>([
   ],
 ]);
 
+const recordById = new Map<string, unknown>();
+
 const readString = (
   value: Record<string, unknown>,
   key: string,
@@ -91,12 +92,13 @@ const readString = (
   return typeof candidate === "string" ? candidate : undefined;
 };
 
-const inspectRecord = (sampleRecord: unknown): DatasetQualityOutput => {
+const inspectRecord = (sampleRecord: unknown): DatasetQualityAudit => {
   const issues: string[] = [];
   const checklist: string[] = [];
 
   if (!isRecord(sampleRecord)) {
     return {
+      rowStatus: "invalid",
       detectedIssueTypes: ["record"],
       suggestedFixes: ["make each JSONL line an object"],
       safeToShareAfterFix: false,
@@ -179,6 +181,7 @@ const inspectRecord = (sampleRecord: unknown): DatasetQualityOutput => {
   }
 
   return {
+    rowStatus: issues.length === 0 ? "clean" : "broken",
     detectedIssueTypes: issues,
     suggestedFixes: [...new Set(checklist)],
     safeToShareAfterFix: !issues.some((issue) => issue.startsWith("source.")),
@@ -187,9 +190,43 @@ const inspectRecord = (sampleRecord: unknown): DatasetQualityOutput => {
   };
 };
 
+const formatAuditOutput = (audit: DatasetQualityAudit): DatasetQualityOutput =>
+  JSON.stringify({
+    rowStatus: audit.rowStatus,
+    issues: audit.detectedIssueTypes,
+    fixes: audit.suggestedFixes,
+    safeAfterFix: audit.safeToShareAfterFix,
+  });
+
+const parseAuditOutput = (output: DatasetQualityOutput): DatasetQualityAudit => {
+  const parsed = JSON.parse(output) as {
+    rowStatus?: unknown;
+    issues?: unknown;
+    fixes?: unknown;
+    safeAfterFix?: unknown;
+  };
+
+  return {
+    rowStatus:
+      parsed.rowStatus === "broken" || parsed.rowStatus === "invalid" || parsed.rowStatus === "clean"
+        ? parsed.rowStatus
+        : "invalid",
+    detectedIssueTypes: Array.isArray(parsed.issues)
+      ? parsed.issues.filter((issue): issue is string => typeof issue === "string")
+      : [],
+    suggestedFixes: Array.isArray(parsed.fixes)
+      ? parsed.fixes.filter((fix): fix is string => typeof fix === "string")
+      : [],
+    safeToShareAfterFix: parsed.safeAfterFix === true,
+    completenessScore: 0,
+    variant: "dataset-quality-audit",
+  };
+};
+
 const loadBrokenData = async () => {
   const text = await readFile(INTENTIONALLY_BROKEN_DATASET, "utf8");
   const parsed = parseJsonl(text, INTENTIONALLY_BROKEN_DATASET);
+  recordById.clear();
 
   return parsed.records.map((record) => {
     const value = isRecord(record.value) ? record.value : {};
@@ -200,12 +237,13 @@ const loadBrokenData = async () => {
       throw new Error(`Missing lab expectation for ${id}.`);
     }
 
+    recordById.set(id, record.value);
+
+    const input =
+      `${id} | line=${record.lineNumber} | fixture=intentionally_broken | expectedIssues=${expected.issueTypes.join(",")}`;
+
     return {
-      input: {
-        id,
-        lineNumber: record.lineNumber,
-        sampleRecord: record.value,
-      },
+      input,
       expected,
     };
   });
@@ -215,15 +253,24 @@ evalite<DatasetQualityInput, DatasetQualityOutput, DatasetQualityExpected>(
   "Lab 01 - Dataset Quality Audit",
   {
     data: loadBrokenData,
-    task: (input) => inspectRecord(input.sampleRecord),
+    task: (input) => {
+      const id = input.split(" | ")[0];
+
+      if (id === undefined) {
+        return formatAuditOutput(inspectRecord(undefined));
+      }
+
+      return formatAuditOutput(inspectRecord(recordById.get(id)));
+    },
     scorers: [
       createEvaliteScorer({
         name: "detected_dataset_issues",
         description: "Checks that the audit finds the intended broken fields.",
         scorer: ({ output, expected }) => {
-          const detected = new Set(output.detectedIssueTypes);
+          const audit = parseAuditOutput(output);
+          const detected = new Set(audit.detectedIssueTypes);
           const matched = expected.issueTypes.filter((issue) => detected.has(issue));
-          const unexpected = output.detectedIssueTypes.filter(
+          const unexpected = audit.detectedIssueTypes.filter(
             (issue) => !expected.issueTypes.includes(issue),
           );
           const score = matched.length / expected.issueTypes.length;
@@ -242,14 +289,15 @@ evalite<DatasetQualityInput, DatasetQualityOutput, DatasetQualityExpected>(
         name: "suggested_fix_checklist",
         description: "Checks that the audit suggests the required minimal fixes.",
         scorer: ({ output, expected }) => {
+          const audit = parseAuditOutput(output);
           const covered = expected.fixChecklist.filter((item) =>
-            output.suggestedFixes.includes(item),
+            audit.suggestedFixes.includes(item),
           );
 
           return makeResult(
             covered.length / expected.fixChecklist.length,
             "Suggested fix coverage for this broken dataset row.",
-            { covered, suggestedFixes: output.suggestedFixes },
+            { covered, suggestedFixes: audit.suggestedFixes },
             0.8,
           );
         },

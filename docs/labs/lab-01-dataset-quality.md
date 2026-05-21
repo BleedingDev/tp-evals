@@ -27,6 +27,8 @@ Spusťte lab:
 pnpm run lab:01
 ```
 
+Terminál ukazuje jen zkrácené preview. Pokud je řádek useknutý, berte ho jako navigaci a otevřete plný výsledek v `.evalite/results/lab-01.json`.
+
 Otevřete `data/evals/dataset-quality-broken.jsonl` a pro každý řádek napište krátký audit note:
 
 1. Jaký field je rozbitý.
@@ -35,6 +37,8 @@ Otevřete `data/evals/dataset-quality-broken.jsonl` a pro každý řádek napiš
 4. Jestli se chyba dá chytit automaticky, nebo potřebuje lidský review.
 
 V Evalite porovnejte scorer `detected_dataset_issues` se `suggested_fix_checklist`. Neřešte jen score. Hledejte, jestli metadata dávají testerovi dost informací k rozhodnutí: `expectedBehavior`, `risk`, `labels`, `metadata.reviewHint`, `metadata.participantEditTargets` a threshold hodnoty.
+
+Ve výstupu nejdřív hledejte `rowStatus`. Hodnota `broken` říká, že checker našel rozbitý dataset row. Teprve potom řešte `detectedIssueTypes` a `suggestedFixes`.
 
 Pokud chcete udělat kontrolovaný experiment, navrhněte jednu konkrétní opravu řádku `broken-empty-edit-targets`: jaký `participantEditTargets` by dával smysl a jaký validní `minIntentConfidence` byste nastavili. Opravu můžete diskutovat jako diff návrh; pointa labu je audit, ne masová editace datasetu.
 
