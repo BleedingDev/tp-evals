@@ -38,7 +38,9 @@ Otevřete `data/evals/dataset-quality-broken.jsonl` a pro každý řádek napiš
 
 V Evalite porovnejte scorer `detected_dataset_issues` se `suggested_fix_checklist`. Neřešte jen score. Hledejte, jestli metadata dávají testerovi dost informací k rozhodnutí: `expectedBehavior`, `risk`, `labels`, `metadata.reviewHint`, `metadata.participantEditTargets` a threshold hodnoty.
 
-Ve výstupu nejdřív hledejte `rowStatus`. Hodnota `broken` říká, že checker našel rozbitý dataset row. Potom čtěte `fixPlan`: vlevo je rozbitý field, vpravo minimální oprava. Například `labels -> add labels` znamená, že řádku chybí použitelné štítky a minimální fix je je doplnit.
+Ve výstupu nejdřív hledejte `rowStatus`. Hodnota `broken` říká, že checker našel rozbitý dataset row. Potom čtěte `fixPlan`: vlevo je rozbitý field, vpravo minimální oprava.
+
+Jako hlavní příklad použijte `translation-cancel-booking-incomplete`. Je to production-candidate style case: překlad destruktivní akce `Cancel booking` nesmí změkčit ani otočit význam. Dataset row ale nemá `labels` ani `expectedBehavior`, takže další tester zatím neví, proč case existuje a podle čeho má rozhodnout release gate.
 
 Pokud chcete udělat kontrolovaný experiment, navrhněte jednu konkrétní opravu řádku `broken-empty-edit-targets`: jaký `participantEditTargets` by dával smysl a jaký validní `minIntentConfidence` byste nastavili. Opravu můžete diskutovat jako diff návrh; pointa labu je audit, ne masová editace datasetu.
 

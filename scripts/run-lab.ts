@@ -185,6 +185,8 @@ const printLab01ReadingGuide = async (resultPath: string): Promise<void> => {
   console.log("- Nehádejte z čísla Score.");
   console.log("- Vezměte konkrétní case ID, otevřete stejný řádek v data/evals/dataset-quality-broken.jsonl.");
   console.log("- V `fixPlan` čtěte každý řádek jako: rozbitý field -> minimální oprava.");
+  console.log("- Lektorský anchor: `translation-cancel-booking-incomplete` je production-candidate style case.");
+  console.log("  Má reálný QA risk: překlad destruktivní akce nesmí změkčit nebo otočit význam.");
   console.log("");
   console.log("Souhrn cases:");
 

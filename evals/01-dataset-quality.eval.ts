@@ -33,10 +33,13 @@ type DatasetQualityOutput = string;
 
 const expectedById = new Map<string, DatasetQualityExpected>([
   [
-    "broken-empty-labels",
+    "translation-cancel-booking-incomplete",
     {
       issueTypes: ["labels", "expectedBehavior"],
-      fixChecklist: ["add labels", "add expectedBehavior"],
+      fixChecklist: [
+        "add labels: translation, destructive-action, booking-flow",
+        "define that cancel booking must stay explicit and must not be softened",
+      ],
       minCompletenessScore: 0.55,
     },
   ],
@@ -108,14 +111,26 @@ const inspectRecord = (sampleRecord: unknown): DatasetQualityAudit => {
   }
 
   const labels = sampleRecord["labels"];
+  const input = sampleRecord["input"];
+  const sourceText = isRecord(input) ? readString(input, "sourceText") : undefined;
+  const isCancelBookingCase = sourceText === "Cancel booking";
+
   if (!Array.isArray(labels) || labels.length === 0) {
     issues.push("labels");
-    checklist.push("add labels");
+    checklist.push(
+      isCancelBookingCase
+        ? "add labels: translation, destructive-action, booking-flow"
+        : "add labels",
+    );
   }
 
   if (readString(sampleRecord, "expectedBehavior") === undefined) {
     issues.push("expectedBehavior");
-    checklist.push("add expectedBehavior");
+    checklist.push(
+      isCancelBookingCase
+        ? "define that cancel booking must stay explicit and must not be softened"
+        : "add expectedBehavior",
+    );
   }
 
   const source = sampleRecord["source"];
