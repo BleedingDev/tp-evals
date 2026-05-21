@@ -138,7 +138,7 @@ Common rescues:
 Default live setup:
 
 - `.env.example` starts with `WORKSHOP_MODE=live`.
-- `OPENROUTER_MODEL` and `OPENROUTER_JUDGE_MODEL` default to `openrouter/owl-alpha`.
+- `OPENROUTER_MODEL` and `OPENROUTER_JUDGE_MODEL` default to `nvidia/nemotron-3-super-120b-a12b:free`.
 - `pnpm run smoke` verifies that live mode and the key are visible to the process.
 - `pnpm run live:check` makes one small model call without printing the key.
 - Record the model name, run time, threshold, dataset version, and retries when discussing results.

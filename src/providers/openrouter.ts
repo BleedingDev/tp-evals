@@ -27,11 +27,11 @@ import type { RunVariantOptions } from "../variants/index.js";
 
 loadWorkshopEnv();
 
-const DEFAULT_MODEL = "openrouter/owl-alpha";
+const DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
 const DEFAULT_FALLBACK_MODELS = [
+  "poolside/laguna-m.1:free",
   "openai/gpt-oss-120b:free",
-  "openrouter/free",
-  "openai/gpt-oss-20b:free",
+  "openrouter/owl-alpha",
 ];
 
 const objectRecordSchema = z.record(z.string(), z.unknown());
@@ -164,6 +164,14 @@ const createProvider = () => {
   });
 };
 
+const modelSettings = (model: string) =>
+  /(?:gpt-oss|trinity-large-thinking)/iu.test(model)
+    ? { usage: { include: true } }
+    : {
+        reasoning: { effort: "none", exclude: true } as const,
+        usage: { include: true },
+      };
+
 const chatJson = async <T>(
   messages: readonly ChatMessage[],
   schema: z.ZodType<T>,
@@ -176,7 +184,7 @@ const chatJson = async <T>(
   for (const candidate of modelCandidates(modelName(options.model))) {
     try {
       const result = await generateObject({
-        model: provider.chat(candidate),
+        model: provider.chat(candidate, modelSettings(candidate)),
         schema,
         system: prompt.system,
         prompt: prompt.prompt,

@@ -95,9 +95,9 @@ EVALITE_TRIAL_COUNT=1
 EVALITE_CACHE=true
 EVALITE_HIDE_TABLE=false
 LIVE_LLM_ENABLED=true
-OPENROUTER_MODEL=openrouter/owl-alpha
-OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
-OPENROUTER_FALLBACK_MODELS=openai/gpt-oss-120b:free,openrouter/free,openai/gpt-oss-20b:free
+OPENROUTER_MODEL=nvidia/nemotron-3-super-120b-a12b:free
+OPENROUTER_JUDGE_MODEL=nvidia/nemotron-3-super-120b-a12b:free
+OPENROUTER_FALLBACK_MODELS=poolside/laguna-m.1:free,openai/gpt-oss-120b:free,openrouter/owl-alpha
 OPENROUTER_TIMEOUT_MS=60000
 OPENROUTER_API_KEY=...
 ```
