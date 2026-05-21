@@ -97,6 +97,7 @@ EVALITE_HIDE_TABLE=false
 LIVE_LLM_ENABLED=true
 OPENROUTER_MODEL=openrouter/owl-alpha
 OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
+OPENROUTER_FALLBACK_MODELS=openai/gpt-oss-120b:free,openrouter/free,openai/gpt-oss-20b:free
 OPENROUTER_TIMEOUT_MS=60000
 OPENROUTER_API_KEY=...
 ```

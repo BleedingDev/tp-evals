@@ -1,3 +1,5 @@
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { generateObject } from "ai";
 import { z } from "zod";
 
 import type {
@@ -26,9 +28,16 @@ import type { RunVariantOptions } from "../variants/index.js";
 loadWorkshopEnv();
 
 const DEFAULT_MODEL = "openrouter/owl-alpha";
-const DEFAULT_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+const DEFAULT_FALLBACK_MODELS = [
+  "openai/gpt-oss-120b:free",
+  "openrouter/free",
+  "openai/gpt-oss-20b:free",
+];
 
 const objectRecordSchema = z.record(z.string(), z.unknown());
+const translationResponseSchema = z.object({
+  text: z.string().min(1),
+}).passthrough();
 const travelSummaryResponseSchema = z.object({
   summary: z.string().min(1),
   insufficientSource: z.boolean().catch(false),
@@ -58,18 +67,6 @@ interface ChatJsonOptions {
   readonly model?: string;
 }
 
-interface OpenRouterResponse {
-  readonly id?: string;
-  readonly model?: string;
-  readonly choices?: Array<{
-    readonly message?: {
-      readonly content?: string;
-    };
-  }>;
-  readonly usage?: unknown;
-  readonly error?: unknown;
-}
-
 const modelName = (override?: string): string =>
   override ??
   process.env["OPENROUTER_MODEL"] ??
@@ -82,8 +79,14 @@ const judgeModelName = (): string =>
   process.env["LIVE_MODEL"] ??
   DEFAULT_MODEL;
 
-const endpoint = (): string =>
-  process.env["OPENROUTER_BASE_URL"] ?? DEFAULT_ENDPOINT;
+const openRouterBaseUrl = (): string | undefined => {
+  const value = process.env["OPENROUTER_BASE_URL"]?.trim();
+  if (!value) {
+    return undefined;
+  }
+
+  return value.replace(/\/chat\/completions\/?$/u, "");
+};
 
 const timeoutMs = (): number => {
   const parsed = Number(process.env["OPENROUTER_TIMEOUT_MS"] ?? "60000");
@@ -100,6 +103,26 @@ export const isOpenRouterConfigured = (): boolean =>
 
 export const getOpenRouterModel = (): string => modelName();
 
+const fallbackModels = (): string[] => {
+  const configured = process.env["OPENROUTER_FALLBACK_MODELS"]
+    ?.split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+
+  return configured && configured.length > 0 ? configured : DEFAULT_FALLBACK_MODELS;
+};
+
+const modelCandidates = (primaryModel: string): string[] => {
+  const candidates: string[] = [];
+  for (const value of [primaryModel, ...fallbackModels()]) {
+    if (!candidates.includes(value)) {
+      candidates.push(value);
+    }
+  }
+
+  return candidates;
+};
+
 const requireApiKey = (): string => {
   const key = process.env["OPENROUTER_API_KEY"]?.trim();
   if (!key) {
@@ -109,22 +132,36 @@ const requireApiKey = (): string => {
   return key;
 };
 
-const extractJson = (content: string): unknown => {
-  const trimmed = content.trim();
-  const fenced = /^```(?:json)?\s*([\s\S]*?)\s*```$/iu.exec(trimmed);
-  const candidate = fenced?.[1]?.trim() ?? trimmed;
+const errorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : String(error);
 
-  try {
-    return JSON.parse(candidate) as unknown;
-  } catch {
-    const start = candidate.indexOf("{");
-    const end = candidate.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      return JSON.parse(candidate.slice(start, end + 1)) as unknown;
-    }
+const isNonFallbackError = (error: unknown): boolean => {
+  const message = errorMessage(error);
+  return /\b(401|unauthorized|user not found|invalid api key)\b/iu.test(message);
+};
 
-    throw new Error("OpenRouter response did not contain a JSON object.");
-  }
+const messagesToPrompt = (messages: readonly ChatMessage[]): {
+  readonly system: string;
+  readonly prompt: string;
+} => ({
+  system: messages
+    .filter((message) => message.role === "system")
+    .map((message) => message.content)
+    .join("\n\n"),
+  prompt: messages
+    .filter((message) => message.role === "user")
+    .map((message) => message.content)
+    .join("\n\n"),
+});
+
+const createProvider = () => {
+  const baseURL = openRouterBaseUrl();
+  return createOpenRouter({
+    apiKey: requireApiKey(),
+    ...(baseURL ? { baseURL } : {}),
+    appName: "Evals QA Workshop",
+    appUrl: "https://local-workshop.invalid",
+  });
 };
 
 const chatJson = async <T>(
@@ -132,46 +169,41 @@ const chatJson = async <T>(
   schema: z.ZodType<T>,
   options: ChatJsonOptions,
 ): Promise<T> => {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs());
+  const provider = createProvider();
+  const prompt = messagesToPrompt(messages);
+  const errors: string[] = [];
 
-  try {
-    const response = await fetch(endpoint(), {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${requireApiKey()}`,
-        "content-type": "application/json",
-        "http-referer": "https://local-workshop.invalid",
-        "x-title": "Evals QA Workshop",
-      },
-      body: JSON.stringify({
-        model: modelName(options.model),
-        messages,
+  for (const candidate of modelCandidates(modelName(options.model))) {
+    try {
+      const result = await generateObject({
+        model: provider.chat(candidate),
+        schema,
+        system: prompt.system,
+        prompt: prompt.prompt,
         temperature: temperature(),
-        max_tokens: options.maxTokens,
-      }),
-      signal: controller.signal,
-    });
+        maxOutputTokens: options.maxTokens,
+        timeout: { totalMs: timeoutMs() },
+        maxRetries: 1,
+      });
 
-    const body = await response.json().catch(async () => ({
-      error: await response.text(),
-    })) as OpenRouterResponse;
-
-    if (!response.ok) {
-      throw new Error(
-        `OpenRouter returned ${response.status}: ${JSON.stringify(body.error ?? body)}`,
-      );
+      return schema.parse(result.object);
+    } catch (error) {
+      errors.push(`${candidate}: ${errorMessage(error)}`);
+      if (isNonFallbackError(error)) {
+        break;
+      }
     }
-
-    const content = body.choices?.[0]?.message?.content;
-    if (typeof content !== "string" || content.trim().length === 0) {
-      throw new Error("OpenRouter response did not include assistant content.");
-    }
-
-    return schema.parse(extractJson(content));
-  } finally {
-    clearTimeout(timeout);
   }
+
+  throw new Error(
+    [
+      "OpenRouter request failed for all configured models.",
+      `Tried: ${modelCandidates(modelName(options.model)).join(", ")}`,
+      "Errors:",
+      ...errors.map((error) => `- ${error}`),
+      "Tip: set OPENROUTER_MODEL or OPENROUTER_FALLBACK_MODELS in .env.",
+    ].join("\n"),
+  );
 };
 
 const unique = (values: readonly string[]): string[] => {
@@ -290,7 +322,7 @@ export const translateWithOpenRouter = async (
         content: JSON.stringify(translationPromptPayload(input, options)),
       },
     ],
-    objectRecordSchema,
+    translationResponseSchema,
     { maxTokens: 240 },
   );
   const text = textFromTranslationResponse(result, input.targetLanguage);

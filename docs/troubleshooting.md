@@ -78,6 +78,7 @@ WORKSHOP_MODE=live
 LIVE_LLM_ENABLED=true
 OPENROUTER_MODEL=openrouter/owl-alpha
 OPENROUTER_JUDGE_MODEL=openrouter/owl-alpha
+OPENROUTER_FALLBACK_MODELS=openai/gpt-oss-120b:free,openrouter/free,openai/gpt-oss-20b:free
 OPENROUTER_API_KEY=...
 ```
 
@@ -89,6 +90,15 @@ pnpm run live:check
 ```
 
 If OpenRouter returns `401`, the key loaded by the process is invalid or not the same key you expected. The repo `.env` is loaded by the workshop commands and the key is not printed. Do not paste the key into issue comments, chat transcripts, slides, or lab handouts.
+
+If OpenRouter returns `502`, times out, or reports missing assistant content, the API key is usually loaded correctly but the selected upstream model is unavailable. Keep `OPENROUTER_MODEL=openrouter/owl-alpha` if you want to try Owl first, but make sure `OPENROUTER_FALLBACK_MODELS` is present so the live check can retry through concrete free models.
+
+For stale Docker dependencies after pulling repository updates, run:
+
+```sh
+docker compose down -v
+docker compose run --rm lab pnpm run live:check
+```
 
 ## Missing Files
 
