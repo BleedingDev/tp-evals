@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import type { ZodType } from "zod";
 
-import { DatasetRecordSchema, type DatasetRecord } from "./schemas.js";
+import { DatasetRecordSchema, type DatasetRecord } from "./schemas.ts";
 
 export const DATASET_ROOT = "data/evals";
 

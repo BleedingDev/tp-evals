@@ -1,21 +1,21 @@
 import { evalite } from "evalite";
 
-import type { TranslationOutput } from "../src/apps/index.js";
+import type { TranslationOutput } from "../src/apps/index.ts";
 import {
   TranslationRecordSchema,
   type TranslationRecord,
-} from "../src/datasets/index.js";
+} from "../src/datasets/index.ts";
 import {
   createJudgeScorer,
   createTextGuardrailScorer,
-} from "../src/scorers/index.js";
+} from "../src/scorers/index.ts";
 import {
   getVariant,
   runTranslation,
   type VariantId,
-} from "../src/variants/index.js";
+} from "../src/variants/index.ts";
 
-import { loadLabData, outputText, workshopColumns } from "./lab-utils.js";
+import { loadLabData, outputText, workshopColumns } from "./lab-utils.ts";
 
 const variants: Array<{ name: string; input: VariantId }> = [
   { name: "plain-ui-translation", input: "translation.flawed" },

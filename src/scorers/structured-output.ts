@@ -13,7 +13,7 @@ import {
   type ScoreInput,
   type ScorerResult,
   type ThresholdOptions,
-} from "./common.js";
+} from "./common.ts";
 
 export interface SchemaValidityOptions extends ThresholdOptions {
   parseJsonString?: boolean;

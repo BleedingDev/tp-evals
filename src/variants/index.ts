@@ -16,9 +16,9 @@ import {
   type TranslationOutput,
   type TravelSummaryInput,
   type TravelSummaryOutput,
-} from "../apps/index.js";
-import { loadWorkshopEnv } from "../env.js";
-import { createLiveModelProvider } from "../providers/live-model.js";
+} from "../apps/index.ts";
+import { loadWorkshopEnv } from "../env.ts";
+import { createLiveModelProvider } from "../providers/live-model.ts";
 
 export type VariantId =
   | "translation.baseline"

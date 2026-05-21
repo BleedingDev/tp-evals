@@ -1,3 +1,3 @@
-export * from "./live-judge.js";
-export * from "./mock-judge.js";
-export * from "./rubrics.js";
+export * from "./live-judge.ts";
+export * from "./mock-judge.ts";
+export * from "./rubrics.ts";

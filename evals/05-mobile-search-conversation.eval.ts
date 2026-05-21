@@ -1,24 +1,24 @@
 import { evalite } from "evalite";
 
-import type { MobileSearchOutput } from "../src/apps/index.js";
+import type { MobileSearchOutput } from "../src/apps/index.ts";
 import {
   MobileSearchRecordSchema,
   type MobileSearchRecord,
-} from "../src/datasets/index.js";
+} from "../src/datasets/index.ts";
 import {
   createJudgeScorer,
   createStructuredOutputScorer,
   scoreFieldAccuracy,
   scoreIntentClassification,
   scoreMissingFieldBehavior,
-} from "../src/scorers/index.js";
-import { runMobileSearch } from "../src/variants/index.js";
+} from "../src/scorers/index.ts";
+import { runMobileSearch } from "../src/variants/index.ts";
 
 import {
   loadLabData,
   resultFromChecks,
   workshopColumns,
-} from "./lab-utils.js";
+} from "./lab-utils.ts";
 
 evalite<MobileSearchRecord, MobileSearchOutput, MobileSearchRecord["expected"]>(
   "Lab 05 - Mobile Search Conversation",

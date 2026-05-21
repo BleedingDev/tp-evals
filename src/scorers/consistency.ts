@@ -12,8 +12,8 @@ import {
   type ScoreInput,
   type ScorerResult,
   type ThresholdOptions,
-} from "./common.js";
-import { parseStructuredOutput } from "./structured-output.js";
+} from "./common.ts";
+import { parseStructuredOutput } from "./structured-output.ts";
 
 export interface ParaphraseEquivalenceOptions extends ThresholdOptions {
   minSimilarity?: number;

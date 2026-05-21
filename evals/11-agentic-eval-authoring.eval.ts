@@ -1,19 +1,19 @@
 import { evalite } from "evalite";
 
-import type { TravelSummaryOutput } from "../src/apps/index.js";
+import type { TravelSummaryOutput } from "../src/apps/index.ts";
 import {
   TravelSummaryRecordSchema,
   type TravelSummaryRecord,
-} from "../src/datasets/index.js";
+} from "../src/datasets/index.ts";
 import {
   createEvaliteScorer,
   createJudgeScorer,
   createSummaryScorer,
   makeResult,
-} from "../src/scorers/index.js";
-import { runTravelSummary } from "../src/variants/index.js";
+} from "../src/scorers/index.ts";
+import { runTravelSummary } from "../src/variants/index.ts";
 
-import { loadLabData, summaryText, workshopColumns } from "./lab-utils.js";
+import { loadLabData, summaryText, workshopColumns } from "./lab-utils.ts";
 
 evalite<TravelSummaryRecord, TravelSummaryOutput, TravelSummaryRecord["expected"]>(
   "Lab 11 - Agentic Eval Authoring",

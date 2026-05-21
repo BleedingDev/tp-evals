@@ -6,33 +6,33 @@ import {
   safeJsonString,
   tokenOverlapRatio,
   type ScorerResult,
-} from "../scorers/common.js";
+} from "../scorers/common.ts";
 import {
   scoreConsistencyAcrossRuns,
   scoreParaphraseEquivalence,
-} from "../scorers/consistency.js";
+} from "../scorers/consistency.ts";
 import {
   scoreInstructionOverride,
   scoreSecretLikeOutput,
   scoreSystemPromptLeakage,
-} from "../scorers/safety.js";
+} from "../scorers/safety.ts";
 import {
   scoreFieldAccuracy,
   scoreIntentClassification,
   scoreMissingFieldBehavior,
-} from "../scorers/structured-output.js";
+} from "../scorers/structured-output.ts";
 import {
   scoreRequiredFacts,
   scoreSummaryLength,
   scoreUnsupportedClaims,
   scoreWarningCoverage,
-} from "../scorers/summary.js";
+} from "../scorers/summary.ts";
 import {
   scoreForbiddenPhrases,
   scoreGlossaryTerms,
   scorePlaceholders,
   scoreTags,
-} from "../scorers/text-quality.js";
+} from "../scorers/text-quality.ts";
 import {
   combineDimensionJudgments,
   createCalibrationMetadata,
@@ -42,7 +42,7 @@ import {
   type Rubric,
   type RubricDimension,
   type WorkshopRubricId,
-} from "./rubrics.js";
+} from "./rubrics.ts";
 
 export interface MockJudgeRequest {
   rubric?: Rubric | WorkshopRubricId;

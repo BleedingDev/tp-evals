@@ -5,14 +5,14 @@ import {
   formatDatasetIssue,
   loadJsonlFile,
   type CaseType,
-} from "../src/datasets/index.js";
+} from "../src/datasets/index.ts";
 import {
   average,
   createEvaliteScorer,
   makeResult,
   type ScoreInput,
   type ScorerResult,
-} from "../src/scorers/index.js";
+} from "../src/scorers/index.ts";
 
 export interface LabRecordBase<TExpected = unknown> {
   readonly id: string;

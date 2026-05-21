@@ -2,7 +2,7 @@ import type {
   MobileSearchRecord,
   TranslationRecord,
   TravelSummaryRecord,
-} from "../datasets/index.js";
+} from "../datasets/index.ts";
 
 export type CapabilityApp = "translation" | "mobile_search" | "travel_summary";
 export type MockVariant = "baseline" | "flawed" | "improved";

@@ -7,7 +7,7 @@ import {
   type MobileSearchOutput,
   type MockVariant,
   type SlotMap,
-} from "./types.js";
+} from "./types.ts";
 
 const normalize = (value: string): string =>
   value.trim().toLowerCase().replace(/\s+/gu, " ");

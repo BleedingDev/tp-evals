@@ -3,15 +3,15 @@ import { evalite } from "evalite";
 import {
   ConsistencyRecordSchema,
   type ConsistencyRecord,
-} from "../src/datasets/index.js";
+} from "../src/datasets/index.ts";
 import {
   createConsistencyScorer,
   createEvaliteScorer,
   makeResult,
   scoreRegressionCounts,
-} from "../src/scorers/index.js";
+} from "../src/scorers/index.ts";
 
-import { loadLabData, workshopColumns } from "./lab-utils.js";
+import { loadLabData, workshopColumns } from "./lab-utils.ts";
 
 interface ConsistencyOutput {
   readonly variant: "recorded-consistency-suite";

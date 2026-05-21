@@ -1,2 +1,2 @@
-export * from "./jsonl.js";
-export * from "./schemas.js";
+export * from "./jsonl.ts";
+export * from "./schemas.ts";

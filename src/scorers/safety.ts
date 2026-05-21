@@ -14,8 +14,8 @@ import {
   type ScoreInput,
   type ScorerResult,
   type ThresholdOptions,
-} from "./common.js";
-import { parseStructuredOutput, scoreSchemaValidity } from "./structured-output.js";
+} from "./common.ts";
+import { parseStructuredOutput, scoreSchemaValidity } from "./structured-output.ts";
 
 export interface InstructionOverrideOptions extends ThresholdOptions {
   blockedInstructions?: readonly string[];

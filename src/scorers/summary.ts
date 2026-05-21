@@ -10,7 +10,7 @@ import {
   type ScoreInput,
   type ScorerResult,
   type ThresholdOptions,
-} from "./common.js";
+} from "./common.ts";
 
 export interface RequiredFactsOptions extends ThresholdOptions {
   minCoverage?: number;

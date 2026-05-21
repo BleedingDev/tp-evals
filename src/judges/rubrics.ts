@@ -1,4 +1,4 @@
-import { clampScore, weightedAverage } from "../scorers/common.js";
+import { clampScore, weightedAverage } from "../scorers/common.ts";
 
 export type JudgeMode = "mock" | "live";
 

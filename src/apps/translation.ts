@@ -4,7 +4,7 @@ import {
   type MockVariant,
   type TranslationInput,
   type TranslationOutput,
-} from "./types.js";
+} from "./types.ts";
 
 const improvedTranslations: Readonly<Record<string, string>> = {
   "es::Save changes": "Guardar cambios",

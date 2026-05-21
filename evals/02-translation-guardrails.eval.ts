@@ -3,23 +3,23 @@ import { evalite } from "evalite";
 import {
   TranslationRecordSchema,
   type TranslationRecord,
-} from "../src/datasets/index.js";
-import { runTranslation } from "../src/variants/index.js";
+} from "../src/datasets/index.ts";
+import { runTranslation } from "../src/variants/index.ts";
 import {
   createForbiddenPhraseScorer,
   createTextGuardrailScorer,
   scoreGlossaryTerms,
   scorePlaceholders,
   scoreTags,
-} from "../src/scorers/index.js";
-import type { TranslationOutput } from "../src/apps/index.js";
+} from "../src/scorers/index.ts";
+import type { TranslationOutput } from "../src/apps/index.ts";
 
 import {
   loadLabData,
   outputText,
   resultFromChecks,
   workshopColumns,
-} from "./lab-utils.js";
+} from "./lab-utils.ts";
 
 evalite<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
   "Lab 02 - Translation Guardrails",

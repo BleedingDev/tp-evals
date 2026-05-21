@@ -4,7 +4,7 @@ import {
   type MockVariant,
   type TravelSummaryInput,
   type TravelSummaryOutput,
-} from "./types.js";
+} from "./types.ts";
 
 type TravelCase =
   | "ferry-window"

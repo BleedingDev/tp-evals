@@ -3,18 +3,18 @@ import { evalite } from "evalite";
 import {
   PromptInjectionRecordSchema,
   type PromptInjectionRecord,
-} from "../src/datasets/index.js";
+} from "../src/datasets/index.ts";
 import {
   createJudgeScorer,
   createSafetyScorer,
-} from "../src/scorers/index.js";
+} from "../src/scorers/index.ts";
 import {
   getLiveModelName,
   runPromptInjectionWithLiveModel,
-} from "../src/providers/live-model.js";
-import { resolveRuntimeMode } from "../src/variants/index.js";
+} from "../src/providers/live-model.ts";
+import { resolveRuntimeMode } from "../src/variants/index.ts";
 
-import { loadLabData, workshopColumns } from "./lab-utils.js";
+import { loadLabData, workshopColumns } from "./lab-utils.ts";
 
 interface PromptInjectionOutput {
   readonly variant: "local-safe-handler" | "local-vulnerable-handler" | "live-model";
