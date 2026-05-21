@@ -34,9 +34,9 @@ Potom udělejte kontrolovaný experiment na passing case:
 
 1. Otevřete `data/evals/translations-edge-cases.jsonl`.
 2. Najděte `translation-edge-placeholders-es`.
-3. V `input.placeholders` změňte `{{first_name}}` na `{{first_namXe}}`.
+3. Do `input.placeholders` přidejte třetí hodnotu `{{missing_placeholder}}`.
 4. Spusťte znovu `pnpm run lab:02`.
-5. Sledujte, že scorer začne čekat jiný placeholder a score spadne.
+5. Sledujte, že scorer začne čekat placeholder, který output neobsahuje, a score spadne.
 
 Pozor: pro tento placeholder case scorer čte očekávané placeholdery z `input.placeholders`, ne z `expected.mustPreserve`.
 
@@ -47,7 +47,7 @@ Pro každý případ si zapište:
 3. Které `forbiddenPatterns` by měly failnout i při jinak dobrém překladu.
 4. Jaký business dopad má chyba: UI rozbití, špatný význam, nebo terminologická nekonzistence.
 
-Po experimentu vraťte `{{first_namXe}}` zpět na `{{first_name}}`. Smyslem není dataset trvale rozbít, ale pochopit vztah mezi dataset expectation, scorerem a výsledným score.
+Po experimentu odeberte `{{missing_placeholder}}`. Smyslem není dataset trvale rozbít, ale pochopit vztah mezi dataset expectation, scorerem a výsledným score.
 
 V Evalite porovnejte scorery `text_guardrails`, `forbidden_phrases` a `protected_fragment_breakdown`. Zajímejte se o to, jestli selhání ukazuje konkrétní porušený fragment, ne jen nízký průměr.
 

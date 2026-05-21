@@ -228,14 +228,14 @@ const printLab02ReadingGuide = (): void => {
   console.log("Kontrolovaný experiment:");
   console.log("1. Otevřete `data/evals/translations-edge-cases.jsonl`.");
   console.log("2. Najděte `translation-edge-placeholders-es`.");
-  console.log("3. V `input.placeholders` změňte `{{first_name}}` na `{{first_namXe}}`.");
+  console.log("3. Do `input.placeholders` přidejte `{{missing_placeholder}}`.");
   console.log("4. Spusťte znovu `pnpm run lab:02`.");
-  console.log("5. Placeholder scorer začne čekat `{{first_namXe}}` a score spadne.");
+  console.log("5. Placeholder scorer začne čekat hodnotu, kterou output neobsahuje, a score spadne.");
   console.log("");
   console.log("Pozor:");
   console.log("- U tohoto case scorer čte placeholdery z `input.placeholders`.");
   console.log("- Změna `expected.mustPreserve` placeholder guardrail nerozbije.");
-  console.log("- Po experimentu vraťte změnu zpět.");
+  console.log("- Po experimentu `{{missing_placeholder}}` zase odeberte.");
 };
 
 const labPortFor = (lab: LabDefinition): string => {
