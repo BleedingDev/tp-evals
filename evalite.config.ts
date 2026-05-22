@@ -41,7 +41,7 @@ export default defineConfig({
   },
   scoreThreshold: readNumber("EVALITE_SCORE_THRESHOLD", 70),
   testTimeout: readNumber("EVALITE_TEST_TIMEOUT_MS", 30000),
-  maxConcurrency: readNumber("EVALITE_MAX_CONCURRENCY", 4),
+  maxConcurrency: readNumber("EVALITE_MAX_CONCURRENCY", 1),
   trialCount: readNumber("EVALITE_TRIAL_COUNT", 1),
   cache: readBoolean("EVALITE_CACHE", true),
   hideTable: readBoolean("EVALITE_HIDE_TABLE", false),

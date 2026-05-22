@@ -222,6 +222,7 @@ const printLab02ReadingGuide = (): void => {
   console.log("");
   console.log("Jak číst Lab 02:");
   console.log("- Tabulka je triage dashboard. Ukáže podezřelý case, ne celý důvod.");
+  console.log("- Pořadí řádků neberte jako součást úkolu. Vždy se orientujte podle `case`.");
   console.log("- `guard` je hard guardrail score: placeholders, tagy, kódy a glossary.");
   console.log("- `forbid` je kontrola zakázaných tvarů a rozbitých protected fragmentů.");
   console.log("- `next` říká první QA problém: hard fail, forbidden, review, nebo pass.");
@@ -249,6 +250,8 @@ const printLab02ReadingGuide = (): void => {
   console.log("- `translation-edge-placeholders-es` slouží k ručnímu rozbití očekávání v datasetu.");
   console.log("- U placeholder case scorer čte očekávané placeholdery z `input.placeholders`.");
   console.log("- Změna `expected.mustPreserve` placeholder guardrail nerozbije.");
+  console.log("- Pokud se při live běhu změní i jiný case, není to efekt B experimentu.");
+  console.log("  Je to samostatný live-model signál, typicky glossary nebo formulace.");
   console.log("- Po experimentu `{{missing_placeholder}}` zase odeberte.");
 };
 
@@ -284,7 +287,8 @@ const printLab04ReadingGuide = (): void => {
   console.log("  Zkratky: `ask` = ask_clarification, `find` = find_item, `open` = open_result.");
   console.log("- `conf` je skutečná confidence / minimální confidence z datasetu.");
   console.log("- `slots` je počet správně vyplněných required slots + stav missingSlots.");
-  console.log("- `next` říká první věc, kterou má QA řešit: intent, confidence, invented, missing, slots, policy, nebo pass.");
+  console.log("- `next` říká první věc, kterou má QA řešit: intent, invented, missing, slots, confidence, policy, nebo pass.");
+  console.log("- Missing fields a špatné slots mají prioritu před confidence.");
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Otevřete `.evalite/results/lab-04.json` a vyberte řádek, kde `next` není `pass`.");
@@ -301,7 +305,8 @@ const printLab05ReadingGuide = (): void => {
   console.log("- `intent` čtěte jako `expected->actual`: vlevo je očekávání, vpravo výstup modelu.");
   console.log("- `slots` je carried/current required slots + stav missingSlots.");
   console.log("- `state` je skóre conversation_state: intent + carried slots + missing behavior.");
-  console.log("- `next` říká první QA problém: intent, confidence, missing, slots, state, policy, nebo pass.");
+  console.log("- `next` říká první QA problém: intent, missing, slots, confidence, state, policy, nebo pass.");
+  console.log("- Missing fields a špatné slots mají prioritu před confidence.");
   console.log("");
   console.log("Úkol Lab 05:");
   console.log("1. Vyberte jeden `pass` case a jeden case, kde `next` není `pass`.");
@@ -470,6 +475,10 @@ const labPortFor = (lab: LabDefinition): string => {
   return process.env["EVALITE_LAB_PORT"] ?? String(3100 + Math.max(labIndex, 0) * 10);
 };
 
+const envForLab = (lab: LabDefinition): NodeJS.ProcessEnv => ({
+  EVALITE_PORT: labPortFor(lab),
+});
+
 const runEvalite = async (
   args: readonly string[],
   resultPath?: string,
@@ -633,7 +642,7 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
     "--outputPath",
     resultPath,
     ...passthroughArgs,
-  ], { EVALITE_PORT: labPortFor(lab) });
+  ], envForLab(lab));
 
   if (exitCode === 0) {
     await printReadingGuideFor(lab.command, resultPath);
@@ -657,7 +666,7 @@ const runLabAll = async (): Promise<never> => {
       "--outputPath",
       resultPathFor(lab.command.replace(":", "-")),
       ...passthroughArgs,
-    ], { EVALITE_PORT: labPortFor(lab) });
+    ], envForLab(lab));
 
     if (exitCode !== 0) {
       process.exit(exitCode);

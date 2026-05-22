@@ -26,6 +26,7 @@ pnpm run lab:02
 
 Tabulku čtěte takto:
 
+- Pořadí řádků není součást úkolu. Vždy se orientujte podle `case`.
 - `guard` je hard guardrail score: placeholders, tagy, kódy a glossary.
 - `forbid` je kontrola zakázaných tvarů a rozbitých protected fragmentů.
 - `next` říká první QA problém: hard fail, forbidden, review, nebo pass.
@@ -50,6 +51,8 @@ Tabulku čtěte takto:
 6. Sledujte, že scorer začne čekat placeholder, který output neobsahuje, a score spadne.
 
 Pozor: pro tento placeholder case scorer čte očekávané placeholdery z `input.placeholders`, ne z `expected.mustPreserve`. Změna `expected.mustPreserve` placeholder guardrail nerozbije.
+
+Pokud při live běhu klesne i jiný case než `translation-edge-placeholders-es`, není to efekt B experimentu. Je to samostatný live-model signál, typicky glossary nebo formulace. B experiment sledujte vždy jen na stejném case ID.
 
 Pro každý případ si zapište:
 

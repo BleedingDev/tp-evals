@@ -73,16 +73,16 @@ function conversationNext(opts: ConversationColumnInput): string {
     return "intent";
   }
 
-  if (opts.output.confidence < expected.minIntentConfidence) {
-    return "confidence";
-  }
-
   if (!sameStringSet(opts.output.missingSlots, expected.missingSlots)) {
     return "missing";
   }
 
   if (requiredSlotMatches(opts) < Object.keys(expected.requiredSlots).length) {
     return "slots";
+  }
+
+  if (opts.output.confidence < expected.minIntentConfidence) {
+    return "confidence";
   }
 
   if (typeof structured === "number" && structured < 0.7) {

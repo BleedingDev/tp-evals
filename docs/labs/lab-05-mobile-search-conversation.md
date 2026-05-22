@@ -42,7 +42,8 @@ Evalite tabulku čtěte takto:
 - `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu.
 - `slots` je počet správně přenesených required slots + stav `missingSlots`.
 - `state` je skóre scoreru `conversation_state`.
-- `next` říká první QA problém: intent, confidence, missing, slots, state, policy, nebo pass.
+- `next` říká první QA problém: intent, missing, slots, confidence, state, policy, nebo pass.
+- Missing fields a špatné slots mají prioritu před confidence. Nejdřív ověřte, zda model bezpečně ví, s čím pracuje; teprve potom řešte, jak jistý si je.
 
 1. Expected `intent`.
 2. `slots`, které pochází z `conversation`.

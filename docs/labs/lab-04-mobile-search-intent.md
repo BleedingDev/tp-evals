@@ -39,7 +39,8 @@ Tabulku čtěte takto:
 - `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu. Zkratky: `ask` = `ask_clarification`, `find` = `find_item`, `open` = `open_result`.
 - `conf` je skutečná confidence / minimální confidence z datasetu.
 - `slots` je počet správně vyplněných required slots + stav `missingSlots`.
-- `next` říká první věc, kterou má QA řešit: intent, confidence, invented, missing, slots, policy, nebo pass.
+- `next` říká první věc, kterou má QA řešit: intent, invented, missing, slots, confidence, policy, nebo pass.
+- Missing fields a špatné slots mají prioritu před confidence. Nízká confidence je důležitá, ale až po kontrole, zda výstup vůbec obsahuje správná pole.
 
 1. Je `intent` správný pro další app action?
 2. Jsou `requiredSlots` skutečně řečené uživatelem?

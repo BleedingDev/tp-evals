@@ -99,10 +99,6 @@ function nextAction(opts: MobileSearchColumnInput): string {
     return "intent";
   }
 
-  if (opts.output.confidence < expected.minIntentConfidence) {
-    return "confidence";
-  }
-
   if (presentDisallowedSlots(opts).length > 0) {
     return "invented";
   }
@@ -113,6 +109,10 @@ function nextAction(opts: MobileSearchColumnInput): string {
 
   if (matchingRequiredSlots(opts) < Object.keys(expected.requiredSlots).length) {
     return "slots";
+  }
+
+  if (opts.output.confidence < expected.minIntentConfidence) {
+    return "confidence";
   }
 
   if (opts.input.caseType === "borderline") {
