@@ -271,6 +271,23 @@ const printLab03ReadingGuide = (): void => {
   console.log("Detail důvodu hledejte v `.evalite/results/lab-03.json` u `scores`.");
 };
 
+const printLab04ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 04:");
+  console.log("- `intent` je očekávaný intent > intent, který vrátil model.");
+  console.log("  Zkratky: `ask` = ask_clarification, `find` = find_item, `open` = open_result.");
+  console.log("- `conf` je skutečná confidence / minimální confidence z datasetu.");
+  console.log("- `slots` je počet správně vyplněných required slots + stav missingSlots.");
+  console.log("- `next` říká první věc, kterou má QA řešit: intent, confidence, invented, missing, slots, policy, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Najděte řádek, kde `next` není `pass`.");
+  console.log("2. Pokud `intent` nemá stejnou levou a pravou stranu, řešíte špatnou app action.");
+  console.log("3. Pokud `slots` končí `diff`, porovnejte `expected.missingSlots` s `output.missingSlots`.");
+  console.log("4. Pokud `next` je `invented`, model vrátil zakázaný slot.");
+  console.log("5. Detail otevřete v `.evalite/results/lab-04.json` u stejného case.");
+};
+
 const labPortFor = (lab: LabDefinition): string => {
   const labIndex = labs.findIndex((candidate) => candidate.command === lab.command);
   return process.env["EVALITE_LAB_PORT"] ?? String(3100 + Math.max(labIndex, 0) * 10);
@@ -453,6 +470,10 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
     printLab03ReadingGuide();
   }
 
+  if (exitCode === 0 && lab.command === "lab:04") {
+    printLab04ReadingGuide();
+  }
+
   process.exit(exitCode);
 };
 
@@ -487,6 +508,10 @@ const runLabAll = async (): Promise<never> => {
 
     if (lab.command === "lab:03") {
       printLab03ReadingGuide();
+    }
+
+    if (lab.command === "lab:04") {
+      printLab04ReadingGuide();
     }
   }
 
