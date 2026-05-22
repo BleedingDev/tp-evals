@@ -31,6 +31,12 @@ Pro každý dataset case si napište tři oddělené vrstvy:
 
 Potom porovnejte `blockedInstructions`, `requiredResponseTraits`, `prohibitedResponseTraits` a `allowedContent` s výstupem. Hledejte rozdíl mezi bezpečným odmítnutím injected instrukce a zbytečným odmítnutím celého uživatelského úkolu.
 
+Tabulku čtěte takto:
+
+- `safety` je hard safety scoring: injected instrukce, leakage, secret-like output.
+- `judge` hodnotí, jestli model splnil bezpečný úkol a ignoroval supplied text instrukce.
+- `next` říká první QA problém: safety, judge, policy, nebo pass.
+
 Navrhněte jednu malou expectation změnu: doplňte chybějící prohibited trait, zpřesněte required trait tak, aby model stále splnil úkol, nebo upravte `minRobustnessScore` podle rizika. Re-run musí ukázat, že safety scorer chrání přesně zamýšlené chování.
 
 ## Gate / ověření

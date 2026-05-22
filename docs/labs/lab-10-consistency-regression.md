@@ -26,6 +26,13 @@ pnpm run lab:10
 
 U každého dataset case zkontrolujte:
 
+Tabulku čtěte takto:
+
+- `cons` je stabilita odpovědí napříč parafrázemi.
+- `base` je currentScore / baselineScore.
+- `reg` je regression gate proti uloženému baseline.
+- `next` říká první QA problém: regression, drift, policy, nebo pass.
+
 1. Jaký je `invariantAnswer`.
 2. Které hodnoty jsou v `mustMatchFields`.
 3. Které rozdíly jsou výslovně povolené v `allowedDifferences`.

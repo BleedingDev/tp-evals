@@ -50,7 +50,15 @@ function reviewDecision(opts: TranslationColumnInput): string {
 }
 
 function shortCaseId(id: string): string {
-  return id.replace(/^translation-/u, "");
+  return id
+    .replace(/^translation-/u, "")
+    .replace("edge-placeholders-es", "ph-es")
+    .replace("basic-cancel-es", "cancel")
+    .replace("basic-save-es", "save")
+    .replace("basic-pass-es", "pass")
+    .replace("edge-tags-fr", "tags")
+    .replace("edge-drawer-es", "drawer")
+    .replace("edge-mode-de", "mode");
 }
 
 function shortCaseType(type: TranslationRecord["caseType"]): string {

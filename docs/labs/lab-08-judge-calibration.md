@@ -27,6 +27,13 @@ pnpm run lab:08
 
 V `evals/08-judge-calibration.eval.ts` najděte `calibrationData`. Pro každý příklad porovnejte:
 
+Tabulku čtěte takto:
+
+- `band` je očekávané pásmo: good, borderline, nebo bad.
+- `score` je reálné judge score.
+- `weakest` je nejslabší dimenze, kterou má QA zkontrolovat.
+- `next` říká cal ok, review, nebo recalibrate.
+
 1. `output`, který judge hodnotí.
 2. `expectedBehavior`, tedy proč je příklad good, borderline nebo bad.
 3. `expected.targetBand`, `minScore` a `maxScore`.

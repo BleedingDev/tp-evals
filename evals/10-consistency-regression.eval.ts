@@ -1,4 +1,5 @@
 import { evalite } from "evalite";
+import type { Evalite } from "evalite/types";
 
 import {
   ConsistencyRecordSchema,
@@ -13,7 +14,12 @@ import {
   scoreRegressionCounts,
 } from "../src/scorers/consistency";
 
-import { loadLabData, workshopColumns } from "./lab-utils";
+import {
+  compactCaseId,
+  formatScore,
+  loadLabData,
+  namedScore,
+} from "./lab-utils";
 
 interface ConsistencyOutput {
   readonly variant: "recorded-consistency-suite";
@@ -24,6 +30,60 @@ interface ConsistencyOutput {
     readonly baselineScore: number;
     readonly threshold: number;
   }[];
+}
+
+type ConsistencyColumnInput = Evalite.ColumnInput<
+  ConsistencyRecord,
+  ConsistencyOutput,
+  ConsistencyRecord["expected"]
+>;
+
+function regressionLabel(output: ConsistencyOutput): string {
+  const regression = output.regressionCases[0];
+
+  if (regression === undefined) {
+    return "n/a";
+  }
+
+  return `${regression.currentScore.toFixed(2)}/${regression.baselineScore.toFixed(2)}`;
+}
+
+function consistencyNext(opts: ConsistencyColumnInput): string {
+  const consistency = namedScore(opts.scores, "consistency");
+  const regression = namedScore(opts.scores, "regression_gate");
+
+  if (typeof regression === "number" && regression < 0.75) {
+    return "regression";
+  }
+
+  if (typeof consistency === "number" && consistency < 0.8) {
+    return "drift";
+  }
+
+  if (opts.input.caseType === "borderline") {
+    return "policy";
+  }
+
+  return "pass";
+}
+
+function consistencyColumns(
+  opts: ConsistencyColumnInput,
+): Evalite.RenderedColumn[] {
+  return [
+    {
+      label: "case",
+      value: compactCaseId(opts.input.id, "consistency-")
+        .replace("policy-window", "policy")
+        .replace("search-slots", "search")
+        .replace("summary-warning", "summary")
+        .replace("refusal-scope", "refusal"),
+    },
+    { label: "cons", value: formatScore(namedScore(opts.scores, "consistency")) },
+    { label: "base", value: regressionLabel(opts.output) },
+    { label: "reg", value: formatScore(namedScore(opts.scores, "regression_gate")) },
+    { label: "next", value: consistencyNext(opts) },
+  ];
 }
 
 const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
@@ -169,6 +229,6 @@ evalite<ConsistencyRecord, ConsistencyOutput, ConsistencyRecord["expected"]>(
         },
       }),
     ],
-    columns: workshopColumns,
+    columns: consistencyColumns,
   },
 );

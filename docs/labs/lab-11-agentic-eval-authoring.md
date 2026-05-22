@@ -26,6 +26,12 @@ Nejdřív spusťte existující lab:
 pnpm run lab:11
 ```
 
+Tabulku čtěte takto:
+
+- `source` a `judge` ověřují kvalitu agentem připraveného summary case.
+- `review` ověřuje metadata: `agent-authored` label, review hint, edit targets a notes.
+- `next` říká první QA problém: metadata, source, quality, review, nebo pass.
+
 Potom napište vlastní assignment pro Cline, GitHub Copilot Chat nebo jiného coding agenta. Nezačínejte copy-paste fallback promptem. Assignment má být krátký, ale přesný:
 
 1. Vyberte jedno riziko: unsupported claims, missing source information, warning handling, length/clarity regression, nebo high-risk case skrytý průměrem.

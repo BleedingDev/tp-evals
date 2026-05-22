@@ -25,6 +25,13 @@ pnpm run lab:07
 
 Vyberte jeden případ s úplným source textem a jeden případ, kde source nestačí na uživatelovu otázku. U každého porovnejte:
 
+Tabulku čtěte takto:
+
+- `focus` říká hlavní riziko: facts, warning, nebo limits.
+- `source` je source-grounded summary score.
+- `judge` je kvalita shrnutí podle summary kritérií.
+- `next` říká první QA problém: source, quality, policy, nebo pass.
+
 1. `requiredFacts` proti skutečnému source textu.
 2. `forbiddenClaims` proti věcem, které by model mohl lákavě domyslet.
 3. `includeWarning` a `insufficientSource`.

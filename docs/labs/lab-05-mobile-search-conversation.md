@@ -27,6 +27,13 @@ pnpm run lab:05
 
 Otevřete `data/evals/mobile-search-conversation.jsonl`. Pro každý řádek vytvořte krátkou trace tabulku:
 
+Evalite tabulku čtěte takto:
+
+- `intent` je očekávaný intent > intent, který vrátil model.
+- `slots` je počet správně přenesených required slots + stav `missingSlots`.
+- `state` je skóre scoreru `conversation_state`.
+- `next` říká první QA problém: intent, confidence, missing, slots, state, policy, nebo pass.
+
 1. Expected `intent`.
 2. `slots`, které pochází z `conversation`.
 3. `slots`, které pochází z aktuální `utterance`.

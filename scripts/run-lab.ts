@@ -222,6 +222,9 @@ const printLab02ReadingGuide = (): void => {
   console.log("");
   console.log("Jak číst Lab 02:");
   console.log("- Tabulka je triage dashboard. Ukáže podezřelý case, ne celý důvod.");
+  console.log("- `guard` je hard guardrail score: placeholders, tagy, kódy a glossary.");
+  console.log("- `forbid` je kontrola zakázaných tvarů a rozbitých protected fragmentů.");
+  console.log("- `next` říká první QA problém: hard fail, forbidden, review, nebo pass.");
   console.log("- `.evalite/results/lab-02.json` = výsledek běhu: output, scores, detaily.");
   console.log("- `data/evals/translations-edge-cases.jsonl` = dataset: input a expected.");
   console.log("- `evals/02-translation-guardrails.eval.ts` = scoring logika, pokud ji chcete prohlédnout.");
@@ -286,6 +289,146 @@ const printLab04ReadingGuide = (): void => {
   console.log("3. Pokud `slots` končí `diff`, porovnejte `expected.missingSlots` s `output.missingSlots`.");
   console.log("4. Pokud `next` je `invented`, model vrátil zakázaný slot.");
   console.log("5. Detail otevřete v `.evalite/results/lab-04.json` u stejného case.");
+};
+
+const printLab05ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 05:");
+  console.log("- `intent` je očekávaný intent > intent, který vrátil model.");
+  console.log("- `slots` je carried/current required slots + stav missingSlots.");
+  console.log("- `state` je skóre conversation_state: intent + carried slots + missing behavior.");
+  console.log("- `next` říká první QA problém: intent, confidence, missing, slots, state, policy, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Vyberte řádek, kde `next` není `pass`.");
+  console.log("2. Otevřete dataset case v `data/evals/mobile-search-conversation.jsonl`.");
+  console.log("3. Oddělte slots z historie od slots z aktuální věty.");
+  console.log("4. Detail výstupu a scorers najdete v `.evalite/results/lab-05.json`.");
+};
+
+const printLab06ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 06:");
+  console.log("- Každý case běží přes prompt variantu `plain` nebo `guard`.");
+  console.log("- `guard` je skóre hard guardrails: placeholders, tags, codes, glossary.");
+  console.log("- `judge` je kvalita významu podle translation kritérií.");
+  console.log("- `next` říká, jestli řešit hard fail, quality, compare, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Porovnejte stejný case napříč variantami.");
+  console.log("2. Nevybírejte vítěze podle průměru, pokud high-risk case failuje.");
+  console.log("3. Detail outputu najdete v `.evalite/results/lab-06.json`.");
+};
+
+const printLab07ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 07:");
+  console.log("- `focus` říká hlavní QA riziko: facts, warning, nebo limits.");
+  console.log("- `source` je source-grounded summary score: required facts, unsupported claims, warning, length.");
+  console.log("- `judge` je kvalita shrnutí podle summary kritérií.");
+  console.log("- `next` říká první problém: source, quality, policy, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. U `source` problému čtěte requiredFacts a forbiddenClaims.");
+  console.log("2. U `limits` ověřte, že model nepředstírá chybějící informace.");
+  console.log("3. Detail najdete v `.evalite/results/lab-07.json`.");
+};
+
+const printLab08ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 08:");
+  console.log("- Tohle testuje judge, ne aplikaci.");
+  console.log("- `band` je očekávané pásmo: good, borderline, nebo bad.");
+  console.log("- `score` je reálné judge score.");
+  console.log("- `weakest` ukazuje nejslabší dimenzi, kterou má QA zkontrolovat.");
+  console.log("- `next` říká cal ok, review, nebo recalibrate.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Known bad nesmí spadnout do pohodlného pass rozhodnutí.");
+  console.log("2. Borderline má zůstat reviewovatelný.");
+  console.log("3. Detail dimenzí najdete v `.evalite/results/lab-08.json`.");
+};
+
+const printLab09ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 09:");
+  console.log("- `safety` je hard safety scoring: injected instrukce, leakage, secret-like output.");
+  console.log("- `judge` hodnotí, jestli model splnil bezpečný úkol a ignoroval supplied text instrukce.");
+  console.log("- `next` říká první problém: safety, judge, policy, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Rozdělte trustedInstruction, userRequest a suppliedText.");
+  console.log("2. Pokud `safety` spadne, řešíte release blocker.");
+  console.log("3. Detail najdete v `.evalite/results/lab-09.json`.");
+};
+
+const printLab10ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 10:");
+  console.log("- `cons` je stabilita odpovědí napříč parafrázemi.");
+  console.log("- `base` je currentScore / baselineScore.");
+  console.log("- `reg` je regression gate proti uloženému baseline.");
+  console.log("- `next` říká první problém: regression, drift, policy, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Hledejte změnu business invariant, ne rozdíl ve formulaci.");
+  console.log("2. U `regression` otevřete regressionCases v detailu.");
+  console.log("3. Detail najdete v `.evalite/results/lab-10.json`.");
+};
+
+const printLab11ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 11:");
+  console.log("- `source` a `judge` ověřují kvalitu agentem připraveného summary case.");
+  console.log("- `review` ověřuje metadata: agent-authored label, review hint, edit targets a notes.");
+  console.log("- `next` říká první problém: metadata, source, quality, review, nebo pass.");
+  console.log("");
+  console.log("Jak postupovat:");
+  console.log("1. Nejdřív napište vlastní assignment pro coding agenta.");
+  console.log("2. Fallback prompt použijte až když se zaseknete.");
+  console.log("3. Agentův diff reviewujte jako QA evidence, ne jako hotovou pravdu.");
+  console.log("4. Detail najdete v `.evalite/results/lab-11.json`.");
+};
+
+const printReadingGuideFor = async (
+  command: LabDefinition["command"],
+  resultPath: string,
+): Promise<void> => {
+  switch (command) {
+    case "lab:01":
+      await printLab01ReadingGuide(resultPath);
+      break;
+    case "lab:02":
+      printLab02ReadingGuide();
+      break;
+    case "lab:03":
+      printLab03ReadingGuide();
+      break;
+    case "lab:04":
+      printLab04ReadingGuide();
+      break;
+    case "lab:05":
+      printLab05ReadingGuide();
+      break;
+    case "lab:06":
+      printLab06ReadingGuide();
+      break;
+    case "lab:07":
+      printLab07ReadingGuide();
+      break;
+    case "lab:08":
+      printLab08ReadingGuide();
+      break;
+    case "lab:09":
+      printLab09ReadingGuide();
+      break;
+    case "lab:10":
+      printLab10ReadingGuide();
+      break;
+    case "lab:11":
+      printLab11ReadingGuide();
+      break;
+  }
 };
 
 const labPortFor = (lab: LabDefinition): string => {
@@ -458,20 +601,8 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
     ...passthroughArgs,
   ], { EVALITE_PORT: labPortFor(lab) });
 
-  if (exitCode === 0 && lab.command === "lab:01") {
-    await printLab01ReadingGuide(resultPath);
-  }
-
-  if (exitCode === 0 && lab.command === "lab:02") {
-    printLab02ReadingGuide();
-  }
-
-  if (exitCode === 0 && lab.command === "lab:03") {
-    printLab03ReadingGuide();
-  }
-
-  if (exitCode === 0 && lab.command === "lab:04") {
-    printLab04ReadingGuide();
+  if (exitCode === 0) {
+    await printReadingGuideFor(lab.command, resultPath);
   }
 
   process.exit(exitCode);
@@ -498,21 +629,10 @@ const runLabAll = async (): Promise<never> => {
       process.exit(exitCode);
     }
 
-    if (lab.command === "lab:01") {
-      await printLab01ReadingGuide(resultPathFor(lab.command.replace(":", "-")));
-    }
-
-    if (lab.command === "lab:02") {
-      printLab02ReadingGuide();
-    }
-
-    if (lab.command === "lab:03") {
-      printLab03ReadingGuide();
-    }
-
-    if (lab.command === "lab:04") {
-      printLab04ReadingGuide();
-    }
+    await printReadingGuideFor(
+      lab.command,
+      resultPathFor(lab.command.replace(":", "-")),
+    );
   }
 
   process.exit(0);

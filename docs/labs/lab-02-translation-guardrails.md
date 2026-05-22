@@ -24,6 +24,12 @@ Spusťte lab:
 pnpm run lab:02
 ```
 
+Tabulku čtěte takto:
+
+- `guard` je hard guardrail score: placeholders, tagy, kódy a glossary.
+- `forbid` je kontrola zakázaných tvarů a rozbitých protected fragmentů.
+- `next` říká první QA problém: hard fail, forbidden, review, nebo pass.
+
 ### A. Analýza připraveného failu, bez editace
 
 1. Otevřete `.evalite/results/lab-02.json`.

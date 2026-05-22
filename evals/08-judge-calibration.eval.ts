@@ -1,4 +1,5 @@
 import { evalite } from "evalite";
+import type { Evalite } from "evalite/types";
 
 import { judgeWithOptionalLive } from "../src/judges/live-judge";
 import type { WorkshopRubricId } from "../src/judges/rubrics";
@@ -6,6 +7,12 @@ import {
   createEvaliteScorer,
   makeResult,
 } from "../src/scorers/common";
+
+import {
+  compactCaseId,
+  formatScore,
+  requireExpected,
+} from "./lab-utils";
 
 interface CalibrationInput {
   readonly id: string;
@@ -30,6 +37,65 @@ interface CalibrationOutput {
   readonly judgeScore: number;
   readonly judgeSummary: string;
   readonly dimensionScores: Readonly<Record<string, number>>;
+}
+
+type CalibrationColumnInput = Evalite.ColumnInput<
+  CalibrationInput,
+  CalibrationOutput,
+  CalibrationExpected
+>;
+
+function topDimension(output: CalibrationOutput): string {
+  const [dimensionId, score] = Object.entries(output.dimensionScores)
+    .sort((left, right) => left[1] - right[1])[0] ?? ["n/a", 0];
+
+  if (score >= 1) {
+    return "all-ok";
+  }
+
+  return `${dimensionId
+    .replace("instruction_hierarchy", "hier")
+    .replace("fact_coverage", "facts")
+    .replace("source_grounding", "ground")
+    .replace("task_completion", "task")
+    .replace("leak_prevention", "leak")}:${score.toFixed(2)}`;
+}
+
+function calibrationNext(opts: CalibrationColumnInput): string {
+  const expected = requireExpected(opts.input.id, opts.expected);
+  const inBand =
+    opts.output.judgeScore >= expected.minScore &&
+    opts.output.judgeScore <= expected.maxScore;
+
+  if (!inBand) {
+    return "recalibrate";
+  }
+
+  if (expected.targetBand === "borderline") {
+    return "review";
+  }
+
+  return "cal ok";
+}
+
+function calibrationColumns(
+  opts: CalibrationColumnInput,
+): Evalite.RenderedColumn[] {
+  const expected = requireExpected(opts.input.id, opts.expected);
+
+  return [
+    {
+      label: "case",
+      value: compactCaseId(opts.input.id, "judge-")
+        .replace("borderline-summary", "border")
+        .replace("good-summary", "good")
+        .replace("bad-injection", "bad"),
+    },
+    { label: "band", value: expected.targetBand.replace("borderline", "border") },
+    { label: "score", value: formatScore(opts.output.judgeScore) },
+    { label: "weakest", value: topDimension(opts.output) },
+    { label: "next", value: calibrationNext(opts) },
+  ];
 }
 
 const calibrationData: Array<{
@@ -162,5 +228,6 @@ evalite<CalibrationInput, CalibrationOutput, CalibrationExpected>(
         },
       }),
     ],
+    columns: calibrationColumns,
   },
 );

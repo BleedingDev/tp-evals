@@ -30,6 +30,14 @@ V `evals/06-prompt-model-variants.eval.ts` najděte:
 
 V Evalite porovnejte varianty po jednotlivých řádcích:
 
+Tabulku čtěte takto:
+
+- `case` je stejný dataset case napříč variantami.
+- Evalite sloupec `Variant` je `plain` nebo `guard`.
+- `guard` je skóre hard guardrails.
+- `judge` je kvalita významu podle translation kritérií.
+- `next` říká první QA problém: hard fail, quality, compare, nebo pass.
+
 1. Zůstaly placeholders přesně stejné?
 2. Zůstaly tagy vyvážené?
 3. Zůstaly protected codes přesné?

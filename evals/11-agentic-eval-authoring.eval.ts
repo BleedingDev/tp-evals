@@ -1,4 +1,5 @@
 import { evalite } from "evalite";
+import type { Evalite } from "evalite/types";
 
 import type { TravelSummaryOutput } from "../src/apps/types";
 import {
@@ -13,7 +14,60 @@ import { createJudgeScorer } from "../src/scorers/judge";
 import { createSummaryScorer } from "../src/scorers/summary";
 import { runTravelSummary } from "../src/variants/run-variants";
 
-import { loadLabData, summaryText, workshopColumns } from "./lab-utils";
+import {
+  compactCaseId,
+  formatScore,
+  loadLabData,
+  namedScore,
+  summaryText,
+} from "./lab-utils";
+
+type AgentAuthoringColumnInput = Evalite.ColumnInput<
+  TravelSummaryRecord,
+  TravelSummaryOutput,
+  TravelSummaryRecord["expected"]
+>;
+
+function agentAuthoringNext(opts: AgentAuthoringColumnInput): string {
+  const source = namedScore(opts.scores, "source_grounded_summary");
+  const judge = namedScore(opts.scores, "rubric_judge");
+  const review = namedScore(opts.scores, "dataset_authoring_review");
+
+  if (typeof review === "number" && review < 1) {
+    return "metadata";
+  }
+
+  if (typeof source === "number" && source < 0.72) {
+    return "source";
+  }
+
+  if (typeof judge === "number" && judge < 0.72) {
+    return "quality";
+  }
+
+  if (opts.input.caseType === "borderline") {
+    return "review";
+  }
+
+  return "pass";
+}
+
+function agentAuthoringColumns(
+  opts: AgentAuthoringColumnInput,
+): Evalite.RenderedColumn[] {
+  return [
+    {
+      label: "case",
+      value: compactCaseId(opts.input.id, "agent-summary-")
+        .replace("missing-fee-policy", "fee-policy")
+        .replace("transfer-warning", "transfer"),
+    },
+    { label: "source", value: formatScore(namedScore(opts.scores, "source_grounded_summary")) },
+    { label: "judge", value: formatScore(namedScore(opts.scores, "rubric_judge")) },
+    { label: "review", value: formatScore(namedScore(opts.scores, "dataset_authoring_review")) },
+    { label: "next", value: agentAuthoringNext(opts) },
+  ];
+}
 
 evalite<TravelSummaryRecord, TravelSummaryOutput, TravelSummaryRecord["expected"]>(
   "Lab 11 - Agentic Eval Authoring",
@@ -62,6 +116,6 @@ evalite<TravelSummaryRecord, TravelSummaryOutput, TravelSummaryRecord["expected"
         },
       }),
     ],
-    columns: workshopColumns,
+    columns: agentAuthoringColumns,
   },
 );

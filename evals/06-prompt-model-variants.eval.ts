@@ -1,4 +1,5 @@
 import { evalite } from "evalite";
+import type { Evalite } from "evalite/types";
 
 import type { TranslationOutput } from "../src/apps/types";
 import {
@@ -13,12 +14,56 @@ import {
   type VariantId,
 } from "../src/variants/run-variants";
 
-import { loadLabData, outputText, workshopColumns } from "./lab-utils";
+import {
+  compactCaseId,
+  formatScore,
+  loadLabData,
+  namedScore,
+  outputText,
+} from "./lab-utils";
 
 const variants: Array<{ name: string; input: VariantId }> = [
-  { name: "plain-ui-translation", input: "translation.flawed" },
-  { name: "guardrailed-translation", input: "translation.improved" },
+  { name: "plain", input: "translation.flawed" },
+  { name: "guard", input: "translation.improved" },
 ];
+
+type VariantColumnInput = Evalite.ColumnInput<
+  TranslationRecord,
+  TranslationOutput,
+  TranslationRecord["expected"]
+>;
+
+function variantNext(opts: VariantColumnInput): string {
+  const guard = namedScore(opts.scores, "text_guardrails");
+  const judge = namedScore(opts.scores, "rubric_judge");
+
+  if (typeof guard === "number" && guard < 0.7) {
+    return "hard fail";
+  }
+
+  if (typeof judge === "number" && judge < 0.68) {
+    return "quality";
+  }
+
+  if (opts.input.caseType === "borderline") {
+    return "compare";
+  }
+
+  return "pass";
+}
+
+function variantColumns(opts: VariantColumnInput): Evalite.RenderedColumn[] {
+  return [
+    {
+      label: "case",
+      value: compactCaseId(opts.input.id, "translation-edge-")
+        .replace("placeholders-es", "ph-es"),
+    },
+    { label: "guard", value: formatScore(namedScore(opts.scores, "text_guardrails")) },
+    { label: "judge", value: formatScore(namedScore(opts.scores, "rubric_judge")) },
+    { label: "next", value: variantNext(opts) },
+  ];
+}
 
 evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
   "Lab 06 - Live Prompt Variants",
@@ -67,6 +112,6 @@ evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["
         }),
       },
     ],
-    columns: workshopColumns,
+    columns: variantColumns,
   },
 );

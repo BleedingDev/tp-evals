@@ -139,3 +139,44 @@ export function workshopColumns<
     },
   ];
 }
+
+export type ScoreLike = {
+  readonly name: string;
+  readonly score?: number | null;
+};
+
+export function namedScore(
+  scores: readonly ScoreLike[],
+  name: string,
+): number | undefined {
+  const score = scores.find((candidate) => candidate.name === name)?.score;
+  return typeof score === "number" ? score : undefined;
+}
+
+export function formatScore(score: number | undefined): string {
+  return typeof score === "number" ? score.toFixed(2) : "n/a";
+}
+
+export function compactCaseId(id: string, prefix: string): string {
+  return id.replace(new RegExp(`^${prefix}`, "u"), "");
+}
+
+export function sameStringSet(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  const rightSet = new Set(right);
+  return left.every((item) => rightSet.has(item));
+}
+
+export function requireExpected<TExpected>(
+  caseId: string,
+  expected: TExpected | undefined,
+): TExpected {
+  if (expected === undefined) {
+    throw new Error(`Missing expected data for ${caseId}.`);
+  }
+
+  return expected;
+}

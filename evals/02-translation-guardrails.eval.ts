@@ -1,4 +1,5 @@
 import { evalite } from "evalite";
+import type { Evalite } from "evalite/types";
 
 import {
   TranslationRecordSchema,
@@ -15,11 +16,70 @@ import {
 import type { TranslationOutput } from "../src/apps/types";
 
 import {
+  compactCaseId,
+  formatScore,
   loadLabData,
+  namedScore,
   outputText,
   resultFromChecks,
-  workshopColumns,
 } from "./lab-utils";
+
+type GuardrailColumnInput = Evalite.ColumnInput<
+  TranslationRecord,
+  TranslationOutput,
+  TranslationRecord["expected"]
+>;
+
+function shortCaseId(id: string): string {
+  return compactCaseId(id, "translation-edge-")
+    .replace("placeholders-es", "ph-es")
+    .replace("tags-fr", "tags")
+    .replace("drawer-es", "drawer")
+    .replace("mode-de", "mode");
+}
+
+function shortCaseType(type: TranslationRecord["caseType"]): string {
+  if (type === "passing") {
+    return "pass";
+  }
+
+  if (type === "failing") {
+    return "fail";
+  }
+
+  return "border";
+}
+
+function guardrailNext(opts: GuardrailColumnInput): string {
+  const guard = namedScore(opts.scores, "text_guardrails");
+  const forbidden = namedScore(opts.scores, "forbidden_phrases");
+
+  if (typeof guard === "number" && guard < 0.7) {
+    return "hard fail";
+  }
+
+  if (typeof forbidden === "number" && forbidden < 1) {
+    return "forbidden";
+  }
+
+  if (opts.input.caseType === "borderline") {
+    return "review";
+  }
+
+  return "pass";
+}
+
+function guardrailColumns(
+  opts: GuardrailColumnInput,
+): Evalite.RenderedColumn[] {
+  return [
+    { label: "case", value: shortCaseId(opts.input.id) },
+    { label: "type", value: shortCaseType(opts.input.caseType) },
+    { label: "guard", value: formatScore(namedScore(opts.scores, "text_guardrails")) },
+    { label: "forbid", value: formatScore(namedScore(opts.scores, "forbidden_phrases")) },
+    { label: "next", value: guardrailNext(opts) },
+  ];
+}
 
 evalite<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
   "Lab 02 - Translation Guardrails",
@@ -64,6 +124,6 @@ evalite<TranslationRecord, TranslationOutput, TranslationRecord["expected"]>(
         },
       },
     ],
-    columns: workshopColumns,
+    columns: guardrailColumns,
   },
 );
