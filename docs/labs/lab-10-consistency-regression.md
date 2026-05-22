@@ -26,6 +26,13 @@ pnpm run lab:10
 
 U každého dataset case zkontrolujte:
 
+Kde přesně hledat:
+
+1. Otevřete `.evalite/results/lab-10.json` a vyberte case s `regression`, `drift` nebo `policy`.
+2. Stejné case ID najděte v `data/evals/consistency.jsonl`.
+3. V datasetu čtěte `input.variants`, `input.context`, `expected.invariantAnswer`, `expected.mustMatchFields`, `expected.allowedDifferences` a `expected.minConsistencyScore`.
+4. U regression problému otevřete v result exportu `regressionCases`.
+
 Tabulku čtěte takto:
 
 - `cons` je stabilita odpovědí napříč parafrázemi.

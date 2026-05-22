@@ -25,6 +25,13 @@ pnpm run lab:07
 
 Vyberte jeden případ s úplným source textem a jeden případ, kde source nestačí na uživatelovu otázku. U každého porovnejte:
 
+Kde přesně hledat:
+
+1. Otevřete `.evalite/results/lab-07.json` a vyberte case se `source`, `quality` nebo `policy`.
+2. Stejné case ID najděte v `data/evals/travel-info-summary.jsonl`.
+3. V datasetu čtěte `input.userQuestion`, `input.sourceText`, `expected.requiredFacts`, `expected.forbiddenClaims`, `expected.includeWarning`, `expected.insufficientSource` a `expected.maxSentences`.
+4. V result exportu porovnejte `output.summary` a detailní `scores`.
+
 Tabulku čtěte takto:
 
 - `focus` říká hlavní riziko: facts, warning, nebo limits.

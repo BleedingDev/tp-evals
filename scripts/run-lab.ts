@@ -261,6 +261,9 @@ const printLab03ReadingGuide = (): void => {
   console.log("- `next` je lektorská zkratka, kam se má QA dívat dál.");
   console.log("");
   console.log("Jak z tabulky vybrat cases:");
+  console.log("- Otevřete `.evalite/results/lab-03.json` a podle `case` najděte detail outputu a `scores`.");
+  console.log("- Otevřete dataset řádek v `data/evals/translations-basic.jsonl` nebo `data/evals/translations-edge-cases.jsonl`.");
+  console.log("- V datasetu porovnejte `expected.idealText`, `expected.mustPreserve`, `expected.forbiddenPatterns`, `expected.glossary` a `expected.minQualityScore`.");
   console.log("- `hard fail`: nejdřív řešte strukturu. Judge debata je vedlejší, release by se měl zastavit.");
   console.log("- `quality`: struktura může vypadat dobře, ale význam nebo terminologie je špatně.");
   console.log("- `policy`: není jasné čisté pass/fail. Tým musí rozhodnout pravidlo, threshold nebo poznámku.");
@@ -284,11 +287,12 @@ const printLab04ReadingGuide = (): void => {
   console.log("- `next` říká první věc, kterou má QA řešit: intent, confidence, invented, missing, slots, policy, nebo pass.");
   console.log("");
   console.log("Jak postupovat:");
-  console.log("1. Najděte řádek, kde `next` není `pass`.");
-  console.log("2. Pokud `intent` nemá stejnou levou a pravou stranu, model by spustil špatnou app action.");
-  console.log("3. Pokud `slots` končí `diff`, porovnejte `expected.missingSlots` s `output.missingSlots`.");
-  console.log("4. Pokud `next` je `invented`, model vrátil zakázaný slot.");
-  console.log("5. Detail otevřete v `.evalite/results/lab-04.json` u stejného case.");
+  console.log("1. Otevřete `.evalite/results/lab-04.json` a vyberte řádek, kde `next` není `pass`.");
+  console.log("2. Stejné case ID najděte v `data/evals/mobile-search-intents.jsonl`.");
+  console.log("3. Pokud `intent` nemá stejnou levou a pravou stranu, model by spustil špatnou app action.");
+  console.log("4. V datasetu porovnejte `expected.requiredSlots`, `expected.missingSlots`, `expected.disallowedSlots` a `expected.minIntentConfidence`.");
+  console.log("5. Pokud `slots` končí `diff`, porovnejte `expected.missingSlots` s `output.missingSlots`.");
+  console.log("6. Pokud `next` je `invented`, model vrátil zakázaný slot.");
 };
 
 const printLab05ReadingGuide = (): void => {
@@ -324,8 +328,10 @@ const printLab06ReadingGuide = (): void => {
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Porovnejte stejný case napříč variantami.");
-  console.log("2. Nevybírejte vítěze podle průměru, pokud protected-fragment case failuje.");
-  console.log("3. Detail outputu najdete v `.evalite/results/lab-06.json`.");
+  console.log("2. Otevřete `.evalite/results/lab-06.json` a u stejného case porovnejte output variant `plain` a `guard`.");
+  console.log("3. Otevřete `evals/06-prompt-model-variants.eval.ts` a najděte `variants` a `records.filter(...)`.");
+  console.log("4. Dataset expectations jsou v `data/evals/translations-edge-cases.jsonl`.");
+  console.log("5. Nevybírejte vítěze podle průměru, pokud protected-fragment case failuje.");
 };
 
 const printLab07ReadingGuide = (): void => {
@@ -337,9 +343,11 @@ const printLab07ReadingGuide = (): void => {
   console.log("- `next` říká první problém: source, quality, policy, nebo pass.");
   console.log("");
   console.log("Jak postupovat:");
-  console.log("1. U `source` problému čtěte requiredFacts a forbiddenClaims.");
-  console.log("2. U `limits` ověřte, že model nepředstírá chybějící informace.");
-  console.log("3. Detail najdete v `.evalite/results/lab-07.json`.");
+  console.log("1. Otevřete `.evalite/results/lab-07.json` a vyberte case se `source`, `quality` nebo `policy`.");
+  console.log("2. Stejné case ID najděte v `data/evals/travel-info-summary.jsonl`.");
+  console.log("3. U `source` problému čtěte `expected.requiredFacts` a `expected.forbiddenClaims`.");
+  console.log("4. U `limits` ověřte `expected.insufficientSource`, `expected.includeWarning` a `expected.maxSentences`.");
+  console.log("5. Porovnejte je s `output.summary` a detailními `scores`.");
 };
 
 const printLab08ReadingGuide = (): void => {
@@ -354,9 +362,11 @@ const printLab08ReadingGuide = (): void => {
   console.log("- `next` říká cal ok, review, nebo recalibrate.");
   console.log("");
   console.log("Jak postupovat:");
-  console.log("1. Known bad nesmí spadnout do pohodlného pass rozhodnutí.");
-  console.log("2. Borderline má zůstat reviewovatelný.");
-  console.log("3. Detail dimenzí najdete v `.evalite/results/lab-08.json`.");
+  console.log("1. Otevřete `evals/08-judge-calibration.eval.ts` a najděte `calibrationData`.");
+  console.log("2. Pro každý case porovnejte `output`, `expectedBehavior`, `expected.targetBand`, `minScore` a `maxScore`.");
+  console.log("3. Detail dimenzí najdete v `.evalite/results/lab-08.json` u `dimensionScores`.");
+  console.log("4. Known bad nesmí spadnout do pohodlného pass rozhodnutí.");
+  console.log("5. Borderline má zůstat reviewovatelný.");
 };
 
 const printLab09ReadingGuide = (): void => {
@@ -367,9 +377,12 @@ const printLab09ReadingGuide = (): void => {
   console.log("- `next` říká první problém: safety, judge, policy, nebo pass.");
   console.log("");
   console.log("Jak postupovat:");
-  console.log("1. Rozdělte trustedInstruction, userRequest a suppliedText.");
-  console.log("2. Pokud `safety` spadne, řešíte release blocker.");
-  console.log("3. Detail najdete v `.evalite/results/lab-09.json`.");
+  console.log("1. Otevřete `.evalite/results/lab-09.json` a vyberte case, kde `next` není `pass`.");
+  console.log("2. Stejné case ID najděte v `data/evals/prompt-injection.jsonl`.");
+  console.log("3. V datasetu oddělte `input.trustedInstruction`, `input.userRequest` a `input.suppliedText`.");
+  console.log("4. V `input.suppliedText` najděte injected instrukci; očekávané bloky jsou v `expected.blockedInstructions`.");
+  console.log("5. Porovnejte `expected.requiredResponseTraits`, `expected.prohibitedResponseTraits` a `expected.allowedContent` s outputem.");
+  console.log("6. Pokud `safety` spadne, řešíte release blocker.");
 };
 
 const printLab10ReadingGuide = (): void => {
@@ -381,9 +394,11 @@ const printLab10ReadingGuide = (): void => {
   console.log("- `next` říká první problém: regression, drift, policy, nebo pass.");
   console.log("");
   console.log("Jak postupovat:");
-  console.log("1. Hledejte změnu business invariant, ne rozdíl ve formulaci.");
-  console.log("2. U `regression` otevřete regressionCases v detailu.");
-  console.log("3. Detail najdete v `.evalite/results/lab-10.json`.");
+  console.log("1. Otevřete `.evalite/results/lab-10.json` a vyberte case s `regression`, `drift` nebo `policy`.");
+  console.log("2. Stejné case ID najděte v `data/evals/consistency.jsonl`.");
+  console.log("3. V datasetu čtěte `input.variants`, `expected.invariantAnswer`, `expected.mustMatchFields` a `expected.allowedDifferences`.");
+  console.log("4. U `regression` otevřete `regressionCases` v detailu výsledku.");
+  console.log("5. Hledejte změnu business invariant, ne rozdíl ve formulaci.");
 };
 
 const printLab11ReadingGuide = (): void => {
@@ -393,11 +408,20 @@ const printLab11ReadingGuide = (): void => {
   console.log("- `review` ověřuje metadata: agent-authored label, review hint, edit targets a notes.");
   console.log("- `next` říká první problém: metadata, source, quality, review, nebo pass.");
   console.log("");
+  console.log("Konkrétní zadání pro agenta:");
+  console.log("Přidej jeden syntetický Lab 11 eval case pro travel summary, kde source text neobsahuje odpověď na část otázky.");
+  console.log("Edituj jen `data/evals/agent-authored-summary.jsonl` a případně `evals/11-agentic-eval-authoring.eval.ts`.");
+  console.log("Case musí mít `agent-authored` label, jasné `expectedBehavior`, konkrétní `requiredFacts`, konkrétní `forbiddenClaims`, `risk` podle dopadu a review metadata.");
+  console.log("Přidej nejvýše jednu malou review kontrolu, která ověří, že nový case má užitečná metadata nebo forbidden claim.");
+  console.log("Nepoužívej reálná zákaznická, booking, airport ani route data.");
+  console.log("Po změně spusť `pnpm run data:check` a `pnpm run lab:11` a napiš changed files + QA rozhodnutí.");
+  console.log("");
   console.log("Jak postupovat:");
-  console.log("1. Nejdřív napište vlastní assignment pro coding agenta.");
-  console.log("2. Fallback prompt použijte až když se zaseknete.");
-  console.log("3. Agentův diff reviewujte jako QA evidence, ne jako hotovou pravdu.");
-  console.log("4. Detail najdete v `.evalite/results/lab-11.json`.");
+  console.log("1. Nejdřív zkuste vlastní assignment pro coding agenta podle zadání výše.");
+  console.log("2. Agent smí editovat hlavně `data/evals/agent-authored-summary.jsonl` a `evals/11-agentic-eval-authoring.eval.ts`.");
+  console.log("3. Fallback prompt otevřete v `docs/agent-prompts/lab-11-agentic-eval-authoring.md` až když se zaseknete.");
+  console.log("4. Po změně otevřete `.evalite/results/lab-11.json` a zkontrolujte `source`, `judge`, `review` a `next`.");
+  console.log("5. Agentův diff reviewujte jako QA evidence, ne jako hotovou pravdu.");
 };
 
 const printReadingGuideFor = async (

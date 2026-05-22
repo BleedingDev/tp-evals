@@ -37,6 +37,13 @@ Tabulku čtěte jako triage:
 
 U každého vybraného případu porovnejte `idealText`, `mustPreserve`, `forbiddenPatterns`, `glossary` a `minQualityScore` s Evalite výstupem. Pak si přečtěte kritéria pro `translation` a určete, která dimenze rozhoduje o kvalitě víc než exact match.
 
+Kde přesně hledat:
+
+1. Otevřete `.evalite/results/lab-03.json` a podle `case` najděte detail outputu a `scores`.
+2. Stejné case ID najděte v `data/evals/translations-basic.jsonl` nebo `data/evals/translations-edge-cases.jsonl`.
+3. V datasetu čtěte hlavně `expected.idealText`, `expected.mustPreserve`, `expected.forbiddenPatterns`, `expected.glossary` a `expected.minQualityScore`.
+4. Kritéria judge najdete v `src/judges/rubrics.ts` pod translation kritérii.
+
 Doporučené anchors:
 
 - `translation-basic-cancel-es`: guardrails mohou projít, ale judge chytí otočený význam.

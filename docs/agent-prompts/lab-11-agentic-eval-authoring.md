@@ -1,6 +1,6 @@
-# Lab 11 Fallback Agent Prompt: nový eval case a kontrola
+# Lab 11 Fallback Agent Prompt: missing source information case
 
-Použijte jen jako fallback, pokud se zaseknete při psaní vlastního assignmentu pro coding agenta. Primární cesta labu je, že účastník nejdřív sám ohraničí QA engineering úkol z rootu repozitáře.
+Použijte jen jako fallback, pokud se zaseknete při práci s krátkým primárním assignmentem v labu. Primární cesta labu je konkrétní zadání: jeden syntetický travel-summary case pro missing source information, jedna malá metadata/review kontrola, gate příkazy a vlastní QA rozhodnutí.
 
 ```text
 Pomáháš v Evalite QA workshop repozitáři.
@@ -11,7 +11,7 @@ Kontext:
 - Data musí být share-safe a nesmí používat reálné company, customer, passenger, booking, airport ani route údaje.
 
 Cíl:
-Přidej jeden nový syntetický case pro Lab 11 a jednu malou kontrolu, která zlepší reviewovatelnost případu. Case má testovat jedno z těchto rizik: unsupported claims, warning handling, missing source information, délka/clarity regression, nebo high-risk selhání skryté průměrem.
+Přidej jeden nový syntetický travel-summary case pro Lab 11 a jednu malou kontrolu, která zlepší reviewovatelnost případu. Case má testovat missing source information: summary nesmí doplnit informaci, která ve sourceText chybí.
 
 Povolené soubory:
 - data/evals/agent-authored-summary.jsonl
@@ -20,7 +20,7 @@ Povolené soubory:
 Úkol:
 1. Přidej přesně jeden nový JSONL řádek do data/evals/agent-authored-summary.jsonl.
 2. Dodrž existující TravelSummaryRecord shape.
-3. Použij syntetický sourceText a syntetické fictional detaily.
+3. Použij syntetický sourceText a syntetické smyšlené detaily.
 4. Vyplň jasné expectedBehavior, labels, risk, metadata.reviewHint, metadata.participantEditTargets, requiredFacts, forbiddenClaims a notes.
 5. Přidej jednu malou lokální kontrolu v evals/11-agentic-eval-authoring.eval.ts:
    - scorer,

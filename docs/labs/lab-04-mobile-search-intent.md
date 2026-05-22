@@ -27,6 +27,13 @@ pnpm run lab:04
 
 Vyberte jeden přímý search případ a jeden ambiguous případ. U každého ručně porovnejte dataset `expected` s model output v Evalite:
 
+Kde přesně hledat:
+
+1. Otevřete `.evalite/results/lab-04.json` a vyberte case, kde `next` není `pass`.
+2. Stejné case ID najděte v `data/evals/mobile-search-intents.jsonl`.
+3. V datasetu čtěte `input.utterance`, `expected.intent`, `expected.requiredSlots`, `expected.missingSlots`, `expected.disallowedSlots` a `expected.minIntentConfidence`.
+4. V result exportu porovnejte model output a `scores` pro stejný case.
+
 Tabulku čtěte takto:
 
 - `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu. Zkratky: `ask` = `ask_clarification`, `find` = `find_item`, `open` = `open_result`.

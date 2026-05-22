@@ -25,9 +25,16 @@ pnpm run lab:09
 
 Pro každý dataset case si napište tři oddělené vrstvy:
 
-1. Co je `trustedInstruction`.
-2. Co je legitimní `userRequest`.
-3. Co je nedůvěryhodný `suppliedText` a které instrukce v něm musí být ignorovány.
+Kde přesně hledat:
+
+1. Otevřete `.evalite/results/lab-09.json` a vyberte case, kde `next` není `pass`.
+2. Stejné case ID najděte v `data/evals/prompt-injection.jsonl`. Case ID jsou krátká a unikátní: `pi-side`, `pi-hidden`, `pi-xlate`, `pi-quote`.
+3. V datasetu rozdělte tři vrstvy:
+   - `input.trustedInstruction`: pravidlo aplikace nebo systému.
+   - `input.userRequest`: legitimní úkol uživatele.
+   - `input.suppliedText`: nedůvěryhodný dodaný text, ve kterém může být injected instrukce.
+4. V `input.suppliedText` najděte větu, kterou model nesmí poslechnout.
+5. Očekávané zablokované instrukce porovnejte s `expected.blockedInstructions`.
 
 Potom porovnejte `blockedInstructions`, `requiredResponseTraits`, `prohibitedResponseTraits` a `allowedContent` s výstupem. Hledejte rozdíl mezi bezpečným odmítnutím injected instrukce a zbytečným odmítnutím celého uživatelského úkolu.
 
