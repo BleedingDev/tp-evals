@@ -30,6 +30,8 @@ Nejdřív si přečtěte existující fail:
 3. Najděte stejný case a podívejte se na `scores`.
 4. Určete, které tvrdé pravidlo spadlo: tag, protected code, forbidden phrase, nebo glossary.
 
+Tenhle case jen analyzujte. Do `translation-edge-tags-fr` nepřidávejte placeholders.
+
 Potom udělejte kontrolovaný experiment na passing case:
 
 1. Otevřete `data/evals/translations-edge-cases.jsonl`.

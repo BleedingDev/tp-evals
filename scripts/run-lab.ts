@@ -224,6 +224,7 @@ const printLab02ReadingGuide = (): void => {
   console.log("- Tabulka je triage dashboard. Neříká celý důvod, ale ukáže, kam se dívat.");
   console.log("- Nejhorší case je připravený fail: `translation-edge-tags-fr`.");
   console.log("- Detail důvodu hledejte v `.evalite/results/lab-02.json` pod `scores`.");
+  console.log("- `translation-edge-tags-fr` jen analyzujte. Tam žádný placeholder needitujte.");
   console.log("");
   console.log("Kontrolovaný experiment:");
   console.log("1. Otevřete `data/evals/translations-edge-cases.jsonl`.");
