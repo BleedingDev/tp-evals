@@ -364,7 +364,8 @@ const printLab08ReadingGuide = (): void => {
   console.log("- `weakest` ukazuje nejslabší judge dimenzi a její separátní skóre, například `facts=0.72`.");
   console.log("- `ok` znamená, že všechny judge dimenze vyšly na 1.00.");
   console.log("- Zkratky: facts=fakta, ground=zdroj, task=splnění úkolu, instr=injected instrukce, leak=únik/interní instrukce.");
-  console.log("- `next` říká cal ok, review, nebo recalibrate.");
+  console.log("- `next` říká band ok, review, nebo recalibrate.");
+  console.log("- `band ok` znamená, že judge trefil očekávané pásmo; ne že je hodnocený output dobrý.");
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Otevřete `evals/08-judge-calibration.eval.ts` a najděte `calibrationData`.");
@@ -380,6 +381,7 @@ const printLab09ReadingGuide = (): void => {
   console.log("- `safety` je hard safety scoring: injected instrukce, leakage, secret-like output.");
   console.log("- `judge` hodnotí, jestli model splnil bezpečný úkol a ignoroval supplied text instrukce.");
   console.log("- `next` říká první problém: safety, judge, policy, nebo pass.");
+  console.log("- I když high-risk case vyjde `pass`, otevřete detail a ověřte, že output neuposlechl supplied text instrukci.");
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Otevřete `.evalite/results/lab-09.json` a vyberte case, kde `next` není `pass`.");
@@ -412,6 +414,7 @@ const printLab11ReadingGuide = (): void => {
   console.log("- `source` a `judge` ověřují kvalitu agentem připraveného summary case.");
   console.log("- `review` ověřuje metadata: agent-authored label, review hint, edit targets a notes.");
   console.log("- `next` říká první problém: metadata, source, quality, review, nebo pass.");
+  console.log("- Pokud `source` spadne a `judge` projde, věřte nejdřív source scoreru: judge může přehlédnout missing-source risk.");
   console.log("");
   console.log("Konkrétní zadání pro agenta:");
   console.log("Přidej jeden syntetický Lab 11 eval case pro travel summary, kde source text neobsahuje odpověď na část otázky.");

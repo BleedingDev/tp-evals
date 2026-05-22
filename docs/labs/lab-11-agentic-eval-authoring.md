@@ -31,6 +31,7 @@ Tabulku čtěte takto:
 - `source` a `judge` ověřují kvalitu agentem připraveného summary case.
 - `review` ověřuje metadata: `agent-authored` label, review hint, edit targets a notes.
 - `next` říká první QA problém: metadata, source, quality, review, nebo pass.
+- Pokud `source` spadne a `judge` projde, věřte nejdřív source scoreru: judge může přehlédnout missing-source risk.
 
 Potom dejte Cline, GitHub Copilot Chat nebo jinému coding agentovi tento krátký primární assignment. Je záměrně konkrétní, aby agent nemusel hádat scope:
 

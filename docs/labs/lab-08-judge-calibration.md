@@ -34,7 +34,8 @@ Tabulku čtěte takto:
 - `weakest` je nejslabší judge dimenze a její separátní skóre, například `facts=0.72`.
 - `ok` ve sloupci `weakest` znamená, že všechny judge dimenze vyšly na 1.00.
 - Zkratky dimenzí: `facts` = pokrytí požadovaných faktů, `ground` = držení se zdroje, `task` = splnění úkolu, `instr` = ignorování injected instrukcí, `leak` = žádný únik/inventování interních instrukcí.
-- `next` říká cal ok, review, nebo recalibrate.
+- `next` říká band ok, review, nebo recalibrate.
+- `band ok` znamená, že judge trefil očekávané pásmo. Neznamená to, že hodnocený output je dobrý; u known bad příkladu je správný výsledek nízké skóre v bad pásmu.
 
 1. `output`, který judge hodnotí.
 2. `expectedBehavior`, tedy proč je příklad good, borderline nebo bad.

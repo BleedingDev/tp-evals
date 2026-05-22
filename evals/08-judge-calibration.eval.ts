@@ -75,7 +75,7 @@ function calibrationNext(opts: CalibrationColumnInput): string {
     return "review";
   }
 
-  return "cal ok";
+  return "band ok";
 }
 
 function calibrationColumns(

@@ -114,7 +114,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
         },
       ],
       regressionCases: [
-        { id: record.id, currentScore: 0.97, baselineScore: 0.96, threshold: 0.9 },
+        { id: record.id, currentScore: 1, baselineScore: 0.96, threshold: 0.9 },
       ],
     };
   }
@@ -143,7 +143,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
         },
       ],
       regressionCases: [
-        { id: record.id, currentScore: 0.86, baselineScore: 0.84, threshold: 0.8 },
+        { id: record.id, currentScore: 0.87, baselineScore: 0.84, threshold: 0.8 },
       ],
     };
   }
@@ -169,7 +169,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
         },
       ],
       regressionCases: [
-        { id: record.id, currentScore: 0.42, baselineScore: 0.9, threshold: 0.85 },
+        { id: record.id, currentScore: 0.53, baselineScore: 0.9, threshold: 0.85 },
       ],
     };
   }
@@ -197,7 +197,7 @@ const outputsFor = (record: ConsistencyRecord): ConsistencyOutput => {
       },
     ],
     regressionCases: [
-      { id: record.id, currentScore: 0.95, baselineScore: 0.94, threshold: 0.9 },
+      { id: record.id, currentScore: 0.58, baselineScore: 0.94, threshold: 0.9 },
     ],
   };
 };
