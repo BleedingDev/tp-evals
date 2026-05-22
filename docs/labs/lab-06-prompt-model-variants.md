@@ -2,7 +2,7 @@
 
 ## Kontext
 
-Porovnáváte dvě live prompt varianty přes AI proxy na stejné sadě překladových edge cases. Slabší varianta může mít lepší průměr na jednoduchých případech, ale selhat na jednom high-risk fragmentu. Silnější QA závěr proto musí být case-level, ne jen average score.
+Porovnáváte dvě live prompt varianty přes AI proxy na stejné sadě překladových edge cases. Slabší varianta může mít lepší průměr na jednoduchých případech, ale selhat na konkrétním protected fragmentu. Silnější QA závěr proto musí být case-level, ne jen average score.
 
 ## Cíl
 
@@ -34,15 +34,16 @@ Tabulku čtěte takto:
 
 - `case` je stejný dataset case napříč variantami.
 - Evalite sloupec `Variant` je `plain` nebo `guard`.
+- `risk` ukazuje riziko konkrétního case.
 - `guard` je skóre hard guardrails.
 - `judge` je kvalita významu podle translation kritérií.
-- `next` říká první QA problém: hard fail, quality, compare, nebo pass.
+- `next` říká první QA krok: block, quality, compare, nebo pass.
 
 1. Zůstaly placeholders přesně stejné?
 2. Zůstaly tagy vyvážené?
 3. Zůstaly protected codes přesné?
 4. Zlepšila se glossary konzistence, nebo jen judge score?
-5. Skrývá průměr jeden high-risk fail?
+5. Skrývá průměr jeden protected-fragment fail nebo medium-risk review?
 
 Proveďte jeden kontrolovaný experiment: přidejte do výběru case ID `translation-edge-mode-de`, znovu spusťte lab a porovnejte, jestli se QA závěr o lepší variantě změnil. Pokud chcete silnější kontrast, změňte první variantu z `translation.baseline` na `translation.flawed` a sledujte, jestli scorer rozdíl zachytí na správných cases.
 

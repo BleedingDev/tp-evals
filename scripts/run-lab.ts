@@ -317,13 +317,14 @@ const printLab06ReadingGuide = (): void => {
   console.log("");
   console.log("Jak číst Lab 06:");
   console.log("- Každý case běží přes prompt variantu `plain` nebo `guard`.");
+  console.log("- `risk` ukazuje riziko konkrétního case; v tomto labu pracujeme s low/medium edge cases.");
   console.log("- `guard` je skóre hard guardrails: placeholders, tags, codes, glossary.");
   console.log("- `judge` je kvalita významu podle translation kritérií.");
-  console.log("- `next` říká, jestli řešit hard fail, quality, compare, nebo pass.");
+  console.log("- `next` říká první QA krok: block, quality, compare, nebo pass.");
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Porovnejte stejný case napříč variantami.");
-  console.log("2. Nevybírejte vítěze podle průměru, pokud high-risk case failuje.");
+  console.log("2. Nevybírejte vítěze podle průměru, pokud protected-fragment case failuje.");
   console.log("3. Detail outputu najdete v `.evalite/results/lab-06.json`.");
 };
 

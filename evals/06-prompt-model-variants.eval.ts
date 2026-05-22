@@ -38,7 +38,7 @@ function variantNext(opts: VariantColumnInput): string {
   const judge = namedScore(opts.scores, "rubric_judge");
 
   if (typeof guard === "number" && guard < 0.7) {
-    return "hard fail";
+    return "block";
   }
 
   if (typeof judge === "number" && judge < 0.68) {
@@ -57,8 +57,11 @@ function variantColumns(opts: VariantColumnInput): Evalite.RenderedColumn[] {
     {
       label: "case",
       value: compactCaseId(opts.input.id, "translation-edge-")
-        .replace("placeholders-es", "ph-es"),
+        .replace("placeholders-es", "ph")
+        .replace("tags-fr", "tags")
+        .replace("drawer-es", "drawer"),
     },
+    { label: "risk", value: opts.input.risk },
     { label: "guard", value: formatScore(namedScore(opts.scores, "text_guardrails")) },
     { label: "judge", value: formatScore(namedScore(opts.scores, "rubric_judge")) },
     { label: "next", value: variantNext(opts) },
