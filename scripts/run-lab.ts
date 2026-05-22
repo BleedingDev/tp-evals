@@ -277,7 +277,7 @@ const printLab03ReadingGuide = (): void => {
 const printLab04ReadingGuide = (): void => {
   console.log("");
   console.log("Jak číst Lab 04:");
-  console.log("- `intent` je očekávaný intent > intent, který vrátil model.");
+  console.log("- `intent` čtěte jako `expected->actual`: vlevo je očekávání, vpravo výstup modelu.");
   console.log("  Zkratky: `ask` = ask_clarification, `find` = find_item, `open` = open_result.");
   console.log("- `conf` je skutečná confidence / minimální confidence z datasetu.");
   console.log("- `slots` je počet správně vyplněných required slots + stav missingSlots.");
@@ -285,7 +285,7 @@ const printLab04ReadingGuide = (): void => {
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Najděte řádek, kde `next` není `pass`.");
-  console.log("2. Pokud `intent` nemá stejnou levou a pravou stranu, řešíte špatnou app action.");
+  console.log("2. Pokud `intent` nemá stejnou levou a pravou stranu, model by spustil špatnou app action.");
   console.log("3. Pokud `slots` končí `diff`, porovnejte `expected.missingSlots` s `output.missingSlots`.");
   console.log("4. Pokud `next` je `invented`, model vrátil zakázaný slot.");
   console.log("5. Detail otevřete v `.evalite/results/lab-04.json` u stejného case.");
@@ -294,10 +294,17 @@ const printLab04ReadingGuide = (): void => {
 const printLab05ReadingGuide = (): void => {
   console.log("");
   console.log("Jak číst Lab 05:");
-  console.log("- `intent` je očekávaný intent > intent, který vrátil model.");
+  console.log("- `intent` čtěte jako `expected->actual`: vlevo je očekávání, vpravo výstup modelu.");
   console.log("- `slots` je carried/current required slots + stav missingSlots.");
   console.log("- `state` je skóre conversation_state: intent + carried slots + missing behavior.");
   console.log("- `next` říká první QA problém: intent, confidence, missing, slots, state, policy, nebo pass.");
+  console.log("");
+  console.log("Úkol Lab 05:");
+  console.log("1. Vyberte jeden `pass` case a jeden case, kde `next` není `pass`.");
+  console.log("2. U každého napište krátkou trace: co přišlo z historie a co z aktuální věty.");
+  console.log("3. Označte slots převzaté z historie, nové slots z utterance a chybějící slots.");
+  console.log("4. Rozhodněte, jestli aplikace může pokračovat akcí, nebo se musí doptat.");
+  console.log("5. U ambiguous case zkuste upravit historii tak, aby reference byla jednoznačná, a spusťte lab znovu.");
   console.log("");
   console.log("Jak postupovat:");
   console.log("1. Vyberte řádek, kde `next` není `pass`.");

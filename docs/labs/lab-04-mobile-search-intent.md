@@ -29,7 +29,7 @@ Vyberte jeden přímý search případ a jeden ambiguous případ. U každého r
 
 Tabulku čtěte takto:
 
-- `intent` je očekávaný intent > intent, který vrátil model. Zkratky: `ask` = `ask_clarification`, `find` = `find_item`, `open` = `open_result`.
+- `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu. Zkratky: `ask` = `ask_clarification`, `find` = `find_item`, `open` = `open_result`.
 - `conf` je skutečná confidence / minimální confidence z datasetu.
 - `slots` je počet správně vyplněných required slots + stav `missingSlots`.
 - `next` říká první věc, kterou má QA řešit: intent, confidence, invented, missing, slots, policy, nebo pass.

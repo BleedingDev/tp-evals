@@ -135,7 +135,7 @@ function mobileSearchIntentColumns(
     { label: "case", value: shortCaseId(opts.input.id) },
     {
       label: "intent",
-      value: `${shortIntent(expected.intent)}>${shortIntent(opts.output.intent)}`,
+      value: `${shortIntent(expected.intent)}->${shortIntent(opts.output.intent)}`,
     },
     {
       label: "conf",

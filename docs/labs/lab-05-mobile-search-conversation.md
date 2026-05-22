@@ -25,11 +25,21 @@ Spusťte lab:
 pnpm run lab:05
 ```
 
-Otevřete `data/evals/mobile-search-conversation.jsonl`. Pro každý řádek vytvořte krátkou trace tabulku:
+### Úkol Lab 05
+
+1. Vyberte jeden `pass` case a jeden case, kde `next` není `pass`.
+2. U každého napište krátkou trace: co přišlo z historie a co z aktuální věty.
+3. Označte slots převzaté z historie, nové slots z utterance a chybějící slots.
+4. Rozhodněte, jestli aplikace může pokračovat akcí, nebo se musí doptat.
+5. U ambiguous case zkuste upravit historii tak, aby reference byla jednoznačná, a spusťte lab znovu.
+
+### Jak číst výstup
+
+Otevřete `data/evals/mobile-search-conversation.jsonl`. Pro vybrané řádky vytvořte krátkou trace tabulku:
 
 Evalite tabulku čtěte takto:
 
-- `intent` je očekávaný intent > intent, který vrátil model.
+- `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu.
 - `slots` je počet správně přenesených required slots + stav `missingSlots`.
 - `state` je skóre scoreru `conversation_state`.
 - `next` říká první QA problém: intent, confidence, missing, slots, state, policy, nebo pass.
