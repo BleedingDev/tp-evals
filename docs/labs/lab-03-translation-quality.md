@@ -29,7 +29,19 @@ Vyberte tři případy:
 2. Jeden borderline případ, kde je otázka spíš QA policy než syntaxe.
 3. Jeden failing případ, kde by nízké judge score mělo být očekávané.
 
-U každého porovnejte `idealText`, `mustPreserve`, `forbiddenPatterns`, `glossary` a `minQualityScore` s Evalite výstupem. Pak si přečtěte rubric pro `translation` a určete, která dimenze rozhoduje o kvalitě víc než exact match.
+Tabulku čtěte jako triage:
+
+- `guardrails` říká, jestli zůstaly zachované placeholders, tagy, kódy, forbidden phrases a glossary.
+- `judge` říká, jestli překlad dává významově a produktově smysl podle kritérií.
+- `next` říká, kam se má QA dívat dál: `hard fail`, `quality`, `policy`, nebo `pass`.
+
+U každého vybraného případu porovnejte `idealText`, `mustPreserve`, `forbiddenPatterns`, `glossary` a `minQualityScore` s Evalite výstupem. Pak si přečtěte kritéria pro `translation` a určete, která dimenze rozhoduje o kvalitě víc než exact match.
+
+Doporučené anchors:
+
+- `translation-basic-cancel-es`: guardrails mohou projít, ale judge chytí otočený význam.
+- `translation-edge-tags-fr`: strukturální hard fail; chybí tagy a chráněný kód.
+- `translation-edge-drawer-es`: policy review nad glossary termínem.
 
 Navrhněte jednu malou změnu: buď upravte threshold tak, aby odpovídal riziku, nebo doplňte expectation note, která vysvětluje borderline rozhodnutí. Cílem není donutit všechny případy projít. Cílem je mít eval, který generuje užitečné QA rozhodnutí.
 

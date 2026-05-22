@@ -249,6 +249,28 @@ const printLab02ReadingGuide = (): void => {
   console.log("- Po experimentu `{{missing_placeholder}}` zase odeberte.");
 };
 
+const printLab03ReadingGuide = (): void => {
+  console.log("");
+  console.log("Jak číst Lab 03:");
+  console.log("- Tohle není hledání jedné chyby. Tohle je porovnání tvrdých pravidel a judge hodnocení.");
+  console.log("- `guardrails` říká: zůstaly zachované placeholders, tagy, kódy, forbidden phrases a glossary?");
+  console.log("- `judge` říká: dává překlad významově a produktově smysl podle kritérií?");
+  console.log("- `next` je lektorská zkratka, kam se má QA dívat dál.");
+  console.log("");
+  console.log("Jak z tabulky vybrat cases:");
+  console.log("- `hard fail`: nejdřív řešte strukturu. Judge debata je vedlejší, release by se měl zastavit.");
+  console.log("- `quality`: struktura může vypadat dobře, ale význam nebo terminologie je špatně.");
+  console.log("- `policy`: není jasné čisté pass/fail. Tým musí rozhodnout pravidlo, threshold nebo poznámku.");
+  console.log("- `pass`: použijte jako kontrolní příklad, jak vypadá zdravý output.");
+  console.log("");
+  console.log("Doporučené anchors pro výklad:");
+  console.log("- `translation-basic-cancel-es`: guardrails mohou projít, ale judge chytí otočený význam.");
+  console.log("- `translation-edge-tags-fr`: strukturální hard fail; chybí tagy a chráněný kód.");
+  console.log("- `translation-edge-drawer-es`: policy review nad glossary termínem.");
+  console.log("");
+  console.log("Detail důvodu hledejte v `.evalite/results/lab-03.json` u `scores`.");
+};
+
 const labPortFor = (lab: LabDefinition): string => {
   const labIndex = labs.findIndex((candidate) => candidate.command === lab.command);
   return process.env["EVALITE_LAB_PORT"] ?? String(3100 + Math.max(labIndex, 0) * 10);
@@ -427,6 +449,10 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
     printLab02ReadingGuide();
   }
 
+  if (exitCode === 0 && lab.command === "lab:03") {
+    printLab03ReadingGuide();
+  }
+
   process.exit(exitCode);
 };
 
@@ -457,6 +483,10 @@ const runLabAll = async (): Promise<never> => {
 
     if (lab.command === "lab:02") {
       printLab02ReadingGuide();
+    }
+
+    if (lab.command === "lab:03") {
+      printLab03ReadingGuide();
     }
   }
 
