@@ -109,4 +109,14 @@ Do not commit `.env`. The smoke command confirms mode and model without printing
 pnpm run live:check
 ```
 
-For narrow workshop edits, prefer the smallest useful gate: `pnpm run data:check` after dataset edits, the relevant `pnpm run lab:NN` after lab edits, and `pnpm run verify` before broad workshop changes are considered ready.
+For instructor dry runs without live model calls:
+
+```sh
+pnpm run docs:check
+pnpm run lab:02 -- --mock
+pnpm run audit:mock
+```
+
+The mock flag is handled by the workshop runner and is safer than relying on shell-level `WORKSHOP_MODE=mock` in environments that also load Mise or `.env`.
+
+For narrow workshop edits, prefer the smallest useful gate: `pnpm run docs:check` after docs or slide wording edits, `pnpm run data:check` after dataset edits, the relevant `pnpm run lab:NN` after lab edits, and `pnpm run verify` before broad workshop changes are considered ready.

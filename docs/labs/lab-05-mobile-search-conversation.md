@@ -10,6 +10,12 @@ Ordinal reference znamená odkaz pořadím, například „first two flights“,
 
 Ověřit, že eval rozlišuje slots převzaté z historie, slots z aktuální utterance, missing slots a clarification behavior pro nejednoznačné reference.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + judge.
+- Stabilní lab contract: [Lab 05](../facilitator/lab-contracts.md#lab-05---mobile-search-conversation).
+- Live výsledek je signál pro conversation behavior, ne deterministická pravda.
+
 ## Soubory
 
 - `evals/05-mobile-search-conversation.eval.ts`
@@ -59,6 +65,14 @@ Příklad:
 - expected slots: `resultPositions: ["1", "2"]`
 
 Potom udělejte jeden řízený experiment: u ambiguous případu změňte assistant history tak, aby reference byla jednoznačná, nebo naopak z jednoznačného případu udělejte ambiguous. Re-run ukáže, jestli se změní intent, carried slots a missing-slot behavior.
+
+Lektorský anchor pro tento experiment je `mobile-convo-nonstop-ambiguous`. Neřešte ho jako jediný možný pravdivý scénář; používejte ho jako čitelný příklad toho, kdy text „the nonstop one“ nestačí bez jednoznačné historie.
+
+## Kontrolní otázky
+
+- Které slots pochází z historie a které z aktuální věty?
+- Je reference jednoznačná pro uživatele i pro aplikaci?
+- Má výstup spustit UI akci, nebo se musí doptat?
 
 ## Gate / ověření
 

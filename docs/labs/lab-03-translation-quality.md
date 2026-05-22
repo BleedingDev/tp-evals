@@ -8,6 +8,12 @@ V Labu 02 jste řešili tvrdé guardrails. Tady porovnáváte tyto kontroly s `j
 
 Vybrat passing, borderline a failing překladový případ, porovnat rule-based signály s judge score a rozhodnout, jestli je nastavený threshold použitelný pro release gate.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + judge.
+- Stabilní lab contract: [Lab 03](../facilitator/lab-contracts.md#lab-03---translation-quality-judge).
+- Drift může vzniknout ve výstupu modelu i v judge hodnocení, proto rozhodujte podle case detailu.
+
 ## Soubory
 
 - `evals/03-translation-quality.eval.ts`
@@ -51,6 +57,12 @@ Doporučené anchors:
 - `translation-edge-drawer-es`: policy review nad glossary termínem.
 
 Navrhněte jednu malou změnu: buď upravte threshold tak, aby odpovídal riziku, nebo doplňte expectation note, která vysvětluje borderline rozhodnutí. Cílem není donutit všechny případy projít. Cílem je mít eval, který generuje užitečné QA rozhodnutí.
+
+## Kontrolní otázky
+
+- Co je hard fail bez debaty a co má řešit judge?
+- Které kritérium rozhodlo o nízkém judge score?
+- Měníte threshold kvůli riziku, nebo jen kvůli zelenému výsledku?
 
 ## Gate / ověření
 

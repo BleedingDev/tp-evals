@@ -58,7 +58,7 @@ export const loadWorkshopEnv = (cwd = process.cwd()): void => {
 
     const key = trimmed.slice(0, separatorIndex).trim();
     const value = unquote(trimmed.slice(separatorIndex + 1));
-    if (key.length > 0) {
+    if (key.length > 0 && process.env[key] === undefined) {
       process.env[key] = value;
     }
   }

@@ -8,6 +8,12 @@ Porovnáváte dvě live prompt varianty přes AI proxy na stejné sadě překlad
 
 Vyhodnotit, jestli rozdíl mezi `plain-ui-translation` a `guardrailed-translation` pochází z promptu, model behavior, nebo z výběru dataset cases.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + judge.
+- Stabilní lab contract: [Lab 06](../facilitator/lab-contracts.md#lab-06---live-prompt-variants).
+- Porovnání variant čtěte case-level; průměr je až druhý krok.
+
 ## Soubory
 
 - `evals/06-prompt-model-variants.eval.ts`
@@ -46,6 +52,12 @@ Tabulku čtěte takto:
 5. Skrývá průměr jeden protected-fragment fail nebo medium-risk review?
 
 Proveďte jeden kontrolovaný experiment: přidejte do výběru case ID `translation-edge-mode-de`, znovu spusťte lab a porovnejte, jestli se QA závěr o lepší variantě změnil. Pokud chcete silnější kontrast, změňte první variantu z `translation.baseline` na `translation.flawed` a sledujte, jestli scorer rozdíl zachytí na správných cases.
+
+## Kontrolní otázky
+
+- Porovnáváte stejný case napříč variantami, nebo jen suite average?
+- Která varianta má horší case-level blocker?
+- Změnil experiment výběr dat, prompt, nebo obojí?
 
 ## Gate / ověření
 

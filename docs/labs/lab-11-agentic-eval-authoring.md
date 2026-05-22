@@ -10,6 +10,12 @@ Důležité: začněte krátkým primárním assignmentem níže. Fallback promp
 
 Zadat agentovi ohraničený QA engineering úkol, nechat ho přidat jeden syntetický Lab 11 case a jednu malou review kontrolu, a potom jeho diff nezávisle zreviewovat.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + judge.
+- Stabilní lab contract: [Lab 11](../facilitator/lab-contracts.md#lab-11---agentic-eval-authoring).
+- Agent urychluje authoring, ale QA drží risk, metadata a rozhodnutí.
+
 ## Soubory
 
 - `docs/agent-prompts/lab-11-agentic-eval-authoring.md`
@@ -83,6 +89,12 @@ Nakonec spusťte:
 pnpm run data:check
 pnpm run lab:11
 ```
+
+## Kontrolní otázky
+
+- Přidal agent přesně jeden syntetický case a nejvýš jednu malou review kontrolu?
+- Je expected behavior testovatelné bez domýšlení?
+- Umíte agentův diff obhájit jako QA evidence, nebo je to weak case?
 
 ## Gate / ověření
 

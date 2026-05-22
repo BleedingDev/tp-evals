@@ -10,6 +10,12 @@ Vedle consistency scoreru se porovnává aktuální score se stored baseline. QA
 
 Ověřit, že equivalent prompts produkují stabilní odpovědi, že `mustMatchFields` chrání podstatné invariants a že regression threshold odpovídá riziku.
 
+## Runtime a kontrakt
+
+- Runtime: local deterministic recorded regression.
+- Stabilní lab contract: [Lab 10](../facilitator/lab-contracts.md#lab-10---consistency-regression).
+- Při opakovaném běhu se nemá měnit pořadí ani score.
+
 ## Soubory
 
 - `evals/10-consistency-regression.eval.ts`
@@ -47,6 +53,12 @@ Tabulku čtěte takto:
 5. Jestli regression proti baseline signalizuje reálnou změnu chování.
 
 Pak navrhněte jednu malou změnu. Například přidejte přesnější `mustMatchFields` pro prompt injection consistency, nebo upravte `allowedDifferences`, pokud scorer trestá neškodnou formulaci. Po re-run sledujte, jestli gate odlišuje povolenou stylistickou varianci od změny faktu nebo akce.
+
+## Kontrolní otázky
+
+- Co je invariant, který se nesmí změnit napříč parafrázemi?
+- Který rozdíl je jen formulace a který už mění chování?
+- Je pokles proti baseline skutečná regression, nebo očekávaná variance?
 
 ## Gate / ověření
 

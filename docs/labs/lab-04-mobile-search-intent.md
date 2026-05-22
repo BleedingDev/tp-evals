@@ -10,6 +10,12 @@ Pro QA je riziko dvojí: model může podextrahovat důležité flight slots, ne
 
 Ověřit, že structured-output scorer postihuje intent, required slots, missing slots, disallowed slots a threshold pro confidence tak, aby výstup šel použít jako automatizační gate.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + deterministic scorers.
+- Stabilní lab contract: [Lab 04](../facilitator/lab-contracts.md#lab-04---mobile-search-intent).
+- Scorer je deterministický, ale live model může vrátit jiné `missingSlots`, `confidence` nebo `intent`.
+
 ## Soubory
 
 - `evals/04-mobile-search-intent.eval.ts`
@@ -49,6 +55,12 @@ Tabulku čtěte takto:
 5. Odpovídá `minIntentConfidence` riziku daného případu?
 
 Pak navrhněte jednu úzkou změnu v datasetu: například přidejte `airline` do `disallowedSlots`, zpřesněte `missingSlots`, nebo upravte confidence threshold u ambiguous věty. Po změně znovu spusťte lab a sledujte, jestli scorer popisuje přesně ten problém, který jste chtěli zachytit.
+
+## Kontrolní otázky
+
+- Je `intent` vlevo i vpravo stejný, tedy `expected->actual`?
+- Které slots uživatel opravdu řekl a které by si model jen domyslel?
+- Je problém v chybějícím poli, vymyšlené hodnotě, nebo jen v confidence?
 
 ## Gate / ověření
 

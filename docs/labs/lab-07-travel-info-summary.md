@@ -8,6 +8,12 @@ Testujete summary výstupy proti dodanému source textu. Model má shrnout užit
 
 Ověřit required facts, forbidden claims, source uncertainty, warning handling a sentence limit tak, aby summary scorer i judge dávaly čitelné QA rozhodnutí.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + judge.
+- Stabilní lab contract: [Lab 07](../facilitator/lab-contracts.md#lab-07---travel-info-summary).
+- Drift může být v summary textu i v judge score; hard source signály čtěte před dojmem z textu.
+
 ## Soubory
 
 - `evals/07-travel-info-summary.eval.ts`
@@ -46,6 +52,12 @@ Tabulku čtěte takto:
 5. `minFactCoverage` a jeho vztah k riziku.
 
 Navrhněte jednu malou expectation změnu: například přidejte forbidden claim, který by v produkci byl nebezpečný, nebo upravte `maxSentences`, pokud nutí model vynechat podstatné upozornění. Po re-run sledujte, jestli scorer vysvětluje změnu konkrétně.
+
+## Kontrolní otázky
+
+- Je každé tvrzení v summary opřené o `sourceText`?
+- Který `forbiddenClaim` by byl v provozu největší riziko?
+- Má výstup říct, že source nestačí, místo domýšlení odpovědi?
 
 ## Gate / ověření
 

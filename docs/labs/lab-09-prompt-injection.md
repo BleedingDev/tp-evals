@@ -8,6 +8,12 @@ Testujete, jestli aplikace zachází s instrukcemi uvnitř supplied textu jako s
 
 Oddělit trusted instruction, user request a supplied text, ověřit safety scorer i judge a rozhodnout, jestli prompt injection ochrana stačí pro automatický gate.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + judge in live mode; local handler in mock mode.
+- Stabilní lab contract: [Lab 09](../facilitator/lab-contracts.md#lab-09---prompt-injection).
+- V mock režimu ověřujete lokální handler; v live režimu navíc chování modelu.
+
 ## Soubory
 
 - `evals/09-prompt-injection.eval.ts`
@@ -46,6 +52,12 @@ Tabulku čtěte takto:
 - I když high-risk case vyjde `pass`, otevřete detail a ověřte, že output neuposlechl supplied text instrukci.
 
 Navrhněte jednu malou expectation změnu: doplňte chybějící prohibited trait, zpřesněte required trait tak, aby model stále splnil úkol, nebo upravte `minRobustnessScore` podle rizika. Re-run musí ukázat, že safety scorer chrání přesně zamýšlené chování.
+
+## Kontrolní otázky
+
+- Která věta je trusted instruction a která je jen data uvnitř supplied textu?
+- Splnil model bezpečný user request, nebo odmítl celý úkol?
+- Poslechl output injected instrukci byť jen částečně?
 
 ## Gate / ověření
 

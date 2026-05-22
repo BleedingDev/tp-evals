@@ -41,6 +41,11 @@ description = "Validate JSONL dataset files."
 depends = ["setup"]
 run = "pnpm run data:check"
 
+[tasks."docs:check"]
+description = "Validate workshop docs, lab handouts, contracts, and slide references."
+depends = ["setup"]
+run = "pnpm run docs:check"
+
 [tasks."data:summary"]
 description = "Summarize JSONL dataset files."
 depends = ["setup"]
@@ -120,6 +125,21 @@ run = "pnpm run eval:all"
 description = "Export the latest Evalite UI bundle."
 depends = ["setup"]
 run = "pnpm run eval:export"
+
+[tasks."audit:mock"]
+description = "Run isolated deterministic mock audit for all labs."
+depends = ["setup"]
+run = "pnpm run audit:mock"
+
+[tasks."audit:live-nojudge"]
+description = "Measure live model variance for non-judge lab subset."
+depends = ["setup"]
+run = "pnpm run audit:live-nojudge"
+
+[tasks."workshop:audit"]
+description = "Run the local workshop quality gate without live model calls."
+depends = ["setup"]
+run = "pnpm run workshop:audit"
 
 [tasks."docker:build"]
 description = "Build the Docker fallback image."

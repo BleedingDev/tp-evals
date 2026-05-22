@@ -15,12 +15,22 @@ import { loadWorkshopEnv } from "../src/env";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 loadWorkshopEnv(rootDir);
+const evaliteBin = resolve(rootDir, "node_modules", "evalite", "dist", "bin.js");
 const objectRecordSchema = z.record(z.string(), z.unknown());
+type WorkshopMode = "live" | "mock";
 
 type LabDefinition = {
   readonly command: `lab:${string}`;
   readonly file: string;
   readonly label: string;
+  readonly runtime: string;
+  readonly anchorCase: string;
+  readonly open: readonly string[];
+  readonly read: readonly string[];
+  readonly edit: string;
+  readonly expectedSignal: string;
+  readonly reset: string;
+  readonly qaDecision: string;
 };
 
 const labs = [
@@ -28,61 +38,243 @@ const labs = [
     command: "lab:01",
     file: "evals/01-dataset-quality.eval.ts",
     label: "Lab 01",
+    runtime: "local deterministic",
+    anchorCase: "translation-cancel-booking-incomplete",
+    open: [
+      ".evalite/results/lab-01.json",
+      "data/evals/dataset-quality-broken.jsonl",
+    ],
+    read: ["rowStatus", "fixPlan", "detectedIssueTypes", "suggestedFixes"],
+    edit: "Navrhněte minimální fix pro jeden rozbitý dataset row.",
+    expectedSignal: "Audit ukáže, co je rozbité; zelená znamená správnou detekci vad.",
+    reset: "Nechte fixture dataset v rozbitém stavu, pokud nejde o řízený lektorský diff.",
+    qaDecision: "Je dataset blokující, review-only, nebo připravený pro gate?",
   },
   {
     command: "lab:02",
     file: "evals/02-translation-guardrails.eval.ts",
     label: "Lab 02",
+    runtime: "live generation + deterministic scorers",
+    anchorCase: "translation-edge-tags-fr; experiment: translation-edge-placeholders-es",
+    open: [
+      ".evalite/results/lab-02.json",
+      "data/evals/translations-edge-cases.jsonl",
+    ],
+    read: ["output.text", "scores", "expected.mustPreserve", "expected.forbiddenPatterns"],
+    edit: "Do input.placeholders u translation-edge-placeholders-es přidejte {{missing_placeholder}}.",
+    expectedSignal: "Stejný case začne čekat placeholder, který output neobsahuje, a guard score spadne.",
+    reset: "Po experimentu {{missing_placeholder}} zase odeberte.",
+    qaDecision: "Je porušení protected fragmentu release blocker, nebo review signal?",
   },
   {
     command: "lab:03",
     file: "evals/03-translation-quality.eval.ts",
     label: "Lab 03",
+    runtime: "live generation + judge",
+    anchorCase: "translation-basic-cancel-es, translation-edge-tags-fr, translation-edge-drawer-es",
+    open: [
+      ".evalite/results/lab-03.json",
+      "data/evals/translations-basic.jsonl",
+      "data/evals/translations-edge-cases.jsonl",
+    ],
+    read: ["guardrails", "judge", "next", "expected.minQualityScore"],
+    edit: "Zpřesněte jednu expectation note nebo threshold u borderline case.",
+    expectedSignal: "Výsledek má jasně oddělit hard fail, quality fail a policy review.",
+    reset: "Vraťte threshold/note, pokud šlo jen o demonstraci.",
+    qaDecision: "Patří suite do release gate, review dashboardu, nebo kalibrace?",
   },
   {
     command: "lab:04",
     file: "evals/04-mobile-search-intent.eval.ts",
     label: "Lab 04",
+    runtime: "live generation + deterministic scorers",
+    anchorCase: "mobile-intent-open-third-no-context",
+    open: [
+      ".evalite/results/lab-04.json",
+      "data/evals/mobile-search-intents.jsonl",
+    ],
+    read: ["intent expected->actual", "slots", "missingSlots", "confidence"],
+    edit: "Přidejte nebo zpřesněte jeden disallowed/missing slot u ambiguous case.",
+    expectedSignal: "next ukáže intent, invented, missing, slots, confidence, nebo pass.",
+    reset: "Vraťte dataset edit, pokud šlo jen o kontrolovaný experiment.",
+    qaDecision: "Může aplikace pokračovat akcí, nebo se musí doptat?",
   },
   {
     command: "lab:05",
     file: "evals/05-mobile-search-conversation.eval.ts",
     label: "Lab 05",
+    runtime: "live generation + judge",
+    anchorCase: "mobile-convo-nonstop-ambiguous",
+    open: [
+      ".evalite/results/lab-05.json",
+      "data/evals/mobile-search-conversation.jsonl",
+    ],
+    read: ["conversation history", "current utterance", "carried slots", "missingSlots"],
+    edit: "U ambiguous historie změňte viditelné výsledky tak, aby reference byla jednoznačná.",
+    expectedSignal: "Změní se action-vs-clarification signál a carried/missing slot behavior.",
+    reset: "Vraťte historii na původní ambiguous variantu.",
+    qaDecision: "Je bezpečné spustit UI akci, nebo musí proběhnout clarification?",
   },
   {
     command: "lab:06",
     file: "evals/06-prompt-model-variants.eval.ts",
     label: "Lab 06",
+    runtime: "live generation + judge",
+    anchorCase: "translation-edge-tags-fr across plain/guard variants",
+    open: [
+      ".evalite/results/lab-06.json",
+      "evals/06-prompt-model-variants.eval.ts",
+      "data/evals/translations-edge-cases.jsonl",
+    ],
+    read: ["same case across variants", "guard", "judge", "next"],
+    edit: "Přidejte do records.filter(...) jeden další edge case.",
+    expectedSignal: "QA závěr o variantě se má opírat o case-level blocker, ne o průměr.",
+    reset: "Vraťte výběr cases na původní sadu.",
+    qaDecision: "Která prompt varianta je bezpečnější pro další testovací kolo?",
   },
   {
     command: "lab:07",
     file: "evals/07-travel-info-summary.eval.ts",
     label: "Lab 07",
+    runtime: "live generation + judge",
+    anchorCase: "travel-summary-luggage-limit",
+    open: [
+      ".evalite/results/lab-07.json",
+      "data/evals/travel-info-summary.jsonl",
+    ],
+    read: ["requiredFacts", "forbiddenClaims", "includeWarning", "insufficientSource"],
+    edit: "Přidejte jeden forbidden claim, který by v provozu byl nebezpečný.",
+    expectedSignal: "source_grounded_summary má vysvětlit unsupported nebo chybějící fakt.",
+    reset: "Odeberte demonstrační forbidden claim, pokud nemá zůstat jako regression case.",
+    qaDecision: "Je summary release gate, review signal, nebo blocker?",
   },
   {
     command: "lab:08",
     file: "evals/08-judge-calibration.eval.ts",
     label: "Lab 08",
+    runtime: "judge calibration",
+    anchorCase: "judge-borderline-summary",
+    open: [
+      ".evalite/results/lab-08.json",
+      "evals/08-judge-calibration.eval.ts",
+    ],
+    read: ["targetBand", "minScore", "maxScore", "dimensionScores", "weakest"],
+    edit: "Zpřesněte jednu hranici borderline pásma s QA důvodem.",
+    expectedSignal: "Known good/bad zůstanou ve správném pásmu a borderline zůstane review.",
+    reset: "Vraťte hranici, pokud šlo jen o kalibrační demonstraci.",
+    qaDecision: "Je judge gate-ready, nebo zatím jen review signal?",
   },
   {
     command: "lab:09",
     file: "evals/09-prompt-injection.eval.ts",
     label: "Lab 09",
+    runtime: "live generation + judge in live mode; local handler in mock mode",
+    anchorCase: "pi-hidden",
+    open: [
+      ".evalite/results/lab-09.json",
+      "data/evals/prompt-injection.jsonl",
+    ],
+    read: ["trustedInstruction", "userRequest", "suppliedText", "blockedInstructions"],
+    edit: "Doplňte jeden prohibitedResponseTrait nebo requiredResponseTrait.",
+    expectedSignal: "Safety scorer má chránit přesně injected instrukci, ne zahodit celý úkol.",
+    reset: "Vraťte expectation edit, pokud byl jen demonstrační.",
+    qaDecision: "Jde o release blocker, nebo review signal?",
   },
   {
     command: "lab:10",
     file: "evals/10-consistency-regression.eval.ts",
     label: "Lab 10",
+    runtime: "local deterministic recorded regression",
+    anchorCase: "consistency-policy-window",
+    open: [
+      ".evalite/results/lab-10.json",
+      "data/evals/consistency.jsonl",
+    ],
+    read: ["invariantAnswer", "mustMatchFields", "allowedDifferences", "regressionCases"],
+    edit: "Zpřesněte mustMatchFields nebo allowedDifferences pro jeden invariant.",
+    expectedSignal: "Gate má odlišit změnu významu od povolené formulace.",
+    reset: "Vraťte invariant edit, pokud byl jen demonstrační.",
+    qaDecision: "Je variabilita přijatelná, nebo regression blocker?",
   },
   {
     command: "lab:11",
     file: "evals/11-agentic-eval-authoring.eval.ts",
     label: "Lab 11",
+    runtime: "live generation + judge",
+    anchorCase: "agent-summary-transfer",
+    open: [
+      ".evalite/results/lab-11.json",
+      "data/evals/agent-authored-summary.jsonl",
+      "evals/11-agentic-eval-authoring.eval.ts",
+    ],
+    read: ["source", "judge", "review", "next", "agent diff"],
+    edit: "Zadejte agentovi přesně jeden nový synthetic missing-source case a jednu review kontrolu.",
+    expectedSignal: "Nový case projde data:check a lab:11 dává obhajitelné QA rozhodnutí.",
+    reset: "Agentův diff ponechte jen pokud QA review potvrdí risk a metadata.",
+    qaDecision: "Je agentem přidaný case release blocker, review signal, nebo weak case?",
   },
 ] as const satisfies readonly LabDefinition[];
 
-const requestedCommand = process.argv[2];
-const passthroughArgs = process.argv.slice(3);
+const rawArgs = process.argv.slice(2);
+const requestedCommand = rawArgs[0];
+
+const parseWorkshopMode = (
+  value: string | undefined,
+): WorkshopMode | undefined => {
+  if (value === "live" || value === "mock") {
+    return value;
+  }
+
+  if (value !== undefined) {
+    throw new Error(`Invalid workshop mode: ${value}. Expected live or mock.`);
+  }
+
+  return undefined;
+};
+
+const parsedArgs = (() => {
+  const passthrough: string[] = [];
+  let workshopMode: WorkshopMode | undefined;
+
+  for (let index = 1; index < rawArgs.length; index += 1) {
+    const arg = rawArgs[index];
+    if (arg === undefined) {
+      continue;
+    }
+
+    if (arg === "--") {
+      continue;
+    }
+
+    if (arg === "--mock") {
+      workshopMode = "mock";
+      continue;
+    }
+
+    if (arg === "--live") {
+      workshopMode = "live";
+      continue;
+    }
+
+    if (arg === "--workshop-mode") {
+      const value = rawArgs[index + 1];
+      workshopMode = parseWorkshopMode(value);
+      index += 1;
+      continue;
+    }
+
+    if (arg.startsWith("--workshop-mode=")) {
+      workshopMode = parseWorkshopMode(arg.slice("--workshop-mode=".length));
+      continue;
+    }
+
+    passthrough.push(arg);
+  }
+
+  return { passthroughArgs: passthrough, workshopMode };
+})();
+
+const passthroughArgs = parsedArgs.passthroughArgs;
 
 const displayPath = (path: string): string => relative(rootDir, path) || ".";
 
@@ -137,6 +329,11 @@ const run = async (
   });
 };
 
+const runEvaliteBinary = async (
+  args: readonly string[],
+  envOverrides: NodeJS.ProcessEnv = {},
+): Promise<number> => run(process.execPath, [evaliteBin, ...args], envOverrides);
+
 const resultPathFor = (name: string): string =>
   resolve(rootDir, ".evalite", "results", `${name}.json`);
 
@@ -161,6 +358,57 @@ const readStringArrayField = (
   return Array.isArray(candidate)
     ? candidate.filter((item): item is string => typeof item === "string")
     : [];
+};
+
+const resultSuiteFor = async (
+  resultPath: string,
+): Promise<Record<string, unknown> | undefined> => {
+  const parsed = JSON.parse(await readFile(resultPath, "utf8")) as unknown;
+
+  if (!isUnknownRecord(parsed) || !Array.isArray(parsed["suites"])) {
+    return undefined;
+  }
+
+  return parsed["suites"].find(isUnknownRecord);
+};
+
+const assertResultMatchesLab = async (
+  resultPath: string,
+  lab: LabDefinition,
+): Promise<void> => {
+  const suite = await resultSuiteFor(resultPath);
+  const filepath = suite === undefined ? undefined : readStringField(suite, "filepath");
+
+  if (filepath === undefined) {
+    throw new Error(`Evalite result ${displayPath(resultPath)} does not contain a suite filepath.`);
+  }
+
+  const expected = resolve(rootDir, lab.file);
+  const actual = resolve(filepath);
+
+  if (actual !== expected) {
+    throw new Error(
+      [
+        `Evalite result mismatch for ${lab.label}.`,
+        `Expected: ${displayPath(expected)}`,
+        `Actual:   ${displayPath(actual)}`,
+        "Re-run with an isolated EVALITE_DB_PATH or clear stale Evalite state.",
+      ].join("\n"),
+    );
+  }
+};
+
+const printLabContract = (lab: LabDefinition): void => {
+  console.log("");
+  console.log(`Lab contract: ${lab.label}`);
+  console.log(`- Runtime: ${lab.runtime}`);
+  console.log(`- Anchor case: ${lab.anchorCase}`);
+  console.log(`- Open: ${lab.open.join(", ")}`);
+  console.log(`- Read: ${lab.read.join(", ")}`);
+  console.log(`- Edit: ${lab.edit}`);
+  console.log(`- Expected signal: ${lab.expectedSignal}`);
+  console.log(`- Reset: ${lab.reset}`);
+  console.log(`- QA decision: ${lab.qaDecision}`);
 };
 
 const printLab01ReadingGuide = async (resultPath: string): Promise<void> => {
@@ -480,6 +728,13 @@ const labPortFor = (lab: LabDefinition): string => {
 
 const envForLab = (lab: LabDefinition): NodeJS.ProcessEnv => ({
   EVALITE_PORT: labPortFor(lab),
+  ...(parsedArgs.workshopMode === undefined
+    ? {}
+    : {
+        WORKSHOP_MODE: parsedArgs.workshopMode,
+        LIVE_LLM_ENABLED: parsedArgs.workshopMode === "live" ? "true" : "false",
+        TP_EVALS_LIVE_JUDGE: parsedArgs.workshopMode === "live" ? "true" : "false",
+      }),
 });
 
 const runEvalite = async (
@@ -496,9 +751,7 @@ const runEvalite = async (
     await mkdir(dirname(resultPath), { recursive: true });
   }
 
-  const exitCode = await run("pnpm", [
-    "exec",
-    "evalite",
+  const exitCode = await runEvaliteBinary([
     ...args,
     ...outputArgs,
     ...passthroughArgs,
@@ -632,12 +885,11 @@ const runDataSummary = async (): Promise<never> => {
 const runLab = async (lab: LabDefinition): Promise<never> => {
   await assertPathsExist([lab.file]);
   console.log(`Running ${lab.label}: ${lab.file}`);
+  printLabContract(lab);
   const resultPath = resultPathFor(lab.command.replace(":", "-"));
   await mkdir(dirname(resultPath), { recursive: true });
 
-  const exitCode = await run("pnpm", [
-    "exec",
-    "evalite",
+  const exitCode = await runEvaliteBinary([
     "run",
     lab.file,
     "--threshold",
@@ -646,6 +898,8 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
     resultPath,
     ...passthroughArgs,
   ], envForLab(lab));
+
+  await assertResultMatchesLab(resultPath, lab);
 
   if (exitCode === 0) {
     await printReadingGuideFor(lab.command, resultPath);
@@ -659,17 +913,19 @@ const runLabAll = async (): Promise<never> => {
 
   for (const lab of labs) {
     console.log(`Running ${lab.label}: ${lab.file}`);
-    const exitCode = await run("pnpm", [
-      "exec",
-      "evalite",
+    printLabContract(lab);
+    const resultPath = resultPathFor(lab.command.replace(":", "-"));
+    const exitCode = await runEvaliteBinary([
       "run",
       lab.file,
       "--threshold",
       threshold(),
       "--outputPath",
-      resultPathFor(lab.command.replace(":", "-")),
+      resultPath,
       ...passthroughArgs,
     ], envForLab(lab));
+
+    await assertResultMatchesLab(resultPath, lab);
 
     if (exitCode !== 0) {
       process.exit(exitCode);

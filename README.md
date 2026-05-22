@@ -52,6 +52,24 @@ pnpm run eval:dev
 
 Then open `http://localhost:3006`.
 
+## Determinism And Audit Commands
+
+The participant path is live by default. For instructor dry-runs and workshop QA,
+use the explicit mock flag or audit commands:
+
+```sh
+pnpm run docs:check
+pnpm run lab:02 -- --mock
+pnpm run audit:mock
+pnpm run audit:live-nojudge
+pnpm run workshop:audit
+```
+
+- `audit:mock` runs every lab repeatedly in isolated mock mode and fails on score or row-order drift.
+- `audit:live-nojudge` measures live model variance for labs that do not use LLM-as-a-Judge.
+- `docs:check` verifies that lab handouts, runtime contracts, reading guides, and slide references stay aligned.
+- `workshop:audit` is the local quality gate that avoids live model calls.
+
 ## Presentation
 
 The workshop deck lives in the shared presentations repository:
@@ -64,7 +82,7 @@ Keep this repository focused on labs, datasets, evals, and checkpoint branches.
 
 ## Labs
 
-Each lab has a short participant handout under `docs/labs`.
+Each lab has a short participant handout under `docs/labs`. Start with [Lab Workflow](docs/labs/README.md) for the shared Observe -> Explain -> Modify -> Re-run -> Decide loop.
 
 | Lab | Focus | Handout |
 | --- | --- | --- |
@@ -92,3 +110,5 @@ pnpm run verify
 Use `pnpm run verify` as the full workshop gate. For narrow edits, run the matching lab command and `pnpm run data:check` when datasets change.
 
 If setup or Evalite does not behave as expected, use [docs/troubleshooting.md](docs/troubleshooting.md).
+
+For post-workshop adoption, use [Follow-up After The Workshop](docs/follow-up.md).

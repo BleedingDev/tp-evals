@@ -147,8 +147,15 @@ Emergency-only mock mode:
 
 - The participant path is live AI proxy only.
 - The code still contains deterministic local variants for instructor dry runs and recovery.
-- Switch to `WORKSHOP_MODE=mock` only if connectivity blocks the room and the live workshop would otherwise stop.
+- Prefer `pnpm run lab:NN -- --mock` or `pnpm run audit:mock` for instructor dry runs.
+- Switch the participant flow to mock mode only if connectivity blocks the room and the live workshop would otherwise stop.
 - If you switch modes, tell participants that scores are no longer live model evidence.
+
+Determinism audit:
+
+- Run `pnpm run audit:mock` before sharing a polished repository version.
+- Run `pnpm run audit:live-nojudge` only when you intentionally want to measure live model variance.
+- Treat Lab 02 and Lab 04 live score drift as expected model-output variance, not scorer nondeterminism.
 
 ## Dry-Run Checklist
 

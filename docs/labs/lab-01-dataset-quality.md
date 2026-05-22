@@ -12,6 +12,12 @@ Zelené score v tomto labu znamená: audit našel očekávané vady. Neznamená:
 
 Najít přesné chyby v každém JSONL řádku, porovnat je se scorer výstupem a navrhnout minimální opravu, která by dataset vrátila do sdílené workshopové kvality.
 
+## Runtime a kontrakt
+
+- Runtime: local deterministic.
+- Stabilní lab contract: [Lab 01](../facilitator/lab-contracts.md#lab-01---dataset-quality-audit).
+- Při opakovaném běhu se nemá měnit pořadí ani score.
+
 ## Soubory
 
 - `evals/01-dataset-quality.eval.ts`
@@ -43,6 +49,12 @@ Ve výstupu nejdřív hledejte `rowStatus`. Hodnota `broken` říká, že checke
 Jako hlavní příklad použijte `translation-cancel-booking-incomplete`. Je to production-candidate style case: překlad destruktivní akce `Cancel booking` nesmí změkčit ani otočit význam. Dataset row ale nemá `labels` ani `expectedBehavior`, takže další tester zatím neví, proč case existuje a podle čeho má rozhodnout release gate.
 
 Pokud chcete udělat kontrolovaný experiment, navrhněte jednu konkrétní opravu řádku `broken-empty-edit-targets`: jaký `participantEditTargets` by dával smysl a jaký validní `minIntentConfidence` byste nastavili. Opravu můžete diskutovat jako diff návrh; pointa labu je audit, ne masová editace datasetu.
+
+## Kontrolní otázky
+
+- Proč může být score zelené, i když je dataset row rozbitý?
+- Který field by nejvíc mátl dalšího testera při release rozhodnutí?
+- Jaký je nejmenší fix, který nezmění smysl původního case?
 
 ## Gate / ověření
 

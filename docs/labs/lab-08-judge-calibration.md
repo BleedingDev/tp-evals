@@ -10,6 +10,12 @@ Pokud calibration failne, neznamená to automaticky, že aplikace je špatná. N
 
 Ověřit, že známé příklady padají do očekávaných score bands a že borderline případ zůstává reviewovatelný místo toho, aby byl falešně zelený nebo červený.
 
+## Runtime a kontrakt
+
+- Runtime: judge calibration.
+- Stabilní lab contract: [Lab 08](../facilitator/lab-contracts.md#lab-08---judge-calibration).
+- Tento lab testuje judge, ne aplikaci; `band ok` znamená správné pásmo, ne dobrý output.
+
 ## Soubory
 
 - `evals/08-judge-calibration.eval.ts`
@@ -44,6 +50,12 @@ Tabulku čtěte takto:
 5. `dimensionScores`, které score táhnou nahoru nebo dolů.
 
 Pak navrhněte jednu kalibrační změnu. Typicky zpřesněte hranici borderline pásma, aby známý hraniční případ nebyl automaticky považovaný za release pass. Nehýbejte pásmem jen proto, aby aktuální výstup prošel; napište QA důvod.
+
+## Kontrolní otázky
+
+- Trefil judge očekávané pásmo good, borderline nebo bad?
+- Která dimenze je nejslabší a proč?
+- Je judge připravený pro gate, nebo zatím jen pro review?
 
 ## Gate / ověření
 

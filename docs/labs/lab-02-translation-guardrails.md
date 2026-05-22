@@ -8,6 +8,12 @@ Testujete překladový tok, ve kterém musí model překládat běžný text, al
 
 Ověřit, že rule-based scorer chrání strukturální fragmenty nezávisle na obecném dojmu z překladu, a zpřesnit jednu dataset expectation tak, aby QA signál nebyl jen kosmetický.
 
+## Runtime a kontrakt
+
+- Runtime: live generation + deterministic scorers.
+- Stabilní lab contract: [Lab 02](../facilitator/lab-contracts.md#lab-02---translation-guardrails).
+- Pořadí cases má být stabilní, ale score se v live režimu může změnit podle výstupu modelu.
+
 ## Soubory
 
 - `.evalite/results/lab-02.json` = výsledek běhu: output, scores, detaily.
@@ -64,6 +70,12 @@ Pro každý případ si zapište:
 Po experimentu odeberte `{{missing_placeholder}}`. Smyslem není dataset trvale rozbít, ale pochopit vztah mezi dataset expectation, scorerem a výsledným score.
 
 V Evalite porovnejte scorery `text_guardrails`, `forbidden_phrases` a `protected_fragment_breakdown`. Zajímejte se o to, jestli selhání ukazuje konkrétní porušený fragment, ne jen nízký průměr.
+
+## Kontrolní otázky
+
+- Který konkrétní fragment se nesmí změnit byte-for-byte?
+- Je chyba strukturální hard fail, nebo jen horší jazyková kvalita?
+- Sledujete při experimentu pořád stejný case ID `translation-edge-placeholders-es`?
 
 ## Gate / ověření
 
