@@ -10,10 +10,11 @@ Ověřit, že rule-based scorer chrání strukturální fragmenty nezávisle na 
 
 ## Soubory
 
-- `evals/02-translation-guardrails.eval.ts`
-- `data/evals/translations-edge-cases.jsonl`
-- `src/apps/translation.ts`
-- `src/scorers/text-quality.ts`
+- `.evalite/results/lab-02.json` = výsledek běhu: output, scores, detaily.
+- `data/evals/translations-edge-cases.jsonl` = dataset: input a expected.
+- `evals/02-translation-guardrails.eval.ts` = scoring logika.
+- `src/apps/translation.ts` = testovaná překladová funkce.
+- `src/scorers/text-quality.ts` = sdílené scorery pro textové guardrails.
 
 ## Úkol
 
@@ -23,24 +24,26 @@ Spusťte lab:
 pnpm run lab:02
 ```
 
-Nejdřív si přečtěte existující fail:
+### A. Analýza připraveného failu, bez editace
 
-1. V tabulce najděte `translation-edge-tags-fr`.
-2. Otevřete `.evalite/results/lab-02.json`.
-3. Najděte stejný case a podívejte se na `scores`.
-4. Určete, které tvrdé pravidlo spadlo: tag, protected code, forbidden phrase, nebo glossary.
+1. Otevřete `.evalite/results/lab-02.json`.
+2. Najděte `translation-edge-tags-fr`.
+3. Čtěte `output.text` a `scores`.
+4. Očekávání porovnejte s dataset row v `data/evals/translations-edge-cases.jsonl`: hlavně `expected.mustPreserve` a `expected.forbiddenPatterns`.
+5. Určete, které tvrdé pravidlo spadlo: tag, protected code, forbidden phrase, nebo glossary.
 
-Tenhle case jen analyzujte. Do `translation-edge-tags-fr` nepřidávejte placeholders.
+`translation-edge-tags-fr` neupravujte. Je to hotový příklad failu, na kterém se učíte číst výsledek.
 
-Potom udělejte kontrolovaný experiment na passing case:
+### B. Kontrolovaný experiment, editace jiného case
 
 1. Otevřete `data/evals/translations-edge-cases.jsonl`.
 2. Najděte `translation-edge-placeholders-es`.
 3. Do `input.placeholders` přidejte třetí hodnotu `{{missing_placeholder}}`.
 4. Spusťte znovu `pnpm run lab:02`.
-5. Sledujte, že scorer začne čekat placeholder, který output neobsahuje, a score spadne.
+5. V `.evalite/results/lab-02.json` zkontrolujte `translation-edge-placeholders-es` a jeho `scores`.
+6. Sledujte, že scorer začne čekat placeholder, který output neobsahuje, a score spadne.
 
-Pozor: pro tento placeholder case scorer čte očekávané placeholdery z `input.placeholders`, ne z `expected.mustPreserve`.
+Pozor: pro tento placeholder case scorer čte očekávané placeholdery z `input.placeholders`, ne z `expected.mustPreserve`. Změna `expected.mustPreserve` placeholder guardrail nerozbije.
 
 Pro každý případ si zapište:
 
