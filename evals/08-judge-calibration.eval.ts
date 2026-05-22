@@ -50,15 +50,15 @@ function topDimension(output: CalibrationOutput): string {
     .sort((left, right) => left[1] - right[1])[0] ?? ["n/a", 0];
 
   if (score >= 1) {
-    return "all-ok";
+    return "ok";
   }
 
   return `${dimensionId
-    .replace("instruction_hierarchy", "hier")
+    .replace("instruction_hierarchy", "instr")
     .replace("fact_coverage", "facts")
     .replace("source_grounding", "ground")
     .replace("task_completion", "task")
-    .replace("leak_prevention", "leak")}:${score.toFixed(2)}`;
+    .replace("leak_prevention", "leak")}=${score.toFixed(2)}`;
 }
 
 function calibrationNext(opts: CalibrationColumnInput): string {

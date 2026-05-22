@@ -348,7 +348,9 @@ const printLab08ReadingGuide = (): void => {
   console.log("- Tohle testuje judge, ne aplikaci.");
   console.log("- `band` je očekávané pásmo: good, borderline, nebo bad.");
   console.log("- `score` je reálné judge score.");
-  console.log("- `weakest` ukazuje nejslabší dimenzi, kterou má QA zkontrolovat.");
+  console.log("- `weakest` ukazuje nejslabší judge dimenzi a její separátní skóre, například `facts=0.72`.");
+  console.log("- `ok` znamená, že všechny judge dimenze vyšly na 1.00.");
+  console.log("- Zkratky: facts=fakta, ground=zdroj, task=splnění úkolu, instr=injected instrukce, leak=únik/interní instrukce.");
   console.log("- `next` říká cal ok, review, nebo recalibrate.");
   console.log("");
   console.log("Jak postupovat:");
