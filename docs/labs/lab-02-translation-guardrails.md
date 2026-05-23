@@ -35,7 +35,10 @@ Tabulku čtěte takto:
 - Pořadí řádků není součást úkolu. Vždy se orientujte podle `case`.
 - `guard` je hard guardrail score: placeholders, tagy, kódy a glossary.
 - `forbid` je kontrola zakázaných tvarů a rozbitých protected fragmentů.
+- `frag` je samostatný breakdown chráněných fragmentů: placeholders, tagy a glossary.
+- Finální `Score` je průměr viditelných scorerů `guard`, `forbid` a `frag`.
 - `next` říká první QA problém: hard fail, forbidden, review, nebo pass.
+- `next` má pro QA vyšší váhu než průměr. Case může mít slušný průměr a stejně být hard fail, pokud spadne chráněný fragment.
 
 ### A. Analýza připraveného failu, bez editace
 
@@ -44,6 +47,7 @@ Tabulku čtěte takto:
 3. Čtěte `output.text` a `scores`.
 4. Očekávání porovnejte s dataset row v `data/evals/translations-edge-cases.jsonl`: hlavně `expected.mustPreserve` a `expected.forbiddenPatterns`.
 5. Určete, které tvrdé pravidlo spadlo: tag, protected code, forbidden phrase, nebo glossary.
+6. Pokud finální `Score` působí překvapivě, zkontrolujte i `frag`; počítá se do průměru stejně jako `guard` a `forbid`.
 
 `translation-edge-tags-fr` neupravujte. Je to hotový příklad failu, na kterém se učíte číst výsledek.
 

@@ -14,7 +14,11 @@ import {
 import { createStructuredOutputScorer } from "../src/scorers/structured-output";
 import { runMobileSearch } from "../src/variants/run-variants";
 
-import { loadLabData } from "./lab-utils";
+import {
+  formatScore,
+  loadLabData,
+  namedScore,
+} from "./lab-utils";
 
 type MobileSearchColumnInput = Evalite.ColumnInput<
   MobileSearchRecord,
@@ -145,6 +149,8 @@ function mobileSearchIntentColumns(
       label: "slots",
       value: `${matchingRequiredSlots(opts)}/${requiredSlotCount} ${missingStatus}`,
     },
+    { label: "schema", value: formatScore(namedScore(opts.scores, "structured_output")) },
+    { label: "noinv", value: formatScore(namedScore(opts.scores, "disallowed_slots")) },
     { label: "next", value: nextAction(opts) },
   ];
 }

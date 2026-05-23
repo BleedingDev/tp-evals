@@ -19,7 +19,7 @@ Use this as the stable instructor-facing map for every lab. The same contract is
 - Anchor case: `translation-edge-tags-fr`
 - Experiment case: `translation-edge-placeholders-es`
 - Open: `.evalite/results/lab-02.json`, `data/evals/translations-edge-cases.jsonl`
-- Read: `output.text`, `scores`, `expected.mustPreserve`, `expected.forbiddenPatterns`
+- Read: `output.text`, `scores`, `guard`, `forbid`, `frag`, `expected.mustPreserve`
 - Edit: add `{{missing_placeholder}}` to `input.placeholders` in `translation-edge-placeholders-es`
 - Expected signal: the same case starts expecting a placeholder that the output does not contain, so guard score drops
 - Reset: remove `{{missing_placeholder}}`
@@ -41,7 +41,7 @@ Use this as the stable instructor-facing map for every lab. The same contract is
 - Runtime: live generation + deterministic scorers
 - Anchor case: `mobile-intent-open-third-no-context`
 - Open: `.evalite/results/lab-04.json`, `data/evals/mobile-search-intents.jsonl`
-- Read: `intent expected->actual`, `slots`, `missingSlots`, `confidence`
+- Read: `intent expected->actual`, `slots`, `missingSlots`, `confidence`, `schema`, `noinv`
 - Edit: add or refine one disallowed or missing slot on an ambiguous case
 - Expected signal: `next` points to intent, invented, missing, slots, confidence, or pass
 - Reset: revert the dataset edit if it was only a controlled experiment
@@ -52,7 +52,7 @@ Use this as the stable instructor-facing map for every lab. The same contract is
 - Runtime: live generation + judge
 - Anchor case: `mobile-convo-nonstop-ambiguous`
 - Open: `.evalite/results/lab-05.json`, `data/evals/mobile-search-conversation.jsonl`
-- Read: conversation history, current utterance, carried slots, missing slots
+- Read: conversation history, current utterance, carried slots, missing slots, `schema`, `state`, `judge`
 - Edit: change visible result history so the ambiguous reference becomes unique
 - Expected signal: action-vs-clarification behavior changes
 - Reset: restore the ambiguous history
@@ -85,7 +85,7 @@ Use this as the stable instructor-facing map for every lab. The same contract is
 - Runtime: judge calibration
 - Anchor case: `judge-borderline-summary`
 - Open: `.evalite/results/lab-08.json`, `evals/08-judge-calibration.eval.ts`
-- Read: `targetBand`, `minScore`, `maxScore`, `dimensionScores`, `weakest`
+- Read: `targetBand`, `minScore`, `maxScore`, `judge`, `weakest`, `fit`
 - Edit: adjust one borderline band boundary with a QA reason
 - Expected signal: known good and known bad stay in their bands; borderline remains reviewable
 - Reset: restore the band if the edit was only a calibration demo

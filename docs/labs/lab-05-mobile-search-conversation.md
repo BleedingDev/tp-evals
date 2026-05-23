@@ -47,7 +47,10 @@ Evalite tabulku čtěte takto:
 
 - `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu.
 - `slots` je počet správně přenesených required slots + stav `missingSlots`.
+- `schema` je scorer `structured_output`: tvar odpovědi, intent, slots, missingSlots a confidence.
 - `state` je skóre scoreru `conversation_state`.
+- `judge` je LLM-as-a-Judge nad kvalitou rozhodnutí v kontextu konverzace.
+- Finální `Score` je průměr viditelných scorerů `schema`, `state` a `judge`.
 - `next` říká první QA problém: intent, missing, slots, confidence, state, policy, nebo pass.
 - Missing fields a špatné slots mají prioritu před confidence. Nejdřív ověřte, zda model bezpečně ví, s čím pracuje; teprve potom řešte, jak jistý si je.
 
@@ -85,4 +88,4 @@ Lektorský anchor pro tento experiment je `mobile-convo-nonstop-ambiguous`. Neř
 
 Rozhodněte, jestli conversation state extraction může spustit navazující UI akci bez lidského zásahu.
 
-Za blocker považujte zejména špatně přenesený route/date context, ignorovanou nejednoznačnost nebo vymyšlený `resultId`.
+Za blocker považujte zejména špatně přenesený route/date context, ignorovanou nejednoznačnost nebo vymyšlený jednoznačný výběr výsledku.

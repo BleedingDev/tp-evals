@@ -53,8 +53,13 @@ function shortCaseType(type: TranslationRecord["caseType"]): string {
 function guardrailNext(opts: GuardrailColumnInput): string {
   const guard = namedScore(opts.scores, "text_guardrails");
   const forbidden = namedScore(opts.scores, "forbidden_phrases");
+  const fragments = namedScore(opts.scores, "protected_fragment_breakdown");
 
   if (typeof guard === "number" && guard < 0.7) {
+    return "hard fail";
+  }
+
+  if (typeof fragments === "number" && fragments < 0.75) {
     return "hard fail";
   }
 
@@ -77,6 +82,7 @@ function guardrailColumns(
     { label: "type", value: shortCaseType(opts.input.caseType) },
     { label: "guard", value: formatScore(namedScore(opts.scores, "text_guardrails")) },
     { label: "forbid", value: formatScore(namedScore(opts.scores, "forbidden_phrases")) },
+    { label: "frag", value: formatScore(namedScore(opts.scores, "protected_fragment_breakdown")) },
     { label: "next", value: guardrailNext(opts) },
   ];
 }

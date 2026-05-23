@@ -60,7 +60,7 @@ const labs = [
       ".evalite/results/lab-02.json",
       "data/evals/translations-edge-cases.jsonl",
     ],
-    read: ["output.text", "scores", "expected.mustPreserve", "expected.forbiddenPatterns"],
+    read: ["output.text", "scores", "guard", "forbid", "frag", "expected.mustPreserve"],
     edit: "Do input.placeholders u translation-edge-placeholders-es přidejte {{missing_placeholder}}.",
     expectedSignal: "Stejný case začne čekat placeholder, který output neobsahuje, a guard score spadne.",
     reset: "Po experimentu {{missing_placeholder}} zase odeberte.",
@@ -93,7 +93,7 @@ const labs = [
       ".evalite/results/lab-04.json",
       "data/evals/mobile-search-intents.jsonl",
     ],
-    read: ["intent expected->actual", "slots", "missingSlots", "confidence"],
+    read: ["intent expected->actual", "slots", "missingSlots", "confidence", "schema", "noinv"],
     edit: "Přidejte nebo zpřesněte jeden disallowed/missing slot u ambiguous case.",
     expectedSignal: "next ukáže intent, invented, missing, slots, confidence, nebo pass.",
     reset: "Vraťte dataset edit, pokud šlo jen o kontrolovaný experiment.",
@@ -109,7 +109,7 @@ const labs = [
       ".evalite/results/lab-05.json",
       "data/evals/mobile-search-conversation.jsonl",
     ],
-    read: ["conversation history", "current utterance", "carried slots", "missingSlots"],
+    read: ["conversation history", "current utterance", "carried slots", "missingSlots", "schema", "state", "judge"],
     edit: "U ambiguous historie změňte viditelné výsledky tak, aby reference byla jednoznačná.",
     expectedSignal: "Změní se action-vs-clarification signál a carried/missing slot behavior.",
     reset: "Vraťte historii na původní ambiguous variantu.",
@@ -158,7 +158,7 @@ const labs = [
       ".evalite/results/lab-08.json",
       "evals/08-judge-calibration.eval.ts",
     ],
-    read: ["targetBand", "minScore", "maxScore", "dimensionScores", "weakest"],
+    read: ["targetBand", "minScore", "maxScore", "judge", "weakest", "fit"],
     edit: "Zpřesněte jednu hranici borderline pásma s QA důvodem.",
     expectedSignal: "Known good/bad zůstanou ve správném pásmu a borderline zůstane review.",
     reset: "Vraťte hranici, pokud šlo jen o kalibrační demonstraci.",
@@ -473,7 +473,10 @@ const printLab02ReadingGuide = (): void => {
   console.log("- Pořadí řádků neberte jako součást úkolu. Vždy se orientujte podle `case`.");
   console.log("- `guard` je hard guardrail score: placeholders, tagy, kódy a glossary.");
   console.log("- `forbid` je kontrola zakázaných tvarů a rozbitých protected fragmentů.");
+  console.log("- `frag` je samostatný breakdown chráněných fragmentů: placeholders, tagy a glossary.");
+  console.log("- Finální `Score` je průměr viditelných scorerů `guard`, `forbid` a `frag`.");
   console.log("- `next` říká první QA problém: hard fail, forbidden, review, nebo pass.");
+  console.log("- `next` má pro QA vyšší váhu než průměr. Case může mít slušný průměr a stejně být hard fail.");
   console.log("- `.evalite/results/lab-02.json` = výsledek běhu: output, scores, detaily.");
   console.log("- `data/evals/translations-edge-cases.jsonl` = dataset: input a expected.");
   console.log("- `evals/02-translation-guardrails.eval.ts` = scoring logika, pokud ji chcete prohlédnout.");
@@ -484,6 +487,7 @@ const printLab02ReadingGuide = (): void => {
   console.log("3. Čtěte `output.text` a `scores`.");
   console.log("4. Očekávání porovnejte s řádkem v datasetu: `expected.mustPreserve` a `expected.forbiddenPatterns`.");
   console.log("5. `translation-edge-tags-fr` neupravujte. Je to hotový příklad failu.");
+  console.log("6. Pokud Score vypadá překvapivě, zkontrolujte i `frag`; ten se do Score počítá stejně jako `guard` a `forbid`.");
   console.log("");
   console.log("B. Kontrolovaný experiment, editace jiného case:");
   console.log("1. Otevřete `data/evals/translations-edge-cases.jsonl`.");
@@ -535,6 +539,9 @@ const printLab04ReadingGuide = (): void => {
   console.log("  Zkratky: `ask` = ask_clarification, `find` = find_item, `open` = open_result.");
   console.log("- `conf` je skutečná confidence / minimální confidence z datasetu.");
   console.log("- `slots` je počet správně vyplněných required slots + stav missingSlots.");
+  console.log("- `schema` je scorer `structured_output`: intent, required slots, missingSlots a confidence.");
+  console.log("- `noinv` je scorer `disallowed_slots`: jestli model nevymyslel zakázané pole.");
+  console.log("- Finální `Score` je průměr viditelných scorerů `schema` a `noinv`.");
   console.log("- `next` říká první věc, kterou má QA řešit: intent, invented, missing, slots, confidence, policy, nebo pass.");
   console.log("- Missing fields a špatné slots mají prioritu před confidence.");
   console.log("");
@@ -552,7 +559,10 @@ const printLab05ReadingGuide = (): void => {
   console.log("Jak číst Lab 05:");
   console.log("- `intent` čtěte jako `expected->actual`: vlevo je očekávání, vpravo výstup modelu.");
   console.log("- `slots` je carried/current required slots + stav missingSlots.");
+  console.log("- `schema` je scorer `structured_output`: tvar odpovědi, intent, slots, missingSlots a confidence.");
   console.log("- `state` je skóre conversation_state: intent + carried slots + missing behavior.");
+  console.log("- `judge` je LLM-as-a-Judge nad kvalitou rozhodnutí v kontextu konverzace.");
+  console.log("- Finální `Score` je průměr viditelných scorerů `schema`, `state` a `judge`.");
   console.log("- `next` říká první QA problém: intent, missing, slots, confidence, state, policy, nebo pass.");
   console.log("- Missing fields a špatné slots mají prioritu před confidence.");
   console.log("");
@@ -608,8 +618,10 @@ const printLab08ReadingGuide = (): void => {
   console.log("Jak číst Lab 08:");
   console.log("- Tohle testuje judge, ne aplikaci.");
   console.log("- `band` je očekávané pásmo: good, borderline, nebo bad.");
-  console.log("- `score` je reálné judge score.");
+  console.log("- `judge` je reálné judge score.");
   console.log("- `weakest` ukazuje nejslabší judge dimenzi a její separátní skóre, například `facts=0.72`.");
+  console.log("- `fit` je scorer `calibration_band`: jestli judge score spadlo do očekávaného pásma.");
+  console.log("- Finální `Score` je `fit`, ne kvalita hodnoceného outputu.");
   console.log("- `ok` znamená, že všechny judge dimenze vyšly na 1.00.");
   console.log("- Zkratky: facts=fakta, ground=zdroj, task=splnění úkolu, instr=injected instrukce, leak=únik/interní instrukce.");
   console.log("- `next` říká band ok, review, nebo recalibrate.");
@@ -726,8 +738,12 @@ const labPortFor = (lab: LabDefinition): string => {
   return process.env["EVALITE_LAB_PORT"] ?? String(3100 + Math.max(labIndex, 0) * 10);
 };
 
+const labDbPathFor = (lab: LabDefinition): string =>
+  resolve(rootDir, ".evalite", "db", `${lab.command.replace(":", "-")}.db`);
+
 const envForLab = (lab: LabDefinition): NodeJS.ProcessEnv => ({
   EVALITE_PORT: labPortFor(lab),
+  EVALITE_DB_PATH: labDbPathFor(lab),
   ...(parsedArgs.workshopMode === undefined
     ? {}
     : {
@@ -888,6 +904,7 @@ const runLab = async (lab: LabDefinition): Promise<never> => {
   printLabContract(lab);
   const resultPath = resultPathFor(lab.command.replace(":", "-"));
   await mkdir(dirname(resultPath), { recursive: true });
+  await mkdir(dirname(labDbPathFor(lab)), { recursive: true });
 
   const exitCode = await runEvaliteBinary([
     "run",
@@ -915,6 +932,7 @@ const runLabAll = async (): Promise<never> => {
     console.log(`Running ${lab.label}: ${lab.file}`);
     printLabContract(lab);
     const resultPath = resultPathFor(lab.command.replace(":", "-"));
+    await mkdir(dirname(labDbPathFor(lab)), { recursive: true });
     const exitCode = await runEvaliteBinary([
       "run",
       lab.file,

@@ -45,6 +45,9 @@ Tabulku čtěte takto:
 - `intent` čtěte jako `expected->actual`: vlevo je očekávání z datasetu, vpravo výstup modelu. Zkratky: `ask` = `ask_clarification`, `find` = `find_item`, `open` = `open_result`.
 - `conf` je skutečná confidence / minimální confidence z datasetu.
 - `slots` je počet správně vyplněných required slots + stav `missingSlots`.
+- `schema` je scorer `structured_output`: tvar odpovědi, intent, required slots, missingSlots a confidence.
+- `noinv` je scorer `disallowed_slots`: jestli model nevymyslel zakázané pole.
+- Finální `Score` je průměr viditelných scorerů `schema` a `noinv`.
 - `next` říká první věc, kterou má QA řešit: intent, invented, missing, slots, confidence, policy, nebo pass.
 - Missing fields a špatné slots mají prioritu před confidence. Nízká confidence je důležitá, ale až po kontrole, zda výstup vůbec obsahuje správná pole.
 

@@ -36,8 +36,10 @@ V `evals/08-judge-calibration.eval.ts` najděte `calibrationData`. Pro každý p
 Tabulku čtěte takto:
 
 - `band` je očekávané pásmo: good, borderline, nebo bad.
-- `score` je reálné judge score.
+- `judge` je reálné judge score.
 - `weakest` je nejslabší judge dimenze a její separátní skóre, například `facts=0.72`.
+- `fit` je scorer `calibration_band`: jestli judge score spadlo do očekávaného pásma.
+- Finální `Score` je `fit`, ne kvalita hodnoceného outputu.
 - `ok` ve sloupci `weakest` znamená, že všechny judge dimenze vyšly na 1.00.
 - Zkratky dimenzí: `facts` = pokrytí požadovaných faktů, `ground` = držení se zdroje, `task` = splnění úkolu, `instr` = ignorování injected instrukcí, `leak` = žádný únik/inventování interních instrukcí.
 - `next` říká band ok, review, nebo recalibrate.

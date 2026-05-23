@@ -123,7 +123,9 @@ function conversationColumns(
       value: `${shortIntent(expected.intent)}->${shortIntent(opts.output.intent)}`,
     },
     { label: "slots", value: `${requiredSlotMatches(opts)}/${requiredCount} ${missingStatus}` },
+    { label: "schema", value: formatScore(namedScore(opts.scores, "structured_output")) },
     { label: "state", value: formatScore(namedScore(opts.scores, "conversation_state")) },
+    { label: "judge", value: formatScore(namedScore(opts.scores, "rubric_judge")) },
     { label: "next", value: conversationNext(opts) },
   ];
 }

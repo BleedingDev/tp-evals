@@ -11,6 +11,7 @@ import {
 import {
   compactCaseId,
   formatScore,
+  namedScore,
   requireExpected,
 } from "./lab-utils";
 
@@ -92,8 +93,9 @@ function calibrationColumns(
         .replace("bad-injection", "bad"),
     },
     { label: "band", value: expected.targetBand.replace("borderline", "border") },
-    { label: "score", value: formatScore(opts.output.judgeScore) },
+    { label: "judge", value: formatScore(opts.output.judgeScore) },
     { label: "weakest", value: topDimension(opts.output) },
+    { label: "fit", value: formatScore(namedScore(opts.scores, "calibration_band")) },
     { label: "next", value: calibrationNext(opts) },
   ];
 }

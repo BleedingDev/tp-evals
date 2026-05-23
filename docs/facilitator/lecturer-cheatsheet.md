@@ -87,6 +87,18 @@ Kontrolujeme:
 - glossary
 - forbidden patterns
 
+Sloupce:
+
+- `guard`: sdruzene hard guardrails
+- `forbid`: zakazane tvary / explicitni forbidden patterns
+- `frag`: breakdown protected fragments, pocita se do finalniho Score
+- `next`: prvni QA krok
+
+Rikat:
+
+> Finalni Score je prumer scoreru `guard`, `forbid` a `frag`. Kdyz je `guard` vyssi, ale Score nizsi, hledejte rozdil ve `frag`.
+> `next` je QA rozhodnuti, ne prumer. Chraneny fragment muze udelat hard fail i pri relativne vysokem Score.
+
 `translation-edge-tags-fr` je pripraveny fail. Jen analyzovat.
 
 `translation-edge-placeholders-es` je experimentalni case. Tam mohou pridat `{{missing_placeholder}}`.
@@ -184,6 +196,8 @@ Sloupce:
 - `intent`: expected->actual
 - `conf`: confidence / threshold
 - `slots`: required slots + missing status
+- `schema`: scorer structured_output
+- `noinv`: scorer disallowed_slots
 - `next`: prvni QA problem
 
 Rikat:
@@ -211,6 +225,13 @@ Ukol:
 3. oznacit carried slots, new slots, missing slots
 4. rozhodnout action vs clarification
 5. upravit ambiguous historii na jednoznacnou a pustit znovu
+
+Sloupce:
+
+- `schema`: structured output shape + intent/slots/missing/confidence
+- `state`: conversation-state scorer
+- `judge`: kvalita rozhodnuti v kontextu konverzace
+- `next`: prvni QA krok
 
 ## Lab 05 Ambiguous Reference
 
@@ -256,7 +277,7 @@ Cist:
 
 Rikat:
 
-> Lepsi average nestaci, pokud high-risk case failuje.
+> Lepsi average nestaci, pokud konkretni protected-fragment case failuje. Nevybirame vitezny prompt jen podle prumeru.
 
 ## Lab 07
 
@@ -282,7 +303,14 @@ Tady netestujeme aplikaci. Testujeme judge.
 
 Known good ma byt good. Known bad ma byt bad. Borderline ma zustat review.
 
-`next=cal ok` znamena, ze kalibrace dopadla spravne, ne ze output je dobry.
+Sloupce:
+
+- `judge`: realne score, ktere judge dal hodnocenemu outputu
+- `weakest`: nejslabsi dimenze judge hodnoceni
+- `fit`: jestli `judge` spadlo do ocekavaneho pasma
+- `Score`: stejne jako `fit`, tedy kvalita kalibrace, ne kvalita outputu
+
+`next=band ok` znamena, ze kalibrace dopadla spravne, ne ze output je dobry.
 
 ## Lab 09
 

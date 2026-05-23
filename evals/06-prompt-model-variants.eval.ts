@@ -9,7 +9,6 @@ import {
 import { createJudgeScorer } from "../src/scorers/judge";
 import { createTextGuardrailScorer } from "../src/scorers/text-quality";
 import {
-  getVariant,
   runTranslation,
   type VariantId,
 } from "../src/variants/run-variants";
@@ -102,18 +101,6 @@ evalite.each(variants)<TranslationRecord, TranslationOutput, TranslationRecord["
         output: ({ output }) => output.text,
         threshold: 0.68,
       }),
-      {
-        name: "variant_profile",
-        description: "Reports the live prompt variant under test.",
-        scorer: (_input) => ({
-          score: 1,
-          name: "variant_profile",
-          description: "Variant metadata is attached for comparison.",
-          metadata: {
-            variants: variants.map((variant) => getVariant(variant.input)),
-          },
-        }),
-      },
     ],
     columns: variantColumns,
   },
